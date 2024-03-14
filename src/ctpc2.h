@@ -95,9 +95,12 @@ typedef struct _ctp_trader_t {
 ctp_trader_t * ctp_trader_new();
 ctp_trader_t * ctp_trader_init(ctp_trader_t * trader, const char front_addr[], const char broker[], 
     const char user[], const char password[], const char app_id[], const char auth_code[]);
+ctp_trader_t * ctp_trader_start(ctp_trader_t * trader);
+void ctp_trader_wait_for_settle(ctp_trader_t * t);
 
 
 typedef struct {
+    int req_id;
     uint32_t rsp_typ;
     void * field;
     size_t size;

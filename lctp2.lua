@@ -46,7 +46,7 @@ local servers = {
         ["gtja-1"] = { front_addr =  "tcp://180.169.75.18:61213", broker = "7090", user = "85194065" }
     },
     trader = {
-        ["sim"] = {
+        ["openctp"] = {
             front_addr = "tcp://121.37.80.177:20002", 
             broker = "7090", 
             user = "7572", 
@@ -88,7 +88,8 @@ end
 
 function new_trader(server)
     -- local trader = ctpc.ctp_trader_init(nil, "tcp://121.37.80.177:20002", "7090", "7572", "123456", "client_tara_060315", "20221011TARA000");
-    local trader = ctpc.ctp_trader_init(nil, server.front_addr, 
+    local trader = ctpc.ctp_trader_new()
+    ctpc.ctp_trader_init(trader, server.front_addr, 
         server.broker,
         server.user,
         server.pass,
@@ -96,9 +97,18 @@ function new_trader(server)
         server.auth_code
     )
     local _mt = {
-        is_ready = function(self) return (self.trader.connected >= 4) end,
+        start = function(self)  
+                ctpc.ctp_trader_start(self.trader)
+                ctpc.ctp_trader_wait_for_settle(self.trader)
+                return self
+            end,
+        -- is_ready = function(self) return (self.trader.connected >= 4) end,
+        recv = function (self)
+                return ffi.gc(ctpc.ctp_trader_recv(self.trader), ctpc.ctp_rsp_free)
+            end,
+        
         query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,
-        fetch_account = function(self, req_id) return ctpc.ctp_trader_fetch_account(self.trader, req_id) end,
+        -- fetch_account = function(self, req_id) return ctpc.ctp_trader_fetch_account(self.trader, req_id) end,
     }
 
     local T = { trader = trader }

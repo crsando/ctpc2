@@ -30,3 +30,51 @@ void ctp_position_free(ctp_position_t * l) {
         free(n);
     }
 }
+
+ctp_position_keeper_t * ctp_position_keeper_new() {
+    ctp_position_keeper_t * pk = (ctp_position_keeper_t *)malloc(sizeof(ctp_position_keeper_t));
+    memset(pk, 0, sizeof(ctp_position_keeper_t));
+    pthread_mutex_init(&pk->lock, NULL);
+}
+
+int ctp_position_keeper_update(ctp_position_keeper_t * pk, struct CThostFtdcInvestorPositionField * data, int last) {
+    ctp_position_t * p = ctp_position_create(data);
+    if( pk->cache == NULL ) {
+        pk->cache = p;
+    }
+    else {
+        ctp_position_append(pk->cache, p);
+    }
+
+    if( last ) {
+        // lock
+        pthread_mutex_lock(&pk->lock);
+
+        ctp_position_free(pk->curr);
+        pk->curr = pk->cache;
+        pk->cache = NULL;
+
+        pthread_mutex_unlock(&pk->lock);
+    }
+}
+ctp_position_t * ctp_position_keeper_localcopy(ctp_position_keeper_t * pk) {
+    pthread_mutex_lock(&pk->lock);
+    ctp_position_t * p = pk->curr;
+    ctp_position_t * copy = NULL;
+    ctp_position_t * q = NULL;
+
+    while (p != NULL) {
+        q = ctp_position_create(&p->field);
+        if(copy == NULL) {
+            copy = q;
+        }
+        else {
+            ctp_position_append(copy, q);
+        }
+        p = p->nxt;
+    }
+
+    pthread_mutex_unlock(&pk->lock);
+
+    return copy;
+}

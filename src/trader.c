@@ -2,12 +2,15 @@
 #include "cond.h"
 #include "queue.h"
 
+#define _SERVICE_MQ_DEF_SIZE_ (1024)
+
 ctp_trader_t * ctp_trader_new() {
     ctp_trader_t * t = (ctp_trader_t *)malloc(sizeof(ctp_trader_t));
     memset(t, 0, sizeof(ctp_trader_t));
     t->q = queue_new_ptr(_SERVICE_MQ_DEF_SIZE_);
     t->c = (struct cond *)malloc(sizeof(struct cond));
     cond_create(t->c);
+    return t;
 }
 
 void ctp_trader_send(ctp_trader_t * t, ctp_rsp_t * msg) {
@@ -38,5 +41,17 @@ void ctp_rsp_free(ctp_rsp_t * r) {
     free(r);
 }
 
-int ctp_trader_query(ctp_trader_t * trader, ctp_trader_req_cb func, void * field);
-void * ctp_trader_fetch(ctp_trader_t * trader, int req_id);
+//
+
+void ctp_trader_wait_for_settle(ctp_trader_t * t) {
+    while(1) {
+        ctp_rsp_t * rsp = ctp_trader_recv(t);
+        if (t->connected == 4) {
+            return;
+        }
+    }
+}
+
+
+// int ctp_trader_query(ctp_trader_t * trader, ctp_trader_req_cb func, void * field);
+// void * ctp_trader_fetch(ctp_trader_t * trader, int req_id);

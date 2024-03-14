@@ -12,6 +12,8 @@ ctpc2.o: ./src/ctpc2.cpp
 	g++ -c -fPIC ./src/ctpc2.cpp -I./$(CTP_VER) 
 md.o: ./src/md.c
 	gcc -c -fPIC ./src/md.c -lpthread -I./$(CTP_VER)
+trader.o: ./src/trader.c
+	gcc -c -fPIC ./src/trader.c -lpthread -I./$(CTP_VER)
 CustomTradeSpi.o: ./src/CustomTradeSpi.cpp
 	g++ -c -fPIC ./src/CustomTradeSpi.cpp -I./$(CTP_VER)
 CustomMdSpi.o: ./src/CustomMdSpi.cpp
@@ -27,8 +29,8 @@ util.o: ./src/util.c
 position.o: ./src/position.c
 	gcc -c -fPIC ./src/position.c -I./$(CTP_VER)
 
-libctpc2.so: ctpc2.o md.o queue.o log.o CustomMdSpi.o CustomTradeSpi.o reg.o position.o util.o
-	gcc ctpc2.o md.o queue.o log.o CustomTradeSpi.o CustomMdSpi.o reg.o position.o util.o \
+libctpc2.so: ctpc2.o md.o trader.o queue.o log.o CustomMdSpi.o CustomTradeSpi.o reg.o position.o util.o
+	gcc ctpc2.o md.o trader.o queue.o log.o CustomTradeSpi.o CustomMdSpi.o reg.o position.o util.o \
 		-shared -o libctpc2.so \
 		-Wl,-rpath,$(INST_LIB_PATH) \
 		-I./$(CTP_VER) -L./$(CTP_VER) -lthostmduserapi_se -lthosttraderapi_se

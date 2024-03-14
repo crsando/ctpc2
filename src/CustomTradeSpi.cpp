@@ -116,16 +116,29 @@ void CustomTradeSpi::OnRspUserLogout(
 	}
 }
 
+#define ON_RSP_THEN_SEND(tp) \
+	do { \
+		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
+		rsp->field = (void *)malloc(sizeof(tp)); \
+		memcpy(rsp->field, pField, sizeof(tp)); \
+		rsp->size = sizeof(tp); \
+		rsp->info = (CThostFtdcRspInfoField*)malloc(sizeof(CThostFtdcRspInfoField)); \
+		memcpy(rsp->info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
+		rsp->req_id = nRequestID; \
+		rsp->last = bIsLast ? 1 : 0; \
+		ctp_trader_send(this->_trader, rsp); \
+	} while(0)
+
 void CustomTradeSpi::OnRspSettlementInfoConfirm(
-	CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
+	CThostFtdcSettlementInfoConfirmField * pField,
 	CThostFtdcRspInfoField *pRspInfo,
 	int nRequestID,
 	bool bIsLast)
 {
-	if (!isErrorRspInfo(pRspInfo))
-	{
+	if (!isErrorRspInfo(pRspInfo)) {
 		this->_trader->connected = 4;
-		log_info("OnRspSettlementInfoConfirm | Success | ConfirmDate:%s %s", pSettlementInfoConfirm->ConfirmDate, pSettlementInfoConfirm->ConfirmTime);
+		log_info("OnRspSettlementInfoConfirm | Success | ConfirmDate:%s %s", pField->ConfirmDate, pField->ConfirmTime);
+		ON_RSP_THEN_SEND(CThostFtdcSettlementInfoConfirmField);
 	}
 	else {
 		log_info("OnRspSettlementInfoConfirm | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
@@ -137,16 +150,11 @@ void CustomTradeSpi::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument,
 	log_info("OnRspQryInstrument | %s | %s", pInstrument->ExchangeID, pInstrument->InstrumentID);
 }
 
-void CustomTradeSpi::OnRspQryTradingAccount( CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+
+
+void CustomTradeSpi::OnRspQryTradingAccount( CThostFtdcTradingAccountField * pField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t));
-	rsp->field = (void *)malloc(sizeof(CThostFtdcTradingAccountField));
-	memcpy(rsp->field, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
-	rsp->info = (CThostFtdcRspInfoField*)malloc(sizeof(CThostFtdcRspInfoField));
-	memcpy(rsp->info, pRspInfo);
-	rsp->req_id = nRequestID;
-	rsp->last = bIsLast ? 1 : 0;
-	ctp_trader_send(this->_trader, rsp);
+	ON_RSP_THEN_SEND(CThostFtdcTradingAccountField);
 }
 
 void CustomTradeSpi::OnRspQryInvestorPosition(

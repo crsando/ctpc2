@@ -133,21 +133,17 @@ ctp_trader_t * ctp_trader_init(
     pTradeSpi->_trader = trader;
     trader->_spi = (void *)pTradeSpi;
     trader->_api = (void *)pTradeUserApi;
-
-	// default on response handler
-	// trader->_on_rsp = ctp_trader_on_rsp;
-
 	pTradeUserApi->RegisterSpi(pTradeSpi);                      // 注册事件类
 	pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);    // 订阅公共流
 	pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);   // 订阅私有流
 	pTradeUserApi->RegisterFront(trader->front_addr);              // 设置交易前置地址
-	pTradeUserApi->Init();                                      // 连接运行
-	// pTradeUserApi->Join();
-	// return 0;
+
+	return trader;
+}
+ctp_trader_t * ctp_trader_start(ctp_trader_t * trader) {
+	_api(trader)->Init();
     return trader;
 }
-
-
 
 int ctp_trader_query_account(ctp_trader_t * trader) {
     log_debug("ctp_trader_query_account");
@@ -156,50 +152,47 @@ int ctp_trader_query_account(ctp_trader_t * trader) {
 	strcpy(tradingAccountReq.BrokerID, trader->broker);
 	strcpy(tradingAccountReq.InvestorID, trader->user);
 	CTP_TRADER_REQ(trader, QryTradingAccount, &tradingAccountReq);
-	// if(r == NULL)
-	// 	r = ctp_trader_new_req(trader);
-	// int rt = _api(trader)->ReqQryTradingAccount(&tradingAccountReq, r->req_id);
 }
 
-ctp_account_t * ctp_trader_fetch_account(ctp_trader_t * trader, int req_id) {
-    // log_debug("ctp_trader_fetch_account | %d", req_id);
-	ctp_account_t * field = NULL;
-	ctp_reg_t * r = NULL;
-	r = ctp_reg_get(trader->reg, req_id);
-	if (r) {
-        // same type effectively
-        field = (ctp_account_t *)malloc(sizeof(ctp_account_t));
-		memcpy(field, (struct CThostFtdcTradingAccountField *)(r->data), sizeof(struct CThostFtdcTradingAccountField));
-		ctp_reg_del(trader->reg, req_id);
-	}
-	return field;
-}
+// ctp_account_t * ctp_trader_fetch_account(ctp_trader_t * trader, int req_id) {
+//     // log_debug("ctp_trader_fetch_account | %d", req_id);
+// 	ctp_account_t * field = NULL;
+// 	ctp_reg_t * r = NULL;
+// 	r = ctp_reg_get(trader->reg, req_id);
+// 	if (r) {
+//         // same type effectively
+//         field = (ctp_account_t *)malloc(sizeof(ctp_account_t));
+// 		memcpy(field, (struct CThostFtdcTradingAccountField *)(r->data), sizeof(struct CThostFtdcTradingAccountField));
+// 		ctp_reg_del(trader->reg, req_id);
+// 	}
+// 	return field;
+// }
 
-void ctp_account_free(ctp_account_t * p) { free(p); }
+// void ctp_account_free(ctp_account_t * p) { free(p); }
 
-int ctp_trader_query_position(ctp_trader_t * trader) {
-	CThostFtdcQryInvestorPositionField field;
-	memset(&field, 0, sizeof(field));
-	strcpy(field.BrokerID, trader->broker);
-	strcpy(field.InvestorID, trader->user);
-	CTP_TRADER_REQ(trader, QryInvestorPosition, &field);
-}
+// int ctp_trader_query_position(ctp_trader_t * trader) {
+// 	CThostFtdcQryInvestorPositionField field;
+// 	memset(&field, 0, sizeof(field));
+// 	strcpy(field.BrokerID, trader->broker);
+// 	strcpy(field.InvestorID, trader->user);
+// 	CTP_TRADER_REQ(trader, QryInvestorPosition, &field);
+// }
 
-ctp_position_t * ctp_trader_fetch_position(ctp_trader_t * trader, int req_id) {
-	ctp_position_t * p = NULL;
-	ctp_reg_t * r = NULL;
-	r = ctp_reg_get(trader->reg, req_id);
-	if (r) {
-		p = ((ctp_position_t *)(r->data))->nxt;
-        if ( p->finished == 1 ) {
-            ctp_reg_del(trader->reg, req_id);
-            return p;
-        }
-        else {
-            return NULL; // not finished yet
-        }
-	}
-	return NULL;
-}
+// ctp_position_t * ctp_trader_fetch_position(ctp_trader_t * trader, int req_id) {
+// 	ctp_position_t * p = NULL;
+// 	ctp_reg_t * r = NULL;
+// 	r = ctp_reg_get(trader->reg, req_id);
+// 	if (r) {
+// 		p = ((ctp_position_t *)(r->data))->nxt;
+//         if ( p->finished == 1 ) {
+//             ctp_reg_del(trader->reg, req_id);
+//             return p;
+//         }
+//         else {
+//             return NULL; // not finished yet
+//         }
+// 	}
+// 	return NULL;
+// }
 
 } // end extern "C"
