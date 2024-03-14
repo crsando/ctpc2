@@ -29,9 +29,7 @@ for i = 1, 1 do
     print(act.Balance)
 end
 
-
 trader:query_position()
-
 
 local finished = false
 while not finished do 
