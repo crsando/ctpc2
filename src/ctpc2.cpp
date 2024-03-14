@@ -6,7 +6,6 @@
 #include "string.h"
 #include "stdlib.h"
 
-
 #include "CustomMdSpi.h"
 #include "CustomTradeSpi.h"
 
@@ -23,13 +22,11 @@ extern "C" {
 void ctp_md_start(ctp_md_t * md) {
     log_debug("ctp_md_start");
 	_api(md)->Init();
-	// _api(md)->Join();
 }
 void ctp_md_join(ctp_md_t * md) {
 	_api(md)->Join();
 }
 
-// ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker[], const char user[], const char password[])
 ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker[], const char user[]) 
 {
     log_debug("ctp_md_init | %s | %s", front_addr, broker);
@@ -37,7 +34,6 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
 	strcpy(md->front_addr, &front_addr[0]);
 	strcpy(md->broker, &broker[0]);
 	strcpy(md->user, &user[0]);
-	// strcpy(md->password, &password[0]);
 
 
     // symbols
@@ -47,9 +43,6 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
     md->symbols_num = 0;
 
 	CustomMdSpi * pMdUserSpi = new CustomMdSpi();       // 创建行情回调实例
-    // strcpy(pMdUserSpi->gBrokerID, broker);
-    // strcpy(pMdUserSpi->gInvestorID, user);
-    // strcpy(pMdUserSpi->gInvestorPassword, password);
 
 	pMdUserSpi->g_pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();   // 创建行情实例
 	pMdUserSpi->g_pMdUserApi->RegisterSpi(pMdUserSpi);               // 注册事件类
@@ -64,7 +57,6 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
 	return md;
 }
 
-// void ctp_md_subscribe(ctp_md_t * md, char * symbol, ctp_func_cb_t cb, void * ctx)
 void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
 {
     log_debug("ctp_md_subscribe | %s", symbol);
@@ -73,14 +65,12 @@ void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
 	const int buf_size = 81;
     assert(n < 9);
 
-
     buf = (char *)malloc(sizeof(char) * buf_size);
     memset(buf, 0, sizeof(char) * buf_size);
     strncpy(buf, symbol, sizeof(char) * (n));
 
 
     // add
-    // memcpy(md->symbols + md->symbols_num, &buf, sizeof(char *));
     md->symbols[md->symbols_num] = buf;
     md->symbols_num ++;
 
@@ -98,10 +88,6 @@ void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
 #define _spi(t) ((CustomTradeSpi *)((t)->_spi))
 #define _api(t) ((CThostFtdcTraderApi *)((t)->_api))
 
-// void ctp_trader_default_rsp_handler(ctp_trader_t * trader, const char name[], void * field, void * rsp_info, int req_id, int is_last) {
-// 	log_debug("handler | OnRsp%s\n | %d", name, req_id);
-// }
-
 ctp_trader_t * ctp_trader_init(
     ctp_trader_t * trader, 
     const char front_addr[], const char broker[], 
@@ -110,11 +96,10 @@ ctp_trader_t * ctp_trader_init(
     )
 {
 	log_debug("ctp_trader_init | %s | %s | %s | %s | %s", front_addr, broker, user, app_id, auth_code);
-    // if(trader == NULL) {
-    //     trader = (ctp_trader_t *)malloc(sizeof(ctp_trader_t));
-    // }
+    if(trader == NULL) {
+        trader = ctp_trader_new();
+    }
 	assert(trader != NULL);
-    // memset(trader, 0, sizeof(ctp_trader_t));
 
     strcpy(trader->front_addr, front_addr);
     strcpy(trader->broker, broker);
@@ -122,10 +107,6 @@ ctp_trader_t * ctp_trader_init(
     strcpy(trader->password, password);
     strcpy(trader->app_id, app_id);
     strcpy(trader->auth_code, auth_code);
-
-	//
-	// trader->reg = (ctp_reg_t **)malloc( sizeof(ctp_reg_t*) );
-	// *(trader->reg) = NULL;
 
     CThostFtdcTraderApi * pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi(); // 创建交易实例
 	CustomTradeSpi *pTradeSpi = new CustomTradeSpi;               // 创建交易回调实例
@@ -154,22 +135,6 @@ int ctp_trader_query_account(ctp_trader_t * trader) {
 	CTP_TRADER_REQ(trader, QryTradingAccount, &tradingAccountReq);
 }
 
-// ctp_account_t * ctp_trader_fetch_account(ctp_trader_t * trader, int req_id) {
-//     // log_debug("ctp_trader_fetch_account | %d", req_id);
-// 	ctp_account_t * field = NULL;
-// 	ctp_reg_t * r = NULL;
-// 	r = ctp_reg_get(trader->reg, req_id);
-// 	if (r) {
-//         // same type effectively
-//         field = (ctp_account_t *)malloc(sizeof(ctp_account_t));
-// 		memcpy(field, (struct CThostFtdcTradingAccountField *)(r->data), sizeof(struct CThostFtdcTradingAccountField));
-// 		ctp_reg_del(trader->reg, req_id);
-// 	}
-// 	return field;
-// }
-
-// void ctp_account_free(ctp_account_t * p) { free(p); }
-
 int ctp_trader_query_position(ctp_trader_t * trader) {
 	CThostFtdcQryInvestorPositionField field;
 	memset(&field, 0, sizeof(field));
@@ -178,30 +143,12 @@ int ctp_trader_query_position(ctp_trader_t * trader) {
 	CTP_TRADER_REQ(trader, QryInvestorPosition, &field);
 }
 
-
-// junk, it is for options
+// useless, it is for options not for futures
 int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
     CThostFtdcQryDepthMarketDataField field;
 	memset(&field, 0, sizeof(field));
 	strcpy(field.InstrumentID, symbol);
 	CTP_TRADER_REQ(trader, QryDepthMarketData, &field);
 }
-
-// ctp_position_t * ctp_trader_fetch_position(ctp_trader_t * trader, int req_id) {
-// 	ctp_position_t * p = NULL;
-// 	ctp_reg_t * r = NULL;
-// 	r = ctp_reg_get(trader->reg, req_id);
-// 	if (r) {
-// 		p = ((ctp_position_t *)(r->data))->nxt;
-//         if ( p->finished == 1 ) {
-//             ctp_reg_del(trader->reg, req_id);
-//             return p;
-//         }
-//         else {
-//             return NULL; // not finished yet
-//         }
-// 	}
-// 	return NULL;
-// }
 
 } // end extern "C"

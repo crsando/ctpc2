@@ -76,7 +76,8 @@ function new_collector(server)
                 return self 
             end,
         recv = function (self)
-                return ffi.gc(ctpc.ctp_md_recv(self.md), ctpc.ctp_md_tick_free)
+                -- return ffi.gc(ctpc.ctp_md_recv(self.md), ctpc.ctp_md_tick_free)
+                return ctpc.ctp_md_recv(self.md)
             end,
     }
     local collector = { md = md }
@@ -103,7 +104,8 @@ function new_trader(server)
             end,
         -- is_ready = function(self) return (self.trader.connected >= 4) end,
         recv = function (self)
-                return ffi.gc(ctpc.ctp_trader_recv(self.trader), ctpc.ctp_rsp_free)
+                -- return ffi.gc(ctpc.ctp_trader_recv(self.trader), ctpc.ctp_rsp_free)
+                return ctpc.ctp_trader_recv(self.trader)
             end,
         
         query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,

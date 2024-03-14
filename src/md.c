@@ -31,11 +31,10 @@ ctp_md_tick_t * ctp_md_recv(ctp_md_t * md) {
     ctp_md_tick_t * msg = NULL;
     while ( msg == NULL ) {
         cond_wait_begin(md->c);
-        cond_wait(md->c);
 
-        // designated behaviour: throw msg away, leave only the last one
-        while( queue_length(md->q) > 0 )
-            msg = (ctp_md_tick_t *)queue_pop_ptr(md->q);
+        while( queue_length(md->q) == 0 )
+            cond_wait(md->c);
+        msg = (ctp_md_tick_t *)queue_pop_ptr(md->q);
 
         cond_wait_end(md->c);
     }
@@ -43,5 +42,6 @@ ctp_md_tick_t * ctp_md_recv(ctp_md_t * md) {
 }
 
 void ctp_md_tick_free(ctp_md_tick_t * t) {
+    log_debug("ctp_md_tick_free");
     free(t);
 }

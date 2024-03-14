@@ -11,7 +11,7 @@ extern "C" {
 // 连接成功应答
 void CustomMdSpi::OnFrontConnected()
 {
-	log_info("OnFrontConnected | %s", this->_md->front_addr);
+	log_debug("OnFrontConnected | %s", this->_md->front_addr);
 	this->_md->connected = 1;
 	// 开始登录
 	CThostFtdcReqUserLoginField loginReq;
@@ -28,14 +28,14 @@ void CustomMdSpi::OnFrontConnected()
 void CustomMdSpi::OnFrontDisconnected(int nReason)
 {
 	this->_md->connected = 0;
-	log_info("OnFrontDisconnected | Error: %d", nReason);
+	log_debug("OnFrontDisconnected | Error: %d", nReason);
 }
 
 // 心跳超时警告
 void CustomMdSpi::OnHeartBeatWarning(int nTimeLapse)
 {
 	this->_md->connected = 0;
-	log_info("OnHeartBeatWarning | nTimeLapse: %d", nTimeLapse);
+	log_debug("OnHeartBeatWarning | nTimeLapse: %d", nTimeLapse);
 }
 
 // 登录应答
@@ -49,9 +49,8 @@ void CustomMdSpi::OnRspUserLogin(
 	if (!bResult)
 	{
 		this->_md->connected = 2;
-		log_info("OnRspUserLogin | Success | BrokerID:%s | UserID:%s", this->_md->broker, this->_md->user);
+		log_debug("OnRspUserLogin | Success | BrokerID:%s | UserID:%s", this->_md->broker, this->_md->user);
 		// 开始订阅行情
-		// int rt = g_pMdUserApi->SubscribeMarketData(g_pInstrumentID, instrumentNum);
         int i;
         log_debug("OnRspUserLogin | SubscribeMarketData | symbols_num %d", this->_md->symbols_num);
         for(i = 0; i < this->_md->symbols_num; i++) {
@@ -62,11 +61,11 @@ void CustomMdSpi::OnRspUserLogin(
 		if (!rt)
 		{
 			this->_md->connected = 3;
-			log_info("OnRspUserLogin | SubscribeMarketData | Success");
+			log_debug("OnRspUserLogin | SubscribeMarketData | Success");
 		}
 	}
 	else
-		log_info("OnRspUserLogin | Fail | ErrorID:%d", pRspInfo->ErrorID);
+		log_debug("OnRspUserLogin | Fail | ErrorID:%d", pRspInfo->ErrorID);
 }
 
 // 登出应答
@@ -79,10 +78,10 @@ void CustomMdSpi::OnRspUserLogout(
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
 	if (!bResult)
 	{
-		log_info("OnRspUserLogout | Success");
+		log_debug("OnRspUserLogout | Success");
 	}
 	else
-		log_info("OnRspUserLogout | Fail | ErrorID:%d", pRspInfo->ErrorID);
+		log_debug("OnRspUserLogout | Fail | ErrorID:%d", pRspInfo->ErrorID);
 }
 
 // 错误通知
@@ -90,7 +89,7 @@ void CustomMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, b
 {
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
 	if (bResult)
-		log_info("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		log_error("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 }
 
 // 订阅行情应答
@@ -103,7 +102,7 @@ void CustomMdSpi::OnRspSubMarketData(
     log_debug("OnRspSubMarketData | %s", pSpecificInstrument->InstrumentID);
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
 	if (bResult)
-		log_info("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		log_error("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 }
 
 // 取消订阅行情应答
@@ -125,10 +124,10 @@ void CustomMdSpi::OnRspSubForQuoteRsp(
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
 	if (!bResult)
 	{
-		log_info("OnRspSubForQuoteRsp | Success | InstrumentID:%s", pSpecificInstrument->InstrumentID);
+		log_debug("OnRspSubForQuoteRsp | Success | InstrumentID:%s", pSpecificInstrument->InstrumentID);
 	}
 	else
-		log_info("OnRspSubForQuoteRsp | Fail | ErrorID:%d", pRspInfo->ErrorID);
+		log_error("OnRspSubForQuoteRsp | Fail | ErrorID:%d", pRspInfo->ErrorID);
 }
 
 // 取消订阅询价应答
@@ -137,10 +136,10 @@ void CustomMdSpi::OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpec
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
 	if (!bResult)
 	{
-		log_info("OnRspUnSubForQuoteRsp | Success | InstrumentID:%s", pSpecificInstrument->InstrumentID);
+		log_debug("OnRspUnSubForQuoteRsp | Success | InstrumentID:%s", pSpecificInstrument->InstrumentID);
 	}
 	else
-		log_info("OnRspUnSubForQuoteRsp | Fail | ErrorID:%d", pRspInfo->ErrorID);
+		log_error("OnRspUnSubForQuoteRsp | Fail | ErrorID:%d", pRspInfo->ErrorID);
 }
 
 // 行情详情通知

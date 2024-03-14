@@ -118,15 +118,32 @@ void CustomTradeSpi::OnRspUserLogout(
 
 #define ON_RSP_THEN_SEND(tp) \
 	do { \
-		log_debug("ON_RSP_THEN_SEND"); \
 		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
-		rsp->field = (void *)malloc(sizeof(tp)); \
-		memcpy(rsp->field, pField, sizeof(tp)); \
-		rsp->size = sizeof(tp); \
+		memset(rsp, 0, sizeof(ctp_rsp_t)); \
+		if(pField) { \
+			rsp->field = (void *)malloc(sizeof(tp)); \
+			memcpy(rsp->field, pField, sizeof(tp)); \
+			rsp->size = sizeof(tp); \
+		} \
+		else { \
+			log_debug("pField == NULL"); \
+			rsp->field = NULL; \
+			rsp->size = 0; \
+		} \
 		rsp->req_id = nRequestID; \
-		rsp->last = bIsLast ? 1 : 0; \
+		rsp->last = (bIsLast ? 1 : 0); \
+		log_debug("ON_RSP_THEN_SEND : last %d", rsp->last); \
 		ctp_trader_send(this->_trader, rsp); \
 	} while(0)
+
+ctp_rsp_t * pack_data(void * data, size_t size) {
+	ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t));
+	memset(rsp, 0, sizeof(ctp_rsp_t));
+	rsp->field = (void *)malloc(size);
+	memcpy(rsp->field, data, size);
+	rsp->size = size;
+	return rsp;
+}
 
 void CustomTradeSpi::OnRspSettlementInfoConfirm(
 	CThostFtdcSettlementInfoConfirmField * pField,
@@ -137,7 +154,12 @@ void CustomTradeSpi::OnRspSettlementInfoConfirm(
 	if (!isErrorRspInfo(pRspInfo)) {
 		this->_trader->connected = 4;
 		log_info("OnRspSettlementInfoConfirm | Success | ConfirmDate:%s %s", pField->ConfirmDate, pField->ConfirmTime);
-		ON_RSP_THEN_SEND(CThostFtdcSettlementInfoConfirmField);
+		// ON_RSP_THEN_SEND(CThostFtdcSettlementInfoConfirmField);
+
+		ctp_rsp_t * rsp = pack_data(pField, sizeof(*pField));
+		rsp->req_id = nRequestID;
+		rsp->last = bIsLast ? 1 : 0;
+		ctp_trader_send(this->_trader, rsp);
 	}
 	else {
 		log_info("OnRspSettlementInfoConfirm | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
@@ -148,8 +170,6 @@ void CustomTradeSpi::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument,
 {
 	log_info("OnRspQryInstrument | %s | %s", pInstrument->ExchangeID, pInstrument->InstrumentID);
 }
-
-
 
 void CustomTradeSpi::OnRspQryTradingAccount( CThostFtdcTradingAccountField * pField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
