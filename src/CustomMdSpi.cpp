@@ -146,10 +146,10 @@ void CustomMdSpi::OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpec
 // 行情详情通知
 void CustomMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	log_info("OnRtnDepthMarketData | InstrumentID:%s | LastPrice:%lf", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice);
-	clock_t start, end;
+	log_debug("OnRtnDepthMarketData | InstrumentID:%s | LastPrice:%lf", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice);
+	// clock_t start, end;
 
-	start = clock();
+	// start = clock();
 	// if(this->_md->_on_tick) {
 	// 	(*(this->_md->_on_tick))(pDepthMarketData);
 	// }
@@ -159,10 +159,10 @@ void CustomMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMar
 
 	ctp_md_send(this->_md, (void*)data);
 
-	end = clock();
+	// end = clock();
 
-	double time_taken = 1000 * double(end - start) / double(CLOCKS_PER_SEC); // milliseconds
-	log_info("OnRtnDepthMarketData | time_taken: %lf millisecs", time_taken);
+	// double time_taken = 1000 * double(end - start) / double(CLOCKS_PER_SEC); // milliseconds
+	// log_info("OnRtnDepthMarketData | time_taken: %lf millisecs", time_taken);
 }
 
 // 询价详情通知

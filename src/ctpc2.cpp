@@ -98,9 +98,9 @@ void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
 #define _spi(t) ((CustomTradeSpi *)((t)->_spi))
 #define _api(t) ((CThostFtdcTraderApi *)((t)->_api))
 
-void ctp_trader_default_rsp_handler(ctp_trader_t * trader, const char name[], void * field, void * rsp_info, int req_id, int is_last) {
-	log_info("handler | OnRsp%s\n | %d", name, req_id);
-}
+// void ctp_trader_default_rsp_handler(ctp_trader_t * trader, const char name[], void * field, void * rsp_info, int req_id, int is_last) {
+// 	log_debug("handler | OnRsp%s\n | %d", name, req_id);
+// }
 
 ctp_trader_t * ctp_trader_init(
     ctp_trader_t * trader, 
@@ -109,7 +109,7 @@ ctp_trader_t * ctp_trader_init(
     const char app_id[], const char auth_code[]
     )
 {
-	log_info("ctp_trader_init | %s | %s | %s | %s | %s", front_addr, broker, user, app_id, auth_code);
+	log_debug("ctp_trader_init | %s | %s | %s | %s | %s", front_addr, broker, user, app_id, auth_code);
     // if(trader == NULL) {
     //     trader = (ctp_trader_t *)malloc(sizeof(ctp_trader_t));
     // }
@@ -124,8 +124,8 @@ ctp_trader_t * ctp_trader_init(
     strcpy(trader->auth_code, auth_code);
 
 	//
-	trader->reg = (ctp_reg_t **)malloc( sizeof(ctp_reg_t*) );
-	*(trader->reg) = NULL;
+	// trader->reg = (ctp_reg_t **)malloc( sizeof(ctp_reg_t*) );
+	// *(trader->reg) = NULL;
 
     CThostFtdcTraderApi * pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi(); // 创建交易实例
 	CustomTradeSpi *pTradeSpi = new CustomTradeSpi;               // 创建交易回调实例

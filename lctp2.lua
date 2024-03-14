@@ -16,12 +16,6 @@ function ffi_load_header_file(fn)
     ffi.cdef(txt)
 end
 
--- ffi_load_header_file(ctp_ver .. "/ThostFtdcUserApiDataType.h")
--- ffi_load_header_file(ctp_ver .. "/ThostFtdcUserApiStruct.h")
--- ffi_load_header_file("src/position.h") -- place this line above ctpc.h
--- ffi_load_header_file("src/ctpc.h")
--- ffi_load_header_file("src/util.h")
-
 ffi_load_header_file(include_path .. "/ctpc2/ThostFtdcUserApiDataType.h")
 ffi_load_header_file(include_path .. "/ctpc2/ThostFtdcUserApiStruct.h")
 ffi_load_header_file(include_path .. "/ctpc2/position.h") -- place this line above ctpc.h
@@ -29,13 +23,18 @@ ffi_load_header_file(include_path .. "/ctpc2/ctpc2.h")
 ffi_load_header_file(include_path .. "/ctpc2/util.h")
 
 ffi.cdef[[
-    ctp_reg_t * ctp_reg_get(ctp_reg_t ** reg, int req_id);
-    ctp_reg_t * ctp_reg_put(ctp_reg_t ** reg, int req_id, void * data, size_t size);
-    ctp_reg_t * ctp_reg_del(ctp_reg_t ** reg, int req_id);
+    enum { LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL };
+    void log_set_level(int level);
 ]]
 
-
 local ctpc = ffi.load("ctpc2")
+
+-- set log level
+function log_set_level(lvl_str)
+    local lvl = ffi.C[lvl_str]
+    lvl = lvl or ffi.C.LOG_INFO
+    ctpc.log_set_level(lvl)
+end
 
 -- configurations
 
@@ -124,4 +123,6 @@ return {
     servers = servers,
     ffi = ffi,
     ctpc = ctpc,
+
+    log_set_level = log_set_level,
 }

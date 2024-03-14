@@ -53,9 +53,9 @@ void ctp_md_tick_free(ctp_md_tick_t * t);
 // declarations
 struct _ctp_trader_t;
 typedef struct _ctp_trader_t ctp_trader_t;
-typedef struct _ctp_reg_t ctp_reg_t;
+// typedef struct _ctp_reg_t ctp_reg_t;
 
-typedef void (*ctp_trader_rsp_cb)(ctp_trader_t * trader, const char name[], void * field, void * rsp_info, int req_id, int is_last);
+// typedef void (*ctp_trader_rsp_cb)(ctp_trader_t * trader, const char name[], void * field, void * rsp_info, int req_id, int is_last);
 
 
 typedef struct _ctp_trader_t {
@@ -82,8 +82,8 @@ typedef struct _ctp_trader_t {
     int req_id; // start from 0, incr on requests
 
     //
-    ctp_trader_rsp_cb on_rsp;
-    ctp_reg_t ** reg; // ATTENTION, double star here
+    // ctp_trader_rsp_cb on_rsp;
+    // ctp_reg_t ** reg; // ATTENTION, double star here
 
     // internal message queue for tick data
     struct queue * q;

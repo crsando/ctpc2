@@ -2,6 +2,8 @@ local ctp = require "lctp2"
 local ffi = ctp.ffi
 local uv = require "luv"
 
+ctp.log_set_level("LOG_ERROR")
+
 local server = {
             front_addr = "tcp://180.169.75.18:61205",
             broker = "7090", 
