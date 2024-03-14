@@ -6,10 +6,15 @@ local server = {
             front_addr = "tcp://180.169.75.18:61205",
             broker = "7090", 
             user = "85194065", 
-            pass = "bE19930706", 
             app_id = "client_tara_060315", 
             auth_code = '20221011TARA0001',
         }
+
+
+-- prompt
+io.write("user: ", server.user, "\n")
+io.write("password: ")
+server.pass = io.read("*line")
 
 local trader = ctp.new_trader(server):start()
 
@@ -33,16 +38,11 @@ while not finished do
 
     local pos = ffi.cast("struct CThostFtdcInvestorPositionField *", rsp.field)
 
-    trader:query_marketdata(pos.InstrumentID)
-    local rsp = trader:recv()
-    local data = ffi.cast("struct CThostFtdcDepthMarketDataField *", rsp.field)
-
     print(
         ffi.string(pos.TradingDay),
         ffi.string(pos.InvestorID),
         ffi.string(pos.ExchangeID),
         ffi.string(pos.InstrumentID),
-            pos.YdPosition, pos.Position,
-        data.LastPrice
+        pos.Position
     )
 end

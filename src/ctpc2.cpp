@@ -178,6 +178,8 @@ int ctp_trader_query_position(ctp_trader_t * trader) {
 	CTP_TRADER_REQ(trader, QryInvestorPosition, &field);
 }
 
+
+// junk, it is for options
 int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
     CThostFtdcQryDepthMarketDataField field;
 	memset(&field, 0, sizeof(field));
