@@ -30,6 +30,12 @@ void ctp_position_free(ctp_position_t * l) {
         free(n);
     }
 }
+struct _ctp_position_keeper_t {
+    ctp_position_t * curr;
+    ctp_position_t * cache;
+
+    pthread_mutex_t lock;
+};
 
 ctp_position_keeper_t * ctp_position_keeper_new() {
     ctp_position_keeper_t * pk = (ctp_position_keeper_t *)malloc(sizeof(ctp_position_keeper_t));

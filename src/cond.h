@@ -2,6 +2,7 @@
 #define ltask_cond_h
 
 #include <pthread.h>
+#include "stdio.h"
 
 struct cond {
     pthread_cond_t c;

@@ -170,13 +170,20 @@ int ctp_trader_query_account(ctp_trader_t * trader) {
 
 // void ctp_account_free(ctp_account_t * p) { free(p); }
 
-// int ctp_trader_query_position(ctp_trader_t * trader) {
-// 	CThostFtdcQryInvestorPositionField field;
-// 	memset(&field, 0, sizeof(field));
-// 	strcpy(field.BrokerID, trader->broker);
-// 	strcpy(field.InvestorID, trader->user);
-// 	CTP_TRADER_REQ(trader, QryInvestorPosition, &field);
-// }
+int ctp_trader_query_position(ctp_trader_t * trader) {
+	CThostFtdcQryInvestorPositionField field;
+	memset(&field, 0, sizeof(field));
+	strcpy(field.BrokerID, trader->broker);
+	strcpy(field.InvestorID, trader->user);
+	CTP_TRADER_REQ(trader, QryInvestorPosition, &field);
+}
+
+int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
+    CThostFtdcQryDepthMarketDataField field;
+	memset(&field, 0, sizeof(field));
+	strcpy(field.InstrumentID, symbol);
+	CTP_TRADER_REQ(trader, QryDepthMarketData, &field);
+}
 
 // ctp_position_t * ctp_trader_fetch_position(ctp_trader_t * trader, int req_id) {
 // 	ctp_position_t * p = NULL;

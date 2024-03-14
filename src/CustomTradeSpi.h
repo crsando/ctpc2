@@ -54,6 +54,8 @@ public:
 	///成交通知
 	void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
+	// Market Data
+	void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 public:
 	ctp_trader_t * _trader;
 	

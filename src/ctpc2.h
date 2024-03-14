@@ -104,7 +104,6 @@ typedef struct {
     uint32_t rsp_typ;
     void * field;
     size_t size;
-    struct CThostFtdcRspInfoField * info;
     int last;
 } ctp_rsp_t;
 
@@ -124,12 +123,17 @@ int ctp_trader_query_account(ctp_trader_t * trader);
 // ctp_account_t * ctp_trader_fetch_account(ctp_trader_t * trader, int req_id);
 // void ctp_account_free(ctp_account_t * p);
 
-// int ctp_trader_query_position(ctp_trader_t * trader);
+int ctp_trader_query_position(ctp_trader_t * trader);
 // ctp_position_t * ctp_trader_fetch_position(ctp_trader_t * trader, int req_id);
 
 
 // typedef int (*ctp_trader_req_cb)(void * field, int req_id);
 // int ctp_trader_query(ctp_trader_t * trader, ctp_trader_req_cb func, void * field);
+
 // void * ctp_trader_fetch(ctp_trader_t * trader, int req_id);
+
+
+// ReqQryDepthMarketData
+int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol);
 
 #endif

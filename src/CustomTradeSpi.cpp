@@ -118,12 +118,11 @@ void CustomTradeSpi::OnRspUserLogout(
 
 #define ON_RSP_THEN_SEND(tp) \
 	do { \
+		log_debug("ON_RSP_THEN_SEND"); \
 		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
 		rsp->field = (void *)malloc(sizeof(tp)); \
 		memcpy(rsp->field, pField, sizeof(tp)); \
 		rsp->size = sizeof(tp); \
-		rsp->info = (CThostFtdcRspInfoField*)malloc(sizeof(CThostFtdcRspInfoField)); \
-		memcpy(rsp->info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
 		rsp->req_id = nRequestID; \
 		rsp->last = bIsLast ? 1 : 0; \
 		ctp_trader_send(this->_trader, rsp); \
@@ -154,15 +153,43 @@ void CustomTradeSpi::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument,
 
 void CustomTradeSpi::OnRspQryTradingAccount( CThostFtdcTradingAccountField * pField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	ON_RSP_THEN_SEND(CThostFtdcTradingAccountField);
+	if (!isErrorRspInfo(pRspInfo)) {
+		log_info("OnRspQryTradingAccount | Succeed");
+		ON_RSP_THEN_SEND(CThostFtdcTradingAccountField);
+	}
+	else {
+		log_info("OnRspQryTradingAccount | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+	}
 }
 
 void CustomTradeSpi::OnRspQryInvestorPosition(
-	CThostFtdcInvestorPositionField *pInvestorPosition,
+	CThostFtdcInvestorPositionField *pField,
 	CThostFtdcRspInfoField *pRspInfo,
 	int nRequestID,
 	bool bIsLast)
 {
+	if (!isErrorRspInfo(pRspInfo)) {
+		log_info("OnRspQryInvestorPosition | Succeed");
+		ON_RSP_THEN_SEND(CThostFtdcInvestorPositionField);
+	}
+	else {
+		log_info("OnRspQryInvestorPosition | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+	}
+}
+
+void CustomTradeSpi::OnRspQryDepthMarketData(
+	CThostFtdcDepthMarketDataField *pField,
+	CThostFtdcRspInfoField *pRspInfo,
+	int nRequestID,
+	bool bIsLast)
+{
+	if (!isErrorRspInfo(pRspInfo)) {
+		log_info("OnRspQryDepthMarketData | Succeed | %s | %lf", pField->InstrumentID, pField->LastPrice);
+		ON_RSP_THEN_SEND(CThostFtdcDepthMarketDataField);
+	}
+	else {
+		log_info("OnRspQryDepthMarketData | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+	}
 }
 
 void CustomTradeSpi::OnRspOrderInsert(
