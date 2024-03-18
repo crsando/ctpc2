@@ -63,6 +63,7 @@ typedef struct _ctp_trader_t {
     int front_id;
     int	session_id;	//会话编号
     char max_order_ref[13];	//报单引用
+    char lst_order_ref[13];
 
     // class pointer
     void * _spi;

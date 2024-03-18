@@ -1,6 +1,6 @@
 PREFIX=/usr/local
-CTP_VER=ctp-6.6.9
-# CTP_VER=openctp-6.6.9
+# CTP_VER=ctp-6.6.9
+CTP_VER=openctp-6.6.9
 
 INCLUDE_PATH=$(PREFIX)/include/ctpc2
 INST_LIB_PATH=$(PREFIX)/lib

@@ -7,17 +7,7 @@ local uv = require "luv"
 -- ctp.log_set_level("LOG_ERROR")
 ctp.log_set_level("LOG_DEBUG")
 
-local server = {
-            front_addr = "tcp://180.169.75.18:61205",
-            broker = "7090", 
-            user = "85194065", 
-            pass = "bE19930706",
-            app_id = "client_tara_060315", 
-            auth_code = '20221011TARA0001',
-        }
-
--- openctp
--- local server = ctp.servers.trader["openctp"] 
+local server = ctp.servers.trader["openctp"] 
 
 -- prompt
 if not server.pass then 

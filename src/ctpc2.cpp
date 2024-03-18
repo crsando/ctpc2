@@ -151,4 +151,47 @@ int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
 	CTP_TRADER_REQ(trader, QryDepthMarketData, &field);
 }
 
+
+
+int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag)
+{
+    int order_ref_i = 0;
+	CThostFtdcInputOrderField orderInsertReq;
+	memset(&orderInsertReq, 0, sizeof(orderInsertReq));
+	strcpy(orderInsertReq.BrokerID, t->broker);
+	strcpy(orderInsertReq.InvestorID, t->user);
+	strcpy(orderInsertReq.InstrumentID, symbol);
+
+    order_ref_i = atoi(t->lst_order_ref) + 1;
+    sprintf(orderInsertReq.OrderRef, "%012d", order_ref_i);
+    log_debug("order_ref: %s", orderInsertReq.OrderRef);
+
+    if ( price <= 0.0001 ) {
+        orderInsertReq.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
+        orderInsertReq.LimitPrice = 0.0;
+        orderInsertReq.TimeCondition = THOST_FTDC_TC_IOC; // 立即成交否则撤销
+    }
+    else {
+        // limit order
+        orderInsertReq.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
+        orderInsertReq.LimitPrice = price;
+        orderInsertReq.TimeCondition = THOST_FTDC_TC_GFD; // 当日有效
+    }
+
+	orderInsertReq.CombOffsetFlag[0] = flag; // input flag
+	orderInsertReq.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
+
+	orderInsertReq.Direction = (volume > 0 ? THOST_FTDC_D_Buy : THOST_FTDC_D_Sell);
+	orderInsertReq.VolumeTotalOriginal = abs(volume); // input volume
+	orderInsertReq.VolumeCondition = THOST_FTDC_VC_AV;
+	orderInsertReq.MinVolume = 1;
+
+	orderInsertReq.ContingentCondition = THOST_FTDC_CC_Immediately;
+	orderInsertReq.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;
+	orderInsertReq.IsAutoSuspend = 0;
+	orderInsertReq.UserForceClose = 0;
+
+	CTP_TRADER_REQ(trader, OrderInsert, &orderInsertReq);
+}
+
 } // end extern "C"

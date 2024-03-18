@@ -80,6 +80,7 @@ void CustomTradeSpi::OnRspUserLogin(
 		this->_trader->front_id = pRspUserLogin->FrontID;
 		this->_trader->session_id = pRspUserLogin->SessionID;
 		strcpy(this->_trader->max_order_ref, pRspUserLogin->MaxOrderRef);
+		strcpy(this->_trader->lst_order_ref, pRspUserLogin->MaxOrderRef);
 
 		// 投资者结算结果确认
 		reqSettlementInfoConfirm();
@@ -240,6 +241,7 @@ void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	// FrontID + SessionID + OrderRef
 	int front_id = this->_trader->front_id;
 	int session_id = this->_trader->session_id;
+	strcpy(this->_trader->lst_order_ref, pOrder->OrderRef);
 
 	// ExchangeID + OrderSysID
 	// log_info("OnRtnOrder | %s | %s | %s | Info | %s | %lf | %d | %d | Status | %c | %c", 
