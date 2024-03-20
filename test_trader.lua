@@ -7,7 +7,7 @@ local uv = require "luv"
 -- ctp.log_set_level("LOG_ERROR")
 ctp.log_set_level("LOG_DEBUG")
 
-local server = ctp.servers.trader["openctp"] 
+local server = ctp.servers.trader["openctp-7x24"] 
 
 -- prompt
 if not server.pass then 
@@ -83,8 +83,8 @@ positions()
 -- 
 print("try order insert")
 
--- ctp.ctpc.ctp_trader_order_insert(trader.trader, "cu2406", 0, 1, 1)
--- ctp.ctpc.ctp_trader_order_insert(trader.trader, "cu2406", 0, -1, -1)
+ctp.ctpc.ctp_trader_order_insert(trader.trader, "cu2406", 0, 1, 1)
+ctp.ctpc.ctp_trader_order_insert(trader.trader, "cu2406", 0, -1, 1)
 ctp.ctpc.ctp_trader_order_insert(trader.trader, "au2406", 0, 1, -1)
 ctp.ctpc.ctp_trader_order_insert(trader.trader, "au2406", 0, -1, -1)
 

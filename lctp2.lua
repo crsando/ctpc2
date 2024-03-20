@@ -127,6 +127,46 @@ function new_trader(server)
     return T
 end
 
+function position_keeper(ptr)
+    local o = {}
+    if ptr ~= nil then 
+        o.core = ffi.cast("ctp_position_keeper_t *", ptr)
+    else 
+        o.core = ctpc.ctp_position_keeper_new()
+    end
+    local _mt = {
+        update = function (self, rsp)
+                assert(self.core)
+                if rsp == nil then return nil, "empty response message" end 
+                local pos = ffi.new("struct CThostFtdcInvestorPositionField *", rsp.field)
+                ctpc.ctp_position_keeper_update(self.core, pos, rsp.last)
+                return (rsp.last == 1)
+            end,
+        localcopy = function (self)
+                local pos = ctpc.ctp_position_keeper_localcopy(self.core)
+                ffi.gc(pos, ctpc.ctp_position_free)
+                self._localcopy = pos
+                return pos
+            end,
+        table = function (self)
+                self:localcopy() -- this will update self._localcopy
+                local p = self._localcopy
+                local T = {}
+                while p ~= nil do 
+                    local symbol = ffi.string(p.field.InstrumentID)
+                    local num = p.field.Position
+                    local direction = (p.field.PosiDirection == 50) and "long" or "short"
+                    T[#T+1] = { symbol = symbol, direction = direction, num = num, }
+                    p = p.nxt
+                end
+                return T
+            end,
+    }
+    _mt.__index = _mt
+    setmetatable(o, _mt)
+    return o
+end
+
 return {
     new_collector = new_collector,
     new_trader = new_trader,
@@ -135,4 +175,6 @@ return {
     ctpc = ctpc,
 
     log_set_level = log_set_level,
+
+    position_keeper = position_keeper,
 }

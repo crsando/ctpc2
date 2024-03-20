@@ -51,6 +51,7 @@ ctp_position_keeper_t * ctp_position_keeper_new() {
 int ctp_position_keeper_update(ctp_position_keeper_t * pk, struct CThostFtdcInvestorPositionField * data, int last) {
     log_debug("ctp_position_keeper_update %d | %d | %d", pk, data, last);
     ctp_position_t * p = ctp_position_create(data);
+    pthread_mutex_lock(&pk->lock);
     if( pk->cache == NULL ) {
         log_debug("ctp_position_keeper_update 0");
         pk->cache = p;
@@ -59,6 +60,7 @@ int ctp_position_keeper_update(ctp_position_keeper_t * pk, struct CThostFtdcInve
         log_debug("ctp_position_keeper_update append");
         ctp_position_append(pk->cache, p);
     }
+    pthread_mutex_unlock(&pk->lock);
 
     if( last ) {
         log_debug("ctp_position_keeper_update lock and swap");
