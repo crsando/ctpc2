@@ -45,8 +45,16 @@ local servers = {
         ["gtja-1"] = { front_addr =  "tcp://180.169.75.18:61213", broker = "7090", user = "85194065" }
     },
     trader = {
-        ["openctp"] = {
+        ["openctp-7x24"] = {
             front_addr = "tcp://121.37.80.177:20002", 
+            broker = "7090", 
+            user = "7572", 
+            pass = "123456", 
+            app_id = "client_tara_060315", 
+            auth_code = "20221011TARA000",
+        },
+        ["openctp"] = {
+            front_addr = "tcp://121.37.90.193:20002", 
             broker = "7090", 
             user = "7572", 
             pass = "123456", 

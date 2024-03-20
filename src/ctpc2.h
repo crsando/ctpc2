@@ -105,4 +105,10 @@ int ctp_trader_query_position(ctp_trader_t * trader);
 // ReqQryDepthMarketData
 // int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol);
 
+
+//
+// Order Executions
+//
+int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, int flag);
+
 #endif

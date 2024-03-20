@@ -153,8 +153,9 @@ int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
 
 
 
-int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag)
+int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, int flag)
 {
+    log_debug("ctp_trader_order_insert %s | %lf | %d | %d", symbol, price, volume, flag);
     int order_ref_i = 0;
 	CThostFtdcInputOrderField orderInsertReq;
 	memset(&orderInsertReq, 0, sizeof(orderInsertReq));
@@ -164,24 +165,34 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
 
     order_ref_i = atoi(t->lst_order_ref) + 1;
     sprintf(orderInsertReq.OrderRef, "%012d", order_ref_i);
+    sprintf(t->lst_order_ref, "%012d", order_ref_i);
     log_debug("order_ref: %s", orderInsertReq.OrderRef);
 
     if ( price <= 0.0001 ) {
+        log_debug("ctp_trader_order_insert | market order");
         orderInsertReq.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
         orderInsertReq.LimitPrice = 0.0;
         orderInsertReq.TimeCondition = THOST_FTDC_TC_IOC; // 立即成交否则撤销
     }
     else {
         // limit order
+        log_debug("ctp_trader_order_insert | limit order | %lf", price);
         orderInsertReq.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
         orderInsertReq.LimitPrice = price;
         orderInsertReq.TimeCondition = THOST_FTDC_TC_GFD; // 当日有效
     }
 
-	orderInsertReq.CombOffsetFlag[0] = flag; // input flag
+    if(flag > 0) {
+        orderInsertReq.CombOffsetFlag[0] = THOST_FTDC_OF_Open; // open
+    }
+    else {
+        orderInsertReq.CombOffsetFlag[0] = THOST_FTDC_OF_Close; // close
+    }
+    log_debug("CombOffsetFlag[0]=%c", orderInsertReq.CombOffsetFlag[0]);
 	orderInsertReq.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
 
 	orderInsertReq.Direction = (volume > 0 ? THOST_FTDC_D_Buy : THOST_FTDC_D_Sell);
+    log_debug("Direction=%c", orderInsertReq.Direction);
 	orderInsertReq.VolumeTotalOriginal = abs(volume); // input volume
 	orderInsertReq.VolumeCondition = THOST_FTDC_VC_AV;
 	orderInsertReq.MinVolume = 1;
@@ -191,7 +202,7 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
 	orderInsertReq.IsAutoSuspend = 0;
 	orderInsertReq.UserForceClose = 0;
 
-	CTP_TRADER_REQ(trader, OrderInsert, &orderInsertReq);
+	CTP_TRADER_REQ(t, OrderInsert, &orderInsertReq);
 }
 
 } // end extern "C"

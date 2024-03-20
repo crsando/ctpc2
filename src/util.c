@@ -24,10 +24,6 @@ int64_t ctp_date_time_to_msec(const char * day, const char * time, int msec) {
     strncpy(buffer + 10, " ", 8);
     strncpy(buffer + 11, time, 8);
 
-    printf(buffer);
-    putchar('\n');
-
-
     memset(&dt, 0, sizeof(struct tm));
     strptime(buffer, "%Y-%m-%d %H:%M:%S", &dt);
 

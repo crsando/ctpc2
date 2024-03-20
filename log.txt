@@ -1,0 +1,144 @@
+23:58:33 DEBUG ./src/trader.c:17: t->c : 175533712
+23:58:33 DEBUG ./src/trader.c:18: t->q : 0
+23:58:33 DEBUG ./src/ctpc2.cpp:98: ctp_trader_init | tcp://121.37.90.193:20002 | 7090 | 7572 | client_tara_060315 | 20221011TARA000
+23:58:33 DEBUG ./src/trader.c:30: ctp_trader_recv start
+23:58:33 DEBUG ./src/trader.c:35: ctp_trader_recv queue length: 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:38: OnFrontConnected | FrontAddr:tcp://121.37.90.193:20002
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:50: ReqAuthenticate | req_id: 1
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:56: OnRspAuthenticate | Success | AppID:client_tara_060315 | AuthCode:20221011TARA000
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:291: reqUserLogin | 7090 | 7572 | 123456
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:297: ReqUserLogin | req_id: 2
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:74: OnRspUserLogin | Success | BrokerID:7090 | UserID:7572
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:75: OnRspUserLogin | FrontID: 0 | SessionID: 198231 | MaxOrderRef: 1
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:312: reqSettlementInfoConfirm
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:318: ReqSettlementInfoConfirm | req_id: 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:157: OnRspSettlementInfoConfirm | Success | ConfirmDate:20240319 23:58:33
+23:58:33 DEBUG ./src/trader.c:23: ctp_trader_send start -603976528 | last: 1
+23:58:33 DEBUG ./src/trader.c:27: 23:58:33 DEBUG ./src/trader.c:51: ctp_trader_send end
+ctp_rsp_free | 3 | -603976480
+23:58:33 DEBUG ./src/trader.c:55: ctp_rsp_free success | -30719664 | 123774714
+23:58:33 DEBUG ./src/ctpc2.cpp:130: ctp_trader_query_account
+23:58:33 INFO  ./src/ctpc2.cpp:135: ReqQryTradingAccount | req_id: 4
+23:58:33 DEBUG ./src/trader.c:30: ctp_trader_recv start
+23:58:33 DEBUG ./src/trader.c:35: ctp_trader_recv queue length: 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000002 | Sys: SHFE+ | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000002 | Sys: SHFE+1991 | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000002 | Sys: SHFE+1991 | cu2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+1991 | cu2406 | Time: 20240319 23:37:41 | 72750.000000 | 1 | 1
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000003 | Sys: SHFE+ | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000003 | Sys: SHFE+1992 | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000003 | Sys: SHFE+1992 | cu2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+1992 | cu2406 | Time: 20240319 23:37:41 | 72760.000000 | 1 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000004 | Sys: SHFE+ | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000005 | Sys: SHFE+ | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000004 | Sys: SHFE+1993 | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000004 | Sys: SHFE+1993 | cu2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+1993 | cu2406 | Time: 20240319 23:37:45 | 72750.000000 | 1 | 1
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000005 | Sys: SHFE+1994 | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000005 | Sys: SHFE+1994 | cu2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+1994 | cu2406 | Time: 20240319 23:37:45 | 72760.000000 | 1 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000006 | Sys: SHFE+ | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000007 | Sys: SHFE+ | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000006 | Sys: SHFE+1995 | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000006 | Sys: SHFE+1995 | cu2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+1995 | cu2406 | Time: 20240319 23:37:48 | 72750.000000 | 1 | 1
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000007 | Sys: SHFE+1996 | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000007 | Sys: SHFE+1996 | cu2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+1996 | cu2406 | Time: 20240319 23:37:48 | 72760.000000 | 1 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000008 | Sys: SHFE+ | au2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000008 | Sys: SHFE+2001 | au2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000008 | Sys: SHFE+2001 | au2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+2001 | au2406 | Time: 20240319 23:41:51 | 505.080000 | 1 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000009 | Sys: SHFE+ | au2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000009 | Sys: SHFE+2002 | au2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000009 | Sys: SHFE+2002 | au2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+2002 | au2406 | Time: 20240319 23:41:51 | 505.040000 | 1 | 1
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000010 | Sys: SHFE+ | au2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000010 | Sys: SHFE+2003 | au2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000010 | Sys: SHFE+2003 | au2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+2003 | au2406 | Time: 20240319 23:41:57 | 505.080000 | 1 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000011 | Sys: SHFE+ | au2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000011 | Sys: SHFE+2004 | au2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:248: OnRtnOrder | Ref: 0+198231+000000000011 | Sys: SHFE+2004 | au2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:268: OnRtnTrade | Sys: SHFE+2004 | au2406 | Time: 20240319 23:41:57 | 505.040000 | 1 | 1
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:178: OnRspQryTradingAccount | Succeed
+23:58:33 DEBUG ./src/CustomTradeSpi.cpp:179: ON_RSP_THEN_SEND : last 1
+23:58:33 DEBUG ./src/trader.c:23: ctp_trader_send start 175538656 | last: 1
+23:58:33 DEBUG ./src/trader.c:27: ctp_trader_send end
+23:58:33 DEBUG ./src/position.c:44: ctp_position_keeper_new
+23:58:33 INFO  ./src/ctpc2.cpp:143: ReqQryInvestorPosition | req_id: 5
+23:58:33 DEBUG ./src/trader.c:30: ctp_trader_recv start
+23:58:33 DEBUG ./src/trader.c:35: ctp_trader_recv queue length: 0
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:193: OnRspQryInvestorPosition | Succeed
+23:58:33 DEBUG ./src/CustomTradeSpi.cpp:194: ON_RSP_THEN_SEND : last 0
+23:58:33 DEBUG ./src/trader.c:23: ctp_trader_send start 175538608 | last: 0
+23:58:33 DEBUG ./src/trader.c:27: 23:58:33 DEBUG ./src/position.c:52: ctp_trader_send end
+ctp_position_keeper_update 175559808 | -738193216 | 0
+23:58:33 DEBUG ./src/position.c:8: ctp_position_new -738193216
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:193: OnRspQryInvestorPosition | Succeed
+23:58:33 DEBUG ./src/position.c:15: 23:58:33 DEBUG ./src/CustomTradeSpi.cpp:194: ctp_position_new -738193216 end
+ON_RSP_THEN_SEND : last 0
+23:58:33 DEBUG ./src/position.c:55: 23:58:33 DEBUG ./src/trader.c:23: ctp_position_keeper_update 0
+23:58:33 DEBUG ./src/trader.c:30: ctp_trader_recv start
+ctp_trader_send start -738192736 | last: 0
+23:58:33 DEBUG ./src/trader.c:35: ctp_trader_recv queue length: 0
+23:58:33 DEBUG ./src/trader.c:27: ctp_trader_send end23:58:33 DEBUG ./src/position.c:52: 
+ctp_position_keeper_update 175559808 | -738192688 | 0
+23:58:33 DEBUG ./src/position.c:8: 23:58:33 INFO  ./src/CustomTradeSpi.cpp:193: ctp_position_new -738192688
+OnRspQryInvestorPosition | Succeed
+23:58:33 DEBUG ./src/CustomTradeSpi.cpp:194: 23:58:33 DEBUG ./src/position.c:15: ON_RSP_THEN_SEND : last 0
+ctp_position_new -738192688 end
+23:58:33 DEBUG ./src/trader.c:23: ctp_trader_send start -738192208 | last: 0
+23:58:33 DEBUG ./src/position.c:59: ctp_position_keeper_update append23:58:33 DEBUG ./src/trader.c:27: ctp_trader_send end
+
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:193: OnRspQryInvestorPosition | Succeed
+23:58:33 DEBUG ./src/trader.c:30: 23:58:33 DEBUG ./src/CustomTradeSpi.cpp:194: ctp_trader_recv start
+ON_RSP_THEN_SEND : last 1
+23:58:33 DEBUG ./src/trader.c:23: 23:58:33 DEBUG ./src/trader.c:35: ctp_trader_send start -738191680 | last: 1
+ctp_trader_recv queue length: 1
+23:58:33 DEBUG ./src/trader.c:27: 23:58:33 DEBUG ./src/position.c:52: ctp_trader_send end
+ctp_position_keeper_update 175559808 | -738192160 | 0
+23:58:33 DEBUG ./src/position.c:8: ctp_position_new -738192160
+23:58:33 DEBUG ./src/position.c:15: ctp_position_new -738192160 end
+23:58:33 DEBUG ./src/position.c:59: ctp_position_keeper_update append
+23:58:33 DEBUG ./src/trader.c:30: ctp_trader_recv start
+23:58:33 DEBUG ./src/trader.c:35: ctp_trader_recv queue length: 1
+23:58:33 DEBUG ./src/position.c:52: ctp_position_keeper_update 175559808 | -738191632 | 1
+23:58:33 DEBUG ./src/position.c:8: ctp_position_new -738191632
+23:58:33 DEBUG ./src/position.c:15: ctp_position_new -738191632 end
+23:58:33 DEBUG ./src/position.c:59: ctp_position_keeper_update append
+23:58:33 DEBUG ./src/position.c:64: ctp_position_keeper_update lock and swap
+23:58:33 DEBUG ./src/position.c:73: ctp_position_keeper_update unlock
+23:58:33 DEBUG ./src/position.c:78: ctp_position_keeper_localcopy start
+23:58:33 DEBUG ./src/position.c:84: ctp_position_keeper_localcopy while
+23:58:33 DEBUG ./src/position.c:86: ctp_position_keeper_localcopy create 1 | 175560000
+23:58:33 DEBUG ./src/position.c:8: ctp_position_new 175560000
+23:58:33 DEBUG ./src/position.c:15: ctp_position_new 175560000 end
+23:58:33 DEBUG ./src/position.c:86: ctp_position_keeper_localcopy create 1 | 175560496
+23:58:33 DEBUG ./src/position.c:8: ctp_position_new 175560496
+23:58:33 DEBUG ./src/position.c:15: ctp_position_new 175560496 end
+23:58:33 DEBUG ./src/position.c:86: ctp_position_keeper_localcopy create 1 | 175560992
+23:58:33 DEBUG ./src/position.c:8: ctp_position_new 175560992
+23:58:33 DEBUG ./src/position.c:15: ctp_position_new 175560992 end
+23:58:33 DEBUG ./src/position.c:86: ctp_position_keeper_localcopy create 1 | 175561488
+23:58:33 DEBUG ./src/position.c:8: ctp_position_new 175561488
+23:58:33 DEBUG ./src/position.c:15: ctp_position_new 175561488 end
+23:58:33 DEBUG ./src/ctpc2.cpp:158: ctp_trader_order_insert au2406 | 0.000000 | 1 | -1
+23:58:33 DEBUG ./src/ctpc2.cpp:169: order_ref: 000000000012
+23:58:33 DEBUG ./src/ctpc2.cpp:172: ctp_trader_order_insert | market order
+23:58:33 DEBUG ./src/ctpc2.cpp:191: CombOffsetFlag[0]=1
+23:58:33 DEBUG ./src/ctpc2.cpp:195: Direction=0
+23:58:33 INFO  ./src/ctpc2.cpp:205: ReqOrderInsert | req_id: 6
+23:58:33 DEBUG ./src/ctpc2.cpp:158: ctp_trader_order_insert au2406 | 0.000000 | -1 | -1
+23:58:33 DEBUG ./src/ctpc2.cpp:169: order_ref: 000000000013
+23:58:33 DEBUG ./src/ctpc2.cpp:172: ctp_trader_order_insert | market order
+23:58:33 DEBUG ./src/ctpc2.cpp:191: CombOffsetFlag[0]=1
+23:58:33 DEBUG ./src/ctpc2.cpp:195: Direction=1
+23:58:33 INFO  ./src/ctpc2.cpp:205: ReqOrderInsert | req_id: 7
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:222: OnRspOrderInsert | 000000000012 | 1009 | 持仓不足
+23:58:33 INFO  ./src/CustomTradeSpi.cpp:222: OnRspOrderInsert | 000000000013 | 1009 | 持仓不足
+luajit: interrupted!
+stack traceback:
+	[C]: in function 'sleep'
+	test_trader.lua:94: in main chunk
+	[C]: at 0x5558097342b0

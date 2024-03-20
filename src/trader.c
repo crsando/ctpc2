@@ -15,6 +15,7 @@ ctp_trader_t * ctp_trader_new() {
     t->c = (struct cond *)malloc(sizeof(struct cond));
     cond_create(t->c);
     log_debug("t->c : %d", t->c);
+    log_debug("t->q : %d", queue_length(t->q));
     return t;
 }
 
