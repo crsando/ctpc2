@@ -21,26 +21,54 @@ end
 local trader = ctp.new_trader(server):start()
 
 print("---")
-
-for i = 1, 1 do
-    trader:query_account()
-    local rsp = trader:recv()
-    local act = ffi.new("struct CThostFtdcTradingAccountField *", rsp.field)
-    print("Balance", act.Balance)
-end
+print "testing start"
+print("---")
 
 local pk = ctp.position_keeper()
 
-trader:query_position()
-
-local finished = false
-while not finished do 
-    local rsp = trader:recv()
-    finished = pk:update(rsp)
+function position()
+    trader:query_position()
+    local finished = false
+    while not finished do 
+        local rsp = trader:recv()
+        finished = pk:update(rsp)
+    end
+    local t = pk:table()
+    print(inspect(t))
 end
 
-local t = pk:table()
+position()
 
-print(inspect(t))
+
+print("---")
+print "testing order insert"
+print("---")
+
+-- #define THOST_FTDC_OFEN_Open '0'
+-- #define THOST_FTDC_OFEN_Close '1'
+-- #define THOST_FTDC_OFEN_ForceClose '2'
+-- #define THOST_FTDC_OFEN_CloseToday '3'
+-- #define THOST_FTDC_OFEN_CloseYesterday '4'
+-- #define THOST_FTDC_OFEN_ForceOff '5'
+-- #define THOST_FTDC_OFEN_LocalForceClose '6'
+
+local op_flg = {
+    Open = 48 + 0,
+    Close = 48 + 1,
+    CloseYesterday = 48 + 3
+}
+
+ctp.ctpc.ctp_trader_order_insert(trader.trader, "i2406", 0, 1, op_flg.Open)
+
+while true do 
+    local ptr, rsp = trader:fetch()
+    print(ptr, rsp, ffi.string(rsp.desc))
+    if ffi.string(rsp.desc) == "CThostFtdcTradeField" then 
+        position()
+        break 
+    end
+end
+
+
 
 os.exit(1)

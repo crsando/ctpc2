@@ -85,6 +85,7 @@ void ctp_trader_wait_for_settle(ctp_trader_t * t);
 typedef struct {
     int req_id;
     uint32_t rsp_typ;
+    char desc[256];
     void * field;
     size_t size;
     int last;
@@ -109,6 +110,6 @@ int ctp_trader_query_position(ctp_trader_t * trader);
 //
 // Order Executions
 //
-int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, int flag);
+int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag);
 
 #endif

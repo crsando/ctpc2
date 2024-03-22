@@ -49,8 +49,8 @@ void ctp_trader_release(ctp_trader_t * t) {
 
 void ctp_rsp_free(ctp_rsp_t * r) {
     log_debug("ctp_rsp_free | %d | %d", r->req_id, r->field);
-    if(r->field) 
-        free(r->field);
+    // if(r->field) 
+        // free(r->field);
     free(r);
     log_debug("ctp_rsp_free success | %d | %d", r->req_id, r->field);
 }

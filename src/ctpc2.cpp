@@ -151,9 +151,7 @@ int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
 	CTP_TRADER_REQ(trader, QryDepthMarketData, &field);
 }
 
-
-
-int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, int flag)
+int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag)
 {
     log_debug("ctp_trader_order_insert %s | %lf | %d | %d", symbol, price, volume, flag);
     int order_ref_i = 0;
@@ -182,12 +180,7 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
         orderInsertReq.TimeCondition = THOST_FTDC_TC_GFD; // 当日有效
     }
 
-    if(flag > 0) {
-        orderInsertReq.CombOffsetFlag[0] = THOST_FTDC_OF_Open; // open
-    }
-    else {
-        orderInsertReq.CombOffsetFlag[0] = THOST_FTDC_OF_Close; // close
-    }
+    orderInsertReq.CombOffsetFlag[0] = flag;
     log_debug("CombOffsetFlag[0]=%c", orderInsertReq.CombOffsetFlag[0]);
 	orderInsertReq.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
 

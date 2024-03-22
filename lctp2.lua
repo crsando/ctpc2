@@ -25,6 +25,8 @@ ffi_load_header_file(include_path .. "/ctpc2/util.h")
 ffi.cdef[[
     enum { LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL };
     void log_set_level(int level);
+
+    void free(void *p);
 ]]
 
 local ctpc = ffi.load("ctpc2")
@@ -112,9 +114,24 @@ function new_trader(server)
                 return self
             end,
         -- is_ready = function(self) return (self.trader.connected >= 4) end,
+
         recv = function (self)
-                -- return ffi.gc(ctpc.ctp_trader_recv(self.trader), ctpc.ctp_rsp_free)
+                -- raw receive
                 return ctpc.ctp_trader_recv(self.trader)
+            end,
+        
+        fetch = function (self)
+                local rsp = ffi.gc(ctpc.ctp_trader_recv(self.trader), ctpc.ctp_rsp_free) 
+                if rsp.desc == "error" then 
+                    return nil, rsp
+                else
+                    local ptr_type = "struct " .. ffi.string(rsp.desc) .. " * "
+                    local ptr = assert(ffi.cast(ptr_type, rsp.field))
+                    if ptr ~= nil then 
+                        ffi.gc(ptr, ffi.C.free)
+                    end
+                    return ptr, rsp
+                end
             end,
         
         query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,
