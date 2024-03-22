@@ -88,8 +88,9 @@ function new_collector(server)
                 return ctpc.ctp_md_recv(self.md)
             end,
     }
+    _mt.__index = _mt
     local collector = { md = md }
-    setmetatable(collector, { __index = _mt } )
+    setmetatable(collector, _mt)
 
     return collector
 end
@@ -118,7 +119,7 @@ function new_trader(server)
         
         query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,
         query_position = function(self) return ctpc.ctp_trader_query_position(self.trader) end,
-        query_marketdata = function(self, symbol) return ctpc.ctp_trader_query_marketdata(self.trader, symbol) end,
+        -- query_marketdata = function(self, symbol) return ctpc.ctp_trader_query_marketdata(self.trader, symbol) end,
         -- fetch_account = function(self, req_id) return ctpc.ctp_trader_fetch_account(self.trader, req_id) end,
     }
 

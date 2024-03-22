@@ -168,7 +168,7 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
     sprintf(t->lst_order_ref, "%012d", order_ref_i);
     log_debug("order_ref: %s", orderInsertReq.OrderRef);
 
-    if ( price <= 0.0001 ) {
+    if ( price < 0.0001 ) {
         log_debug("ctp_trader_order_insert | market order");
         orderInsertReq.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
         orderInsertReq.LimitPrice = 0.0;
