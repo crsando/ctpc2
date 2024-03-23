@@ -196,6 +196,29 @@ local op_flg = {
 
 function order_insert(symbol, volume, flag)
     print(">>> lctpc2 order_insert", symbol, volume, flag)
+
+    local flag = flag
+    if not flag then 
+        local u = {}
+        for _, p in ipairs(pk:table()) do 
+            if p.symbol == symbol then 
+                u[p.direction] = (u[p.direction] or 0) + p.num
+            end
+        end
+
+        if volume > 0 then 
+            if u["short"] > 0 then 
+                flag = op_flg.Close
+            end
+        elseif volume < 0 then 
+            if u["long"] > 0 then 
+                flag = op_flg.Close 
+            end
+        end
+        flag = flag or op_flg.Open
+    end
+    print("flag", flag)
+
     ctp.ctpc.ctp_trader_order_insert(trader.trader, symbol, 0, volume, flag)
     local order = {}
     order.FrontID = tonumber(trader.trader.front_id)
@@ -221,7 +244,12 @@ end
 -- order_insert("IF2406", 1, op_flg.Open)
 -- order_insert("IF2406", -1, op_flg.Close)
 
-order_insert("cu2406", 1, op_flg.Open)
-order_insert("cu2406", -1, op_flg.Close)
+-- order_insert("cu2406", 1, op_flg.Open)
+-- order_insert("cu2406", -1, op_flg.Close)
+
+for i = 1, 50 do
+    position()
+    order_insert("i2406", -1)
+end
 
 os.exit(1)
