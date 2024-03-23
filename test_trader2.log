@@ -1,0 +1,245 @@
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:38: OnFrontConnected | FrontAddr:tcp://121.37.80.177:20002
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:50: ReqAuthenticate | req_id: 1
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:56: OnRspAuthenticate | Success | AppID:client_tara_060315 | AuthCode:20221011TARA000
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:324: reqUserLogin | 7090 | 7572 | 123456
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:330: ReqUserLogin | req_id: 2
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:74: OnRspUserLogin | Success | BrokerID:7090 | UserID:7572
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:75: OnRspUserLogin | FrontID: 0 | SessionID: 249449 | MaxOrderRef: 1
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:345: reqSettlementInfoConfirm
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:351: ReqSettlementInfoConfirm | req_id: 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:182: OnRspSettlementInfoConfirm | Success | ConfirmDate:20240323 16:04:44
+16:04:44 INFO  ./src/ctpc2.cpp:143: ReqQryInvestorPosition | req_id: 4
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000002 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000002 | Sys: DCE+85239 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000002 | Sys: DCE+85239 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+85239 | i2406 | Time: 20240323 10:38:57 | 828.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+85292 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+85292 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+85292 | i2406 | Time: 20240323 10:39:25 | 829.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+85792 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+85792 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+85792 | i2406 | Time: 20240323 10:43:50 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+85837 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+85837 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+85837 | i2406 | Time: 20240323 10:44:17 | 831.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+85892 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000003 | Sys: DCE+85892 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+85892 | i2406 | Time: 20240323 10:44:44 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000004 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000004 | Sys: DCE+98914 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000004 | Sys: DCE+98914 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+98914 | i2406 | Time: 20240323 12:42:04 | 831.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000005 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000005 | Sys: DCE+99357 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000005 | Sys: DCE+99357 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+99357 | i2406 | Time: 20240323 12:45:56 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000006 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000006 | Sys: DCE+99428 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000006 | Sys: DCE+99428 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+99428 | i2406 | Time: 20240323 12:46:33 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000007 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000007 | Sys: DCE+100527 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000007 | Sys: DCE+100527 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+100527 | i2406 | Time: 20240323 12:56:10 | 833.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000008 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000008 | Sys: DCE+101951 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000008 | Sys: DCE+101951 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+101951 | i2406 | Time: 20240323 13:09:08 | 833.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000009 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000009 | Sys: DCE+101952 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000009 | Sys: DCE+101952 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+101952 | i2406 | Time: 20240323 13:09:17 | 833.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000010 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000010 | Sys: DCE+101953 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000010 | Sys: DCE+101953 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+101953 | i2406 | Time: 20240323 13:12:50 | 834.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000011 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000011 | Sys: DCE+101954 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000011 | Sys: DCE+101954 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+101954 | i2406 | Time: 20240323 13:14:17 | 832.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000012 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000012 | Sys: DCE+101955 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000012 | Sys: DCE+101955 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+101955 | i2406 | Time: 20240323 13:16:46 | 831.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000013 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000013 | Sys: DCE+101956 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000013 | Sys: DCE+101956 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+101956 | i2406 | Time: 20240323 13:17:12 | 831.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000014 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000014 | Sys: DCE+102001 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000014 | Sys: DCE+102001 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+102001 | i2406 | Time: 20240323 13:19:09 | 832.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000015 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000015 | Sys: DCE+102094 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000015 | Sys: DCE+102094 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+102094 | i2406 | Time: 20240323 13:19:57 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000016 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000016 | Sys: DCE+102217 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000016 | Sys: DCE+102217 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+102217 | i2406 | Time: 20240323 13:21:03 | 832.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000017 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000017 | Sys: DCE+117589 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000017 | Sys: DCE+117589 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+117589 | i2406 | Time: 20240323 15:39:18 | 828.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000018 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000018 | Sys: DCE+117678 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000018 | Sys: DCE+117678 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+117678 | i2406 | Time: 20240323 15:40:06 | 828.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000019 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000019 | Sys: DCE+117707 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000019 | Sys: DCE+117707 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+117707 | i2406 | Time: 20240323 15:40:21 | 829.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000020 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000020 | Sys: DCE+117804 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000020 | Sys: DCE+117804 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+117804 | i2406 | Time: 20240323 15:41:15 | 829.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000021 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000021 | Sys: DCE+117817 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000021 | Sys: DCE+117817 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+117817 | i2406 | Time: 20240323 15:41:21 | 830.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000022 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000022 | Sys: DCE+117918 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000022 | Sys: DCE+117918 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+117918 | i2406 | Time: 20240323 15:42:11 | 829.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000023 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000023 | Sys: DCE+117953 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000023 | Sys: DCE+117953 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+117953 | i2406 | Time: 20240323 15:42:30 | 829.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000024 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000024 | Sys: DCE+117984 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000024 | Sys: DCE+117984 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+117984 | i2406 | Time: 20240323 15:42:47 | 829.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000025 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000025 | Sys: DCE+118015 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000025 | Sys: DCE+118015 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118015 | i2406 | Time: 20240323 15:43:03 | 829.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000026 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000026 | Sys: DCE+118028 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000026 | Sys: DCE+118028 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118028 | i2406 | Time: 20240323 15:43:10 | 829.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000027 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000027 | Sys: DCE+118199 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000027 | Sys: DCE+118199 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118199 | i2406 | Time: 20240323 15:44:44 | 829.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000028 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000028 | Sys: DCE+118386 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000028 | Sys: DCE+118386 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118386 | i2406 | Time: 20240323 15:46:25 | 832.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000029 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000029 | Sys: DCE+118425 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000029 | Sys: DCE+118425 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118425 | i2406 | Time: 20240323 15:46:44 | 833.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000030 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000030 | Sys: DCE+118568 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000030 | Sys: DCE+118568 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118568 | i2406 | Time: 20240323 15:48:03 | 832.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000031 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000031 | Sys: DCE+118663 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000031 | Sys: DCE+118663 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118663 | i2406 | Time: 20240323 15:48:53 | 832.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000032 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000032 | Sys: DCE+118706 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000032 | Sys: DCE+118706 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118706 | i2406 | Time: 20240323 15:49:16 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000033 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000033 | Sys: DCE+118731 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000033 | Sys: DCE+118731 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118731 | i2406 | Time: 20240323 15:49:28 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000034 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000034 | Sys: DCE+118834 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000034 | Sys: DCE+118834 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118834 | i2406 | Time: 20240323 15:50:20 | 832.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000035 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000035 | Sys: DCE+118909 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000035 | Sys: DCE+118909 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118909 | i2406 | Time: 20240323 15:50:59 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000036 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000036 | Sys: DCE+118996 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000036 | Sys: DCE+118996 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+118996 | i2406 | Time: 20240323 15:51:44 | 832.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000037 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000037 | Sys: DCE+119027 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000037 | Sys: DCE+119027 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119027 | i2406 | Time: 20240323 15:51:59 | 833.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000038 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000038 | Sys: DCE+119192 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000038 | Sys: DCE+119192 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119192 | i2406 | Time: 20240323 15:53:25 | 832.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000039 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000039 | Sys: DCE+119245 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000039 | Sys: DCE+119245 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119245 | i2406 | Time: 20240323 15:53:53 | 831.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000040 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000040 | Sys: DCE+119274 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000040 | Sys: DCE+119274 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119274 | i2406 | Time: 20240323 15:54:07 | 831.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000041 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000041 | Sys: DCE+119389 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000041 | Sys: DCE+119389 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119389 | i2406 | Time: 20240323 15:55:06 | 831.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000042 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000042 | Sys: DCE+119478 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000042 | Sys: DCE+119478 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119478 | i2406 | Time: 20240323 15:55:55 | 832.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000043 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000043 | Sys: DCE+119521 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000043 | Sys: DCE+119521 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119521 | i2406 | Time: 20240323 15:56:17 | 832.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000044 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000044 | Sys: DCE+119750 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000044 | Sys: DCE+119750 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119750 | i2406 | Time: 20240323 15:58:21 | 834.000000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000045 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000045 | Sys: DCE+119875 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000045 | Sys: DCE+119875 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119875 | i2406 | Time: 20240323 15:59:26 | 833.500000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000046 | Sys: DCE+ | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000046 | Sys: DCE+119876 | i2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000046 | Sys: DCE+119876 | i2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: DCE+119876 | i2406 | Time: 20240323 15:59:26 | 832.500000 | 1 | 1
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000047 | Sys: CFFEX+ | IF2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000047 | Sys: CFFEX+120377 | IF2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000047 | Sys: CFFEX+120377 | IF2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: CFFEX+120377 | IF2406 | Time: 20240323 16:03:50 | 3505.400000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000048 | Sys: CFFEX+ | IF2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000048 | Sys: CFFEX+120378 | IF2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000048 | Sys: CFFEX+120378 | IF2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: CFFEX+120378 | IF2406 | Time: 20240323 16:03:50 | 3504.800000 | 1 | 1
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000049 | Sys: CFFEX+ | IF2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000049 | Sys: CFFEX+120407 | IF2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000049 | Sys: CFFEX+120407 | IF2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: CFFEX+120407 | IF2406 | Time: 20240323 16:04:05 | 3506.200000 | 1 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000050 | Sys: CFFEX+ | IF2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000050 | Sys: CFFEX+120408 | IF2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000050 | Sys: CFFEX+120408 | IF2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: CFFEX+120408 | IF2406 | Time: 20240323 16:04:05 | 3505.800000 | 1 | 1
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:44 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:44 INFO  ./src/ctpc2.cpp:198: ReqOrderInsert | req_id: 5
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000051 | Sys: SHFE+ | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000051 | Sys: SHFE+120485 | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000051 | Sys: SHFE+120485 | cu2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: SHFE+120485 | cu2406 | Time: 20240323 16:04:46 | 72370.000000 | 1 | 0
+16:04:45 INFO  ./src/ctpc2.cpp:143: ReqQryInvestorPosition | req_id: 6
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/ctpc2.cpp:198: ReqOrderInsert | req_id: 7
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000052 | Sys: SHFE+ | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | a
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000052 | Sys: SHFE+120486 | cu2406 | 0.000000 | #:1 | #Traded: 0 | Status | 0 | 3
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:279: OnRtnOrder | Ref: 0+249449+000000000052 | Sys: SHFE+120486 | cu2406 | 0.000000 | #:0 | #Traded: 1 | Status | 0 | 0
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:300: OnRtnTrade | Sys: SHFE+120486 | cu2406 | Time: 20240323 16:04:46 | 72360.000000 | 1 | 1
+16:04:45 INFO  ./src/ctpc2.cpp:143: ReqQryInvestorPosition | req_id: 8
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed
+16:04:45 INFO  ./src/CustomTradeSpi.cpp:218: OnRspQryInvestorPosition | Succeed

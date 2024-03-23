@@ -164,7 +164,7 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
     order_ref_i = atoi(t->lst_order_ref) + 1;
     sprintf(orderInsertReq.OrderRef, "%012d", order_ref_i);
     sprintf(t->lst_order_ref, "%012d", order_ref_i);
-    log_debug("order_ref: %s", orderInsertReq.OrderRef);
+    log_debug("order_ref: %s | %s", orderInsertReq.OrderRef, t->lst_order_ref);
 
     if ( price < 0.0001 ) {
         log_debug("ctp_trader_order_insert | market order");

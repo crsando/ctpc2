@@ -7,6 +7,7 @@ local ffi = ctp.ffi
 
 -- ctp.log_set_level("LOG_ERROR")
 ctp.log_set_level("LOG_INFO")
+-- ctp.log_set_level("LOG_DEBUG")
 
 local pk = ctp.position_keeper()
 
@@ -17,14 +18,17 @@ _mt_order_book.query = function (self, t)
     if t == nil then return nil end
     -- t : table or cdata (CThostFtdcOrderField)
     local tostr = (type(t) == "table") and tostring or ffi.string
-    local isempty = function (s) return (s~=nil) and (string.match(tostr(s), "^%s*$") ~= nil) end
+    local isempty = function (s) return (s==nil) or (string.match(tostr(s), "^%s*$") ~= nil) end
 
-    -- print("query: OrderSysID", ffi.string(t.OrderSysID))
 
     for _, order in ipairs(order_book) do 
+        print("check order: ", inspect(order))
         local criterion = true
 
-        if (ffi.istype("struct CThostFtdcOrderField *", t)) and (not isempty(t.OrderRef)) then 
+        if 
+            ((type(t) == "table") and (t.OrderRef)) or 
+            ((ffi.istype("struct CThostFtdcOrderField *", t)) and (not isempty(t.OrderRef)))
+            then 
             criterion = criterion and (tostr(t.OrderRef) == order.OrderRef)
 
             -- no need the compare these
@@ -34,8 +38,6 @@ _mt_order_book.query = function (self, t)
         end
 
         if not isempty(t.OrderSysID) then 
-            print("query: ExchangeID", ffi.string(t.ExchangeID))
-            print("query: OrderSysID", ffi.string(t.OrderSysID))
             criterion = criterion and (tostr(t.ExchangeID) == order.ExchangeID)
             criterion = criterion and (tostr(t.OrderSysID) == order.OrderSysID)
             if criterion then return order end
@@ -48,8 +50,6 @@ _mt_order_book.update_trade = function(self, t)
         local tostr = (type(t) == "table") and tostring or ffi.string
         local o = self:query(t)
         if not o then return nil end
-        print("to update trade", t)
-        print("to update trade", inspect(o))
         local cols_str = { "TradeDate", "TradeTime" }
         local cols_num = { "OffsetFlag", "Direction", "Volume", "Price" }
         for _, k in ipairs(cols_str) do o[k] = (t[k] ~= nil) and tostr(t[k]) end
@@ -137,6 +137,7 @@ function process_message(trader, criterion)
         flg = criterion(rsp)
         ctp.ctpc.ctp_rsp_free(rsp)
     end
+    print("end of process message")
 end
 
 local server = ctp.servers.trader["openctp-7x24"] 
@@ -155,6 +156,11 @@ local trader = ctp.new_trader(server):start()
 print("---")
 print "testing start"
 print("---")
+
+-- local u, o = pcall(function () return trader.trader.session_id end)
+-- print(u, o)
+
+-- os.exit(1)
 
 
 function position()
@@ -208,9 +214,14 @@ function order_insert(symbol, volume, flag)
     position()
 end
 
-order_insert("i2406", 1, op_flg.Open)
-order_insert("i2406", 1, op_flg.Close)
+-- order_insert("i2406", 1, op_flg.Open)
+-- order_insert("i2406", -1, op_flg.Close)
 
 
+-- order_insert("IF2406", 1, op_flg.Open)
+-- order_insert("IF2406", -1, op_flg.Close)
+
+order_insert("cu2406", 1, op_flg.Open)
+order_insert("cu2406", -1, op_flg.Close)
 
 os.exit(1)
