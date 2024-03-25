@@ -194,8 +194,9 @@ local op_flg = {
     CloseYesterday = 48 + 3
 }
 
-function order_insert(symbol, volume, flag)
-    print(">>> lctpc2 order_insert", symbol, volume, flag)
+-- flag is optional
+function order_insert(symbol, price, volume, flag)
+    print(">>> lctpc2 order_insert", symbol, price, volume, flag)
 
     local flag = flag
     if not flag then 
@@ -219,7 +220,7 @@ function order_insert(symbol, volume, flag)
     end
     print("flag", flag)
 
-    ctp.ctpc.ctp_trader_order_insert(trader.trader, symbol, 0, volume, flag)
+    ctp.ctpc.ctp_trader_order_insert(trader.trader, symbol, price, volume, flag)
     local order = {}
     order.FrontID = tonumber(trader.trader.front_id)
     order.SessionID = tonumber(trader.trader.session_id)
