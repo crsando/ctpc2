@@ -26,10 +26,25 @@ print("---")
 
 trader:query_instrument()
 
+local futures = {}
+
 while true do 
     local rsp = trader:recv()
+    local field = ffi.cast( "struct " .. ffi.string(rsp.field_name) .. "*", rsp.field)
+
+    if tonumber(field.ProductClass) == 49 then -- Futures
+        local c = { 
+                symbol = ffi.string(field.InstrumentID),
+                exchange_id = ffi.string(field.ExchangeID),
+                product = ffi.string(field.ProductID),
+                expire_date = ffi.string(field.ExpireDate),
+            }
+
+        print("future", inspect(c))
+        futures[#futures + 1] = c
+    end
+
+    if rsp.last == 1 then 
+        break 
+    end
 end
-
-
-
-os.exit(1)
