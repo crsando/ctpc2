@@ -14,25 +14,6 @@ extern "C" {
 #define _trader_api ((CThostFtdcTraderApi *)(this->_trader->_api))
 #define _trader_spi ((CThostFtdcTraderApi *)(this->_trader->_spi))
 
-
-#define CTP_TRADER_ON_RSP(cmd, cf) \
-void CustomTradeSpi::OnRsp ## cmd ## (cf * field, \
-	CThostFtdcRspInfoField * pRspInfo, \
-	int nRequestID, \
-	bool bIsLast \
-	) \
-{ \
-	if (!isErrorRspInfo(pRspInfo)) { \
-		log_info("OnRsp%s | RequstID: %d | Success\n", #cmd, nRequestID); \
-		if ( this->_trader->on_rsp ) { \
-			this->_trader->on_rsp(#cmd, (field), pRspInfo, nRequestID, (bIsLast ? 1 : 0)); \
-		} \
-	} \
-	else { \
-		log_info("OnRsp%s | RequstID: %d | Failed | %s\n", # cmd, nRequestID, pRspInfo->ErrorMsg); \
-	} \
-} 
-
 void CustomTradeSpi::OnFrontConnected()
 {
 	log_info("OnFrontConnected | FrontAddr:%s", this->_trader->front_addr);

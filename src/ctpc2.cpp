@@ -153,12 +153,12 @@ int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id)
 }
 
 // useless, it is for options not for futures
-int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
-    CThostFtdcQryDepthMarketDataField field;
-	memset(&field, 0, sizeof(field));
-	strcpy(field.InstrumentID, symbol);
-	CTP_TRADER_REQ(trader, QryDepthMarketData, &field);
-}
+// int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
+//     CThostFtdcQryDepthMarketDataField field;
+// 	memset(&field, 0, sizeof(field));
+// 	strcpy(field.InstrumentID, symbol);
+// 	CTP_TRADER_REQ(trader, QryDepthMarketData, &field);
+// }
 
 int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag)
 {
