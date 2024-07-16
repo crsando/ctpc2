@@ -156,7 +156,9 @@ void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRe
 		memset(rsp, 0, sizeof(ctp_rsp_t)); \
 		rsp->req_id = nRequestID; \
 		rsp->last = (bIsLast ? 1 : 0); \
+        rsp->is_last = bIsLast; \
         strcpy(rsp->desc, #tp); \
+        strcpy(rsp->func_name, #fn); \
         strcpy(rsp->field_name, #tp); \
 		if(pField) { \
 			rsp->field = (void *)malloc(sizeof(tp)); \

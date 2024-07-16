@@ -86,6 +86,7 @@ typedef struct {
     // header
     uint32_t rsp_typ;
     char desc[256];
+    char func_name[256];
     char field_name[256];
 
     // main body
@@ -93,6 +94,7 @@ typedef struct {
     void * field;
     size_t size;
     int last;
+    bool is_last;
 
     // common
     void * rsp_info;
