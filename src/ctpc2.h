@@ -93,6 +93,9 @@ typedef struct {
     void * field;
     size_t size;
     int last;
+
+    // common
+    void * rsp_info;
 } ctp_rsp_t;
 
 void ctp_trader_send(ctp_trader_t * t, ctp_rsp_t * msg);

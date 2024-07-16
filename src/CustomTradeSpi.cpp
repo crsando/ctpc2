@@ -155,11 +155,44 @@ void CustomTradeSpi::OnRspUserLogout(
 			rsp->field = NULL; \
 			rsp->size = 0; \
 		} \
+        rsp->rsp_info = (void *)malloc(sizeof(CThostFtdcRspInfoField)); \
+        memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
 		rsp->req_id = nRequestID; \
 		rsp->last = (bIsLast ? 1 : 0); \
 		log_debug("ON_RSP_THEN_SEND : struct %s | last %d", rsp->desc, rsp->last); \
 		ctp_trader_send(this->_trader, rsp); \
 	} while(0)
+
+
+#define CUSTOM_ON(fn, tp) \
+void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)  { \
+    log_debug("%s | nRequestID : %d | isLast: %d", #fn, nRequestID, bIsLast ? 1 : 0); \
+	if(pRspInfo && (pRspInfo->ErrorID != 0)) { \
+		log_debug("%s | ErrorRsp | %d | %s", #fn, pRspInfo->ErrorID, pRspInfo->ErrorMsg); \
+    } \
+	do { \
+		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
+		memset(rsp, 0, sizeof(ctp_rsp_t)); \
+		rsp->req_id = nRequestID; \
+		rsp->last = (bIsLast ? 1 : 0); \
+        strcpy(rsp->desc, #tp); \
+        strcpy(rsp->field_name, #tp); \
+		if(pField) { \
+			rsp->field = (void *)malloc(sizeof(tp)); \
+			memcpy(rsp->field, pField, sizeof(tp)); \
+			rsp->size = sizeof(tp); \
+		} \
+		else { \
+			rsp->field = NULL; \
+			rsp->size = 0; \
+		} \
+        if(pRspInfo) { \
+            rsp->rsp_info = (void *)malloc(sizeof(CThostFtdcRspInfoField)); \
+            memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
+        } \
+		ctp_trader_send(this->_trader, rsp); \
+	} while(0); \
+}
 
 ctp_rsp_t * pack_data(void * data, size_t size) {
 	ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t));
@@ -191,51 +224,55 @@ void CustomTradeSpi::OnRspSettlementInfoConfirm(
 	}
 }
 
-void CustomTradeSpi::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	log_info("OnRspQryInstrument | %s | %s", pInstrument->ExchangeID, pInstrument->InstrumentID);
-}
+CUSTOM_ON(OnRspQryTradingAccount, CThostFtdcTradingAccountField);
+CUSTOM_ON(OnRspQryInvestorPosition, CThostFtdcInvestorPositionField);
+CUSTOM_ON(OnRspQryInstrument, CThostFtdcInstrumentField);
 
-void CustomTradeSpi::OnRspQryTradingAccount( CThostFtdcTradingAccountField * pField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if (!isErrorRspInfo(pRspInfo)) {
-		log_info("OnRspQryTradingAccount | Succeed");
-		ON_RSP_THEN_SEND(CThostFtdcTradingAccountField);
-	}
-	else {
-		log_info("OnRspQryTradingAccount | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-	}
-}
+// void CustomTradeSpi::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+// {
+// 	log_info("OnRspQryInstrument | %s | %s", pInstrument->ExchangeID, pInstrument->InstrumentID);
+// }
 
-void CustomTradeSpi::OnRspQryInvestorPosition(
-	CThostFtdcInvestorPositionField *pField,
-	CThostFtdcRspInfoField *pRspInfo,
-	int nRequestID,
-	bool bIsLast)
-{
-	if (!isErrorRspInfo(pRspInfo)) {
-		log_info("OnRspQryInvestorPosition | Succeed");
-		ON_RSP_THEN_SEND(CThostFtdcInvestorPositionField);
-	}
-	else {
-		log_info("OnRspQryInvestorPosition | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-	}
-}
+// void CustomTradeSpi::OnRspQryTradingAccount( CThostFtdcTradingAccountField * pField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+// {
+// 	if (!isErrorRspInfo(pRspInfo)) {
+// 		log_info("OnRspQryTradingAccount | Succeed");
+// 		ON_RSP_THEN_SEND(CThostFtdcTradingAccountField);
+// 	}
+// 	else {
+// 		log_info("OnRspQryTradingAccount | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+// 	}
+// }
 
-void CustomTradeSpi::OnRspQryDepthMarketData(
-	CThostFtdcDepthMarketDataField *pField,
-	CThostFtdcRspInfoField *pRspInfo,
-	int nRequestID,
-	bool bIsLast)
-{
-	if (!isErrorRspInfo(pRspInfo)) {
-		log_info("OnRspQryDepthMarketData | Succeed | %s | %lf", pField->InstrumentID, pField->LastPrice);
-		ON_RSP_THEN_SEND(CThostFtdcDepthMarketDataField);
-	}
-	else {
-		log_info("OnRspQryDepthMarketData | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-	}
-}
+// void CustomTradeSpi::OnRspQryInvestorPosition(
+// 	CThostFtdcInvestorPositionField *pField,
+// 	CThostFtdcRspInfoField *pRspInfo,
+// 	int nRequestID,
+// 	bool bIsLast)
+// {
+// 	if (!isErrorRspInfo(pRspInfo)) {
+// 		log_info("OnRspQryInvestorPosition | Succeed");
+// 		ON_RSP_THEN_SEND(CThostFtdcInvestorPositionField);
+// 	}
+// 	else {
+// 		log_info("OnRspQryInvestorPosition | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+// 	}
+// }
+
+// void CustomTradeSpi::OnRspQryDepthMarketData(
+// 	CThostFtdcDepthMarketDataField *pField,
+// 	CThostFtdcRspInfoField *pRspInfo,
+// 	int nRequestID,
+// 	bool bIsLast)
+// {
+// 	if (!isErrorRspInfo(pRspInfo)) {
+// 		log_info("OnRspQryDepthMarketData | Succeed | %s | %lf", pField->InstrumentID, pField->LastPrice);
+// 		ON_RSP_THEN_SEND(CThostFtdcDepthMarketDataField);
+// 	}
+// 	else {
+// 		log_info("OnRspQryDepthMarketData | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+// 	}
+// }
 
 void CustomTradeSpi::OnRspOrderInsert(
 	CThostFtdcInputOrderField *pField, 
