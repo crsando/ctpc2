@@ -42,19 +42,26 @@ local process_message = coroutine.create(function ()
     local default_handler = S.OnRsp
     while true do 
         local rsp = trader:recv()
-        local field = ffi.cast( "struct " .. ffi.string(rsp.field_name) .. "*", rsp.field)
         local func_name = ffi.string(rsp.func_name)
         local handler = S[func_name] or S.OnRsp
 
         -- print("process message", rsp.req_id, func_name, rsp.is_last)
 
         if handler then 
-            handler(rsp)
+            handler {
+                req_id = tonumber(rsp.req_id),
+                field = ffi.cast( "struct " .. ffi.string(rsp.field_name) .. "*", rsp.field),
+                field_name = ffi.string(rsp.field_name),
+                func_name = ffi.string(rsp.func_name),
+                is_last = rsp.is_last,
+            }
         end
 
         coroutine.yield()
     end
 end)
+
+
 
 local function wrap_query(req_id) 
     R[req_id] = {} -- store results
@@ -68,11 +75,32 @@ local function wrap_query(req_id)
     return T
 end
 
-local get_futures_list = coroutine.create(function()
-    local futures = wrap_query(trader:query_instrument())
-    local res = {}
+local function wait_request(req_id)
+    R[req_id] = {} -- store results
+    local T = R[req_id]
+    local job = coroutine.create(function() 
+            while true do
+                local is_last = (T[#T] or {}).is_last or false
+                print("wait request", #T, is_last)
+                if is_last then break end
+                coroutine.resume(process_message)
+                coroutine.yield()
+            end
+        end)
+    while coroutine.resume(job) do 
+        -- do nothing
+    end
+    return T
+end
 
-    for i, entry in ipairs(futures) do 
+
+local rst = wait_request(trader:query_instrument("SHFE"))
+local futures = {}
+
+do
+    for i, entry in ipairs(rst) do 
+        print(inspect(entry))
+        print(entry.func_name, entry.field_name)
         local field = entry.field
         local c = { 
                 symbol = ffi.string(field.InstrumentID),
@@ -80,20 +108,16 @@ local get_futures_list = coroutine.create(function()
                 product = ffi.string(field.ProductID),
                 expire_date = ffi.string(field.ExpireDate),
             }
-        res[i] = c
+        futures[i] = c
     end
-
-    return res
-end)
-
-while coroutine.resume(get_futures_list) do 
 end
-
 
 trader:logout()
 
-coroutine.resume(process_message)
+print(inspect(futures))
+
+-- while true do 
+--     coroutine.resume(process_message)
+-- end
 
 print("task over, exit")
-
-os.exit(0)
