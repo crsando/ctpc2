@@ -113,6 +113,11 @@ function new_trader(server)
                 ctpc.ctp_trader_wait_for_settle(self.trader)
                 return self
             end,
+
+        logout = function(self)
+                ctpc.ctp_trader_logout(self.trader)
+                return self
+            end,
         -- is_ready = function(self) return (self.trader.connected >= 4) end,
 
         recv = function (self)

@@ -46,10 +46,9 @@ local process_message = coroutine.create(function ()
         local func_name = ffi.string(rsp.func_name)
         local handler = S[func_name] or S.OnRsp
 
-        print("process message", rsp.req_id, func_name, rsp.is_last)
+        -- print("process message", rsp.req_id, func_name, rsp.is_last)
 
         if handler then 
-            print("handler", func_name)
             handler(rsp)
         end
 
@@ -90,29 +89,11 @@ end)
 while coroutine.resume(get_futures_list) do 
 end
 
+
+trader:logout()
+
+coroutine.resume(process_message)
+
 print("task over, exit")
 
 os.exit(0)
-
---[[
-while true do 
-    local rsp = trader:recv()
-    local field = ffi.cast( "struct " .. ffi.string(rsp.field_name) .. "*", rsp.field)
-
-    if tonumber(field.ProductClass) == 49 then -- Futures
-        local c = { 
-                symbol = ffi.string(field.InstrumentID),
-                exchange_id = ffi.string(field.ExchangeID),
-                product = ffi.string(field.ProductID),
-                expire_date = ffi.string(field.ExpireDate),
-            }
-
-        print("future", inspect(c))
-        futures[#futures + 1] = c
-    end
-
-    if rsp.last == 1 then 
-        break 
-    end
-end
-]]

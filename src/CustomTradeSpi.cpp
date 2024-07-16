@@ -211,6 +211,8 @@ CUSTOM_ON(OnRspQryTradingAccount, CThostFtdcTradingAccountField);
 CUSTOM_ON(OnRspQryInvestorPosition, CThostFtdcInvestorPositionField);
 CUSTOM_ON(OnRspQryInstrument, CThostFtdcInstrumentField);
 
+// CUSTOM_ON(OnRspUserLogout, CThostFtdcUserLogoutField);
+
 // void CustomTradeSpi::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 // {
 // 	log_info("OnRspQryInstrument | %s | %s", pInstrument->ExchangeID, pInstrument->InstrumentID);

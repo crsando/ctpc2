@@ -126,6 +126,14 @@ ctp_trader_t * ctp_trader_start(ctp_trader_t * trader) {
     return trader;
 }
 
+int ctp_trader_logout(ctp_trader_t * trader) {
+    CThostFtdcUserLogoutField field;
+    memset(&field, 0, sizeof(CThostFtdcUserLogoutField));
+    strcpy(field.BrokerID, trader->broker);
+    strcpy(field.UserID, trader->user);
+	CTP_TRADER_REQ(trader, UserLogout, &field);
+}
+
 int ctp_trader_query_account(ctp_trader_t * trader) {
     log_debug("ctp_trader_query_account");
 	CThostFtdcQryTradingAccountField tradingAccountReq;

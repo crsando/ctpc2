@@ -122,4 +122,6 @@ int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id)
 //
 int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag);
 
+int ctp_trader_logout(ctp_trader_t * t);
+
 #endif
