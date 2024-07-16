@@ -136,6 +136,8 @@ function new_trader(server)
         
         query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,
         query_position = function(self) return ctpc.ctp_trader_query_position(self.trader) end,
+
+        query_instrument = function(self, exchange_id) return ctpc.ctp_trader_query_instrument(self.trader, exchange_id) end,
         -- query_marketdata = function(self, symbol) return ctpc.ctp_trader_query_marketdata(self.trader, symbol) end,
         -- fetch_account = function(self, req_id) return ctpc.ctp_trader_fetch_account(self.trader, req_id) end,
     }

@@ -83,9 +83,13 @@ ctp_trader_t * ctp_trader_start(ctp_trader_t * trader);
 void ctp_trader_wait_for_settle(ctp_trader_t * t);
 
 typedef struct {
-    int req_id;
+    // header
     uint32_t rsp_typ;
     char desc[256];
+    char field_name[256];
+
+    // main body
+    int req_id;
     void * field;
     size_t size;
     int last;
@@ -102,6 +106,7 @@ void ctp_rsp_free(ctp_rsp_t * r);
 
 int ctp_trader_query_account(ctp_trader_t * trader); 
 int ctp_trader_query_position(ctp_trader_t * trader);
+int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id);
 
 // ReqQryDepthMarketData
 // int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol);

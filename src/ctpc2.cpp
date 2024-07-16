@@ -143,6 +143,15 @@ int ctp_trader_query_position(ctp_trader_t * trader) {
 	CTP_TRADER_REQ(trader, QryInvestorPosition, &field);
 }
 
+int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id) {
+	CThostFtdcQryInstrumentField field;
+	memset(&field, 0, sizeof(field));
+    if (exchange_id) {
+        strcpy(field.ExchangeID, exchange_id);
+    }
+	CTP_TRADER_REQ(trader, QryInstrument, &field);
+}
+
 // useless, it is for options not for futures
 int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
     CThostFtdcQryDepthMarketDataField field;

@@ -144,15 +144,14 @@ void CustomTradeSpi::OnRspUserLogout(
 	do { \
 		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
 		memset(rsp, 0, sizeof(ctp_rsp_t)); \
+        strcpy(rsp->desc, #tp); \
 		if(pField) { \
-			strcpy(rsp->desc, #tp); \
 			rsp->field = (void *)malloc(sizeof(tp)); \
 			memcpy(rsp->field, pField, sizeof(tp)); \
 			rsp->size = sizeof(tp); \
 		} \
 		else { \
 			log_debug("pField == NULL"); \
-			strcpy(rsp->desc, "empty"); \
 			rsp->field = NULL; \
 			rsp->size = 0; \
 		} \
