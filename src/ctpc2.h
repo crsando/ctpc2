@@ -6,9 +6,13 @@
 #include "stdint.h"
 #include "macros.h"
 #include "position.h"
+#include <stdbool.h>
 
 // typedef void (*ctp_func_cb_t)(void * tick, void * _ctx);
 // typedef void (*ctp_tick_cb)(struct CThostFtdcDepthMarketDataField * tick);
+
+// common callback type
+typedef void * (*ctp_msg_pack_cb)(void * data);
 
 typedef struct {
     // tcp://xxx.xxx.xxx.xxx:xxxx
@@ -74,11 +78,15 @@ typedef struct _ctp_trader_t {
     // internal message queue for tick data
     struct queue * q;
     struct cond * c;
+    ctp_msg_pack_cb packer;
 } ctp_trader_t;
 
 ctp_trader_t * ctp_trader_new();
 ctp_trader_t * ctp_trader_init(ctp_trader_t * trader, const char front_addr[], const char broker[], 
     const char user[], const char password[], const char app_id[], const char auth_code[]);
+
+void ctp_trader_set_msg_packer(ctp_trader_t * trader, ctp_msg_pack_cb packer);
+
 ctp_trader_t * ctp_trader_start(ctp_trader_t * trader);
 void ctp_trader_wait_for_settle(ctp_trader_t * t);
 
@@ -100,8 +108,9 @@ typedef struct {
     void * rsp_info;
 } ctp_rsp_t;
 
-void ctp_trader_send(ctp_trader_t * t, ctp_rsp_t * msg);
-ctp_rsp_t * ctp_trader_recv(ctp_trader_t * t);
+void ctp_trader_send(ctp_trader_t * t, void * msg);
+// ctp_rsp_t * ctp_trader_recv(ctp_trader_t * t);
+ctp_rsp_t * ctp_trader_recv(ctp_trader_t * t, bool blocking);
 void ctp_rsp_free(ctp_rsp_t * r);
 
 //

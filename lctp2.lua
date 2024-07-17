@@ -120,13 +120,15 @@ function new_trader(server)
             end,
         -- is_ready = function(self) return (self.trader.connected >= 4) end,
 
-        recv = function (self)
+        recv = function (self, blocking)
                 -- raw receive
-                return ctpc.ctp_trader_recv(self.trader)
+                blocking = blocking or true
+                return ctpc.ctp_trader_recv(self.trader, blocking)
             end,
         
-        fetch = function (self)
-                local rsp = ffi.gc(ctpc.ctp_trader_recv(self.trader), ctpc.ctp_rsp_free) 
+        fetch = function (self, blocking)
+                blocking = blocking or true
+                local rsp = ffi.gc(ctpc.ctp_trader_recv(self.trader, blocking), ctpc.ctp_rsp_free) 
                 if rsp.desc == "error" then 
                     return nil, rsp
                 else

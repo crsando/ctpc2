@@ -121,6 +121,10 @@ ctp_trader_t * ctp_trader_init(
 
 	return trader;
 }
+void ctp_trader_set_msg_packer(ctp_trader_t * trader, ctp_msg_pack_cb packer) {
+    trader->packer = packer;
+}
+
 ctp_trader_t * ctp_trader_start(ctp_trader_t * trader) {
 	_api(trader)->Init();
     return trader;

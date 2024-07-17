@@ -98,60 +98,9 @@ void CustomTradeSpi::OnRspUserLogout(
 	}
 }
 
-
-#define ON_RSP_THEN_SEND_SIMPLE(tp) \
+#define ON_RSP_THEN_SEND(fn ,tp) \
 	do { \
-		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
-		memset(rsp, 0, sizeof(ctp_rsp_t)); \
-		if(pField) { \
-			strcpy(rsp->desc, #tp); \
-			rsp->field = (void *)malloc(sizeof(tp)); \
-			memcpy(rsp->field, pField, sizeof(tp)); \
-			rsp->size = sizeof(tp); \
-		} \
-		else { \
-			log_debug("pField == NULL"); \
-			strcpy(rsp->desc, "empty"); \
-			rsp->field = NULL; \
-			rsp->size = 0; \
-		} \
-		rsp->req_id = -1; \
-		rsp->last = 1; \
-		log_debug("ON_RSP_THEN_SEND : struct %s | last %d", rsp->desc, rsp->last); \
-		ctp_trader_send(this->_trader, rsp); \
-	} while(0)
-
-#define ON_RSP_THEN_SEND(tp) \
-	do { \
-		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
-		memset(rsp, 0, sizeof(ctp_rsp_t)); \
-        strcpy(rsp->desc, #tp); \
-		if(pField) { \
-			rsp->field = (void *)malloc(sizeof(tp)); \
-			memcpy(rsp->field, pField, sizeof(tp)); \
-			rsp->size = sizeof(tp); \
-		} \
-		else { \
-			log_debug("pField == NULL"); \
-			rsp->field = NULL; \
-			rsp->size = 0; \
-		} \
-        rsp->rsp_info = (void *)malloc(sizeof(CThostFtdcRspInfoField)); \
-        memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
-		rsp->req_id = nRequestID; \
-		rsp->last = (bIsLast ? 1 : 0); \
-		log_debug("ON_RSP_THEN_SEND : struct %s | last %d", rsp->desc, rsp->last); \
-		ctp_trader_send(this->_trader, rsp); \
-	} while(0)
-
-
-#define CUSTOM_ON(fn, tp) \
-void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)  { \
-    log_debug("%s | nRequestID : %d | isLast: %d", #fn, nRequestID, bIsLast ? 1 : 0); \
-	if(pRspInfo && (pRspInfo->ErrorID != 0)) { \
-		log_debug("%s | ErrorRsp | %d | %s", #fn, pRspInfo->ErrorID, pRspInfo->ErrorMsg); \
-    } \
-	do { \
+        void * msg = NULL; \
 		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
 		memset(rsp, 0, sizeof(ctp_rsp_t)); \
 		rsp->req_id = nRequestID; \
@@ -173,8 +122,67 @@ void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRe
             rsp->rsp_info = (void *)malloc(sizeof(CThostFtdcRspInfoField)); \
             memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
         } \
-		ctp_trader_send(this->_trader, rsp); \
-	} while(0); \
+        if(this->_trader->packer != NULL) \
+            msg = this->_trader->packer(rsp); \
+        else \
+            msg = (void *)rsp; \
+		ctp_trader_send(this->_trader, msg); \
+	} while(0)
+
+#define ON_RSP_THEN_SEND_COMPACT(fn, tp) \
+    do { \
+        CThostFtdcRspInfoField *pRspInfo = NULL; \
+        bool bIsLast = true; \
+        int nRequestID = -1; \
+        ON_RSP_THEN_SEND(fn, tp); \
+    } while(0)
+
+
+// #define CUSTOM_ON(fn, tp) \
+// void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)  { \
+//     log_debug("%s | nRequestID : %d | isLast: %d", #fn, nRequestID, bIsLast ? 1 : 0); \
+// 	if(pRspInfo && (pRspInfo->ErrorID != 0)) { \
+// 		log_debug("%s | ErrorRsp | %d | %s", #fn, pRspInfo->ErrorID, pRspInfo->ErrorMsg); \
+//     } \
+// 	do { \
+//         void * msg = NULL; \
+// 		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
+// 		memset(rsp, 0, sizeof(ctp_rsp_t)); \
+// 		rsp->req_id = nRequestID; \
+// 		rsp->last = (bIsLast ? 1 : 0); \
+//         rsp->is_last = bIsLast; \
+//         strcpy(rsp->desc, #tp); \
+//         strcpy(rsp->func_name, #fn); \
+//         strcpy(rsp->field_name, #tp); \
+// 		if(pField) { \
+// 			rsp->field = (void *)malloc(sizeof(tp)); \
+// 			memcpy(rsp->field, pField, sizeof(tp)); \
+// 			rsp->size = sizeof(tp); \
+// 		} \
+// 		else { \
+// 			rsp->field = NULL; \
+// 			rsp->size = 0; \
+// 		} \
+//         if(pRspInfo) { \
+//             rsp->rsp_info = (void *)malloc(sizeof(CThostFtdcRspInfoField)); \
+//             memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
+//         } \
+//         if(this->_trader->packer != NULL) \
+//             msg = this->_trader->packer(rsp); \
+//         else \
+//             msg = (void *)rsp; \
+// 		ctp_trader_send(this->_trader, msg); \
+// 	} while(0); \
+// }
+
+// #undef CUSTOM_ON
+#define CUSTOM_ON(fn, tp) \
+void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)  { \
+    log_debug("%s | nRequestID : %d | isLast: %d", #fn, nRequestID, bIsLast ? 1 : 0); \
+	if(pRspInfo && (pRspInfo->ErrorID != 0)) { \
+		log_debug("%s | ErrorRsp | %d | %s", #fn, pRspInfo->ErrorID, pRspInfo->ErrorMsg); \
+    } \
+    ON_RSP_THEN_SEND(fn, tp); \
 }
 
 ctp_rsp_t * pack_data(void * data, size_t size) {
@@ -267,7 +275,7 @@ void CustomTradeSpi::OnRspOrderInsert(
 {
 	if (!isErrorRspInfo(pRspInfo)) {
 		log_info("OnRspOrderInsert | %s | %d | %s", pField->OrderRef);
-		ON_RSP_THEN_SEND(CThostFtdcInputOrderField);
+		ON_RSP_THEN_SEND(OnRspOrderInsert, CThostFtdcInputOrderField);
 	}
 	else {
 		log_info("OnRspOrderInsert | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
@@ -313,7 +321,8 @@ void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pField)
 			pField->OrderSubmitStatus,
 			pField->OrderStatus
 		);
-	ON_RSP_THEN_SEND_SIMPLE(CThostFtdcOrderField);
+
+	ON_RSP_THEN_SEND_COMPACT(OnRtnOrder, CThostFtdcOrderField);
 }
 
 void CustomTradeSpi::OnRtnTrade(CThostFtdcTradeField *pField)
@@ -329,7 +338,7 @@ void CustomTradeSpi::OnRtnTrade(CThostFtdcTradeField *pField)
 			pField->Volume,
 			pField->Direction
 		);
-	ON_RSP_THEN_SEND_SIMPLE(CThostFtdcTradeField);
+	ON_RSP_THEN_SEND_COMPACT(OnRtnTrade, CThostFtdcTradeField);
 }
 
 bool CustomTradeSpi::isErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)

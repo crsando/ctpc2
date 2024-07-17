@@ -41,20 +41,22 @@ end
 local process_message = coroutine.create(function ()
     local default_handler = S.OnRsp
     while true do 
-        local rsp = trader:recv()
-        local func_name = ffi.string(rsp.func_name)
-        local handler = S[func_name] or S.OnRsp
+        local rsp = trader:recv(false) -- non-blocking
+        if rsp ~= nil then 
+            local func_name = ffi.string(rsp.func_name)
+            local handler = S[func_name] or S.OnRsp
 
-        -- print("process message", rsp.req_id, func_name, rsp.is_last)
+            -- print("process message", rsp.req_id, func_name, rsp.is_last)
 
-        if handler then 
-            handler {
-                req_id = tonumber(rsp.req_id),
-                field = ffi.cast( "struct " .. ffi.string(rsp.field_name) .. "*", rsp.field),
-                field_name = ffi.string(rsp.field_name),
-                func_name = ffi.string(rsp.func_name),
-                is_last = rsp.is_last,
-            }
+            if handler then 
+                handler {
+                    req_id = tonumber(rsp.req_id),
+                    field = ffi.cast( "struct " .. ffi.string(rsp.field_name) .. "*", rsp.field),
+                    field_name = ffi.string(rsp.field_name),
+                    func_name = ffi.string(rsp.func_name),
+                    is_last = rsp.is_last,
+                }
+            end
         end
 
         coroutine.yield()
