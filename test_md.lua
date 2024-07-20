@@ -2,8 +2,11 @@ local ctp = require "lctp2"
 local ffi = ctp.ffi
 
 local collector = ctp.new_collector(ctp.servers.md["openctp"])
-    :subscribe({ "cu2403" })
-    :start()
+print("cond", collector.md.c)
+-- test conditional signaling
+collector:cond(collector.md.c)
+collector:subscribe({ "cu2409" })
+collector:start()
 
 print("---")
 

@@ -81,6 +81,10 @@ void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
     }
 }
 
+void ctp_md_hook(ctp_md_t * md, ctp_hook_cb hook) {
+    log_debug("ctp_md_hook | %x", hook);
+    md->hook = hook;
+}
 
 // Trader API
 #undef _spi

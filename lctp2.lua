@@ -75,6 +75,15 @@ function new_collector(server)
     ctpc.ctp_md_init(md, server.front_addr, server.broker, server.user)
 
     local _mt = {
+        hook = function (self, hook)
+                ctpc.ctp_md_hook(self.md, hook)
+                return self
+            end,
+        cond = function(self, cond)
+                self.md.ext_cond = ffi.new("void*", cond)
+                print("setting cond", cond, self.md.ext_cond)
+                return self
+            end,
         subscribe = function (self, symbols) 
                 for _, symbol in ipairs(symbols) do 
                     ctpc.ctp_md_subscribe(self.md, symbol) 

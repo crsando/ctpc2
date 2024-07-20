@@ -85,18 +85,7 @@ void CustomTradeSpi::OnHeartBeatWarning(int nTimeLapse)
 	log_info("OnHeartBeatWarning");
 }
 
-void CustomTradeSpi::OnRspUserLogout(
-	CThostFtdcUserLogoutField *pUserLogout,
-	CThostFtdcRspInfoField *pRspInfo,
-	int nRequestID,
-	bool bIsLast)
-{
-	if (!isErrorRspInfo(pRspInfo))
-	{
-		loginFlag = false; // 登出就不能再交易了 
-		log_info("OnRspUserLogout | Success | BrokerID:%s | UserID:%s", this->_trader->broker, this->_trader->user);
-	}
-}
+
 
 #define ON_RSP_THEN_SEND(fn ,tp) \
 	do { \
@@ -129,6 +118,7 @@ void CustomTradeSpi::OnRspUserLogout(
 		ctp_trader_send(this->_trader, msg); \
 	} while(0)
 
+// this macro is used for Order/Trade Response
 #define ON_RSP_THEN_SEND_COMPACT(fn, tp) \
     do { \
         CThostFtdcRspInfoField *pRspInfo = NULL; \
@@ -138,44 +128,6 @@ void CustomTradeSpi::OnRspUserLogout(
     } while(0)
 
 
-// #define CUSTOM_ON(fn, tp) \
-// void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)  { \
-//     log_debug("%s | nRequestID : %d | isLast: %d", #fn, nRequestID, bIsLast ? 1 : 0); \
-// 	if(pRspInfo && (pRspInfo->ErrorID != 0)) { \
-// 		log_debug("%s | ErrorRsp | %d | %s", #fn, pRspInfo->ErrorID, pRspInfo->ErrorMsg); \
-//     } \
-// 	do { \
-//         void * msg = NULL; \
-// 		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
-// 		memset(rsp, 0, sizeof(ctp_rsp_t)); \
-// 		rsp->req_id = nRequestID; \
-// 		rsp->last = (bIsLast ? 1 : 0); \
-//         rsp->is_last = bIsLast; \
-//         strcpy(rsp->desc, #tp); \
-//         strcpy(rsp->func_name, #fn); \
-//         strcpy(rsp->field_name, #tp); \
-// 		if(pField) { \
-// 			rsp->field = (void *)malloc(sizeof(tp)); \
-// 			memcpy(rsp->field, pField, sizeof(tp)); \
-// 			rsp->size = sizeof(tp); \
-// 		} \
-// 		else { \
-// 			rsp->field = NULL; \
-// 			rsp->size = 0; \
-// 		} \
-//         if(pRspInfo) { \
-//             rsp->rsp_info = (void *)malloc(sizeof(CThostFtdcRspInfoField)); \
-//             memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
-//         } \
-//         if(this->_trader->packer != NULL) \
-//             msg = this->_trader->packer(rsp); \
-//         else \
-//             msg = (void *)rsp; \
-// 		ctp_trader_send(this->_trader, msg); \
-// 	} while(0); \
-// }
-
-// #undef CUSTOM_ON
 #define CUSTOM_ON(fn, tp) \
 void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)  { \
     log_debug("%s | nRequestID : %d | isLast: %d", #fn, nRequestID, bIsLast ? 1 : 0); \
@@ -203,69 +155,17 @@ void CustomTradeSpi::OnRspSettlementInfoConfirm(
 	if (!isErrorRspInfo(pRspInfo)) {
 		this->_trader->connected = 4;
 		log_info("OnRspSettlementInfoConfirm | Success | ConfirmDate:%s %s", pField->ConfirmDate, pField->ConfirmTime);
-		// ON_RSP_THEN_SEND(CThostFtdcSettlementInfoConfirmField);
-
-		ctp_rsp_t * rsp = pack_data(pField, sizeof(*pField));
-		rsp->req_id = nRequestID;
-		rsp->last = bIsLast ? 1 : 0;
-		ctp_trader_send(this->_trader, rsp);
 	}
 	else {
 		log_info("OnRspSettlementInfoConfirm | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 	}
+
+    ON_RSP_THEN_SEND(OnRspSettlementInfoConfirm, CThostFtdcSettlementInfoConfirmField);
 }
 
 CUSTOM_ON(OnRspQryTradingAccount, CThostFtdcTradingAccountField);
 CUSTOM_ON(OnRspQryInvestorPosition, CThostFtdcInvestorPositionField);
 CUSTOM_ON(OnRspQryInstrument, CThostFtdcInstrumentField);
-
-// CUSTOM_ON(OnRspUserLogout, CThostFtdcUserLogoutField);
-
-// void CustomTradeSpi::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-// {
-// 	log_info("OnRspQryInstrument | %s | %s", pInstrument->ExchangeID, pInstrument->InstrumentID);
-// }
-
-// void CustomTradeSpi::OnRspQryTradingAccount( CThostFtdcTradingAccountField * pField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-// {
-// 	if (!isErrorRspInfo(pRspInfo)) {
-// 		log_info("OnRspQryTradingAccount | Succeed");
-// 		ON_RSP_THEN_SEND(CThostFtdcTradingAccountField);
-// 	}
-// 	else {
-// 		log_info("OnRspQryTradingAccount | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-// 	}
-// }
-
-// void CustomTradeSpi::OnRspQryInvestorPosition(
-// 	CThostFtdcInvestorPositionField *pField,
-// 	CThostFtdcRspInfoField *pRspInfo,
-// 	int nRequestID,
-// 	bool bIsLast)
-// {
-// 	if (!isErrorRspInfo(pRspInfo)) {
-// 		log_info("OnRspQryInvestorPosition | Succeed");
-// 		ON_RSP_THEN_SEND(CThostFtdcInvestorPositionField);
-// 	}
-// 	else {
-// 		log_info("OnRspQryInvestorPosition | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-// 	}
-// }
-
-// void CustomTradeSpi::OnRspQryDepthMarketData(
-// 	CThostFtdcDepthMarketDataField *pField,
-// 	CThostFtdcRspInfoField *pRspInfo,
-// 	int nRequestID,
-// 	bool bIsLast)
-// {
-// 	if (!isErrorRspInfo(pRspInfo)) {
-// 		log_info("OnRspQryDepthMarketData | Succeed | %s | %lf", pField->InstrumentID, pField->LastPrice);
-// 		ON_RSP_THEN_SEND(CThostFtdcDepthMarketDataField);
-// 	}
-// 	else {
-// 		log_info("OnRspQryDepthMarketData | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-// 	}
-// }
 
 void CustomTradeSpi::OnRspOrderInsert(
 	CThostFtdcInputOrderField *pField, 
@@ -275,25 +175,26 @@ void CustomTradeSpi::OnRspOrderInsert(
 {
 	if (!isErrorRspInfo(pRspInfo)) {
 		log_info("OnRspOrderInsert | %s | %d | %s", pField->OrderRef);
-		ON_RSP_THEN_SEND(OnRspOrderInsert, CThostFtdcInputOrderField);
 	}
 	else {
 		log_info("OnRspOrderInsert | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 	}
+    ON_RSP_THEN_SEND(OnRspOrderInsert, CThostFtdcInputOrderField);
 }
 
 void CustomTradeSpi::OnRspOrderAction(
-	CThostFtdcInputOrderActionField *pInputOrderAction,
+	CThostFtdcInputOrderActionField *pField,
 	CThostFtdcRspInfoField *pRspInfo,
 	int nRequestID,
 	bool bIsLast)
 {
 	if (!isErrorRspInfo(pRspInfo)) { 
 		log_info("OnRspOrderAction | %s | %s | %d | %s", 
-			pInputOrderAction->ExchangeID, 
-			pInputOrderAction->OrderSysID, 
+			pField->ExchangeID, 
+			pField->OrderSysID, 
 			pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 	}
+    ON_RSP_THEN_SEND(OnRspOrderAction, CThostFtdcInputOrderActionField);
 }
 
 void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pField)
@@ -339,6 +240,21 @@ void CustomTradeSpi::OnRtnTrade(CThostFtdcTradeField *pField)
 			pField->Direction
 		);
 	ON_RSP_THEN_SEND_COMPACT(OnRtnTrade, CThostFtdcTradeField);
+}
+
+void CustomTradeSpi::OnRspUserLogout(
+	CThostFtdcUserLogoutField *pField,
+	CThostFtdcRspInfoField *pRspInfo,
+	int nRequestID,
+	bool bIsLast)
+{
+	if (!isErrorRspInfo(pRspInfo))
+	{
+		loginFlag = false; // 登出就不能再交易了 
+		log_info("OnRspUserLogout | Success | BrokerID:%s | UserID:%s", this->_trader->broker, this->_trader->user);
+	}
+
+    ON_RSP_THEN_SEND(OnRspUserLogout, CThostFtdcUserLogoutField);
 }
 
 bool CustomTradeSpi::isErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)

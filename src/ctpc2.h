@@ -7,12 +7,14 @@
 #include "macros.h"
 #include "position.h"
 #include <stdbool.h>
+#include "cond.h"
 
 // typedef void (*ctp_func_cb_t)(void * tick, void * _ctx);
 // typedef void (*ctp_tick_cb)(struct CThostFtdcDepthMarketDataField * tick);
 
 // common callback type
 typedef void * (*ctp_msg_pack_cb)(void * data);
+typedef void (*ctp_hook_cb)(void * self, void * data);
 
 typedef struct {
     // tcp://xxx.xxx.xxx.xxx:xxxx
@@ -32,6 +34,11 @@ typedef struct {
     // internal message queue for tick data
     struct queue * q;
     struct cond * c;
+
+    // external hook
+    ctp_hook_cb hook;
+
+    void * ext_cond;
 } ctp_md_t;
 
 
@@ -39,6 +46,7 @@ typedef struct {
 ctp_md_t * ctp_md_new();
 ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker[], const char user[]);
 void ctp_md_subscribe(ctp_md_t * md, const char symbol[]);
+void ctp_md_hook(ctp_md_t * md, ctp_hook_cb hook);
 void ctp_md_start(ctp_md_t * md);
 
 typedef struct CThostFtdcDepthMarketDataField ctp_md_tick_t;
