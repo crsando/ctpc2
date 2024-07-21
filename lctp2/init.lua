@@ -247,9 +247,10 @@ local function totable(cdata)
     -- if matched
     local o = {}
     for attr, type in pairs(s) do 
+        -- io.stderr:write("totable", field_name, attr, type, datatypes[type], cdata[attr], "\n")
         if not datatypes[type] then 
             o[attr] = nil
-        elseif type == "string" then
+        elseif datatypes[type] == "string" then
             o[attr] = ffi.string(cdata[attr])
         else -- int, short, char
             o[attr] = tonumber(cdata[attr])

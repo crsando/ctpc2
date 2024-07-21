@@ -21,9 +21,9 @@ local function parse_datatype(line)
             o = type
         elseif (type == "int") or (type == "short") then 
             o = "integer"
-        elseif (type == "char") and (sz == nil) then 
+        elseif (type == "char") and (#sz == 0) then 
             o = "char"
-        elseif (type == "char") and (sz ~= nil) then 
+        elseif (type == "char") and (#sz  > 0) then 
             o = "string"
         else
             print("mismatch", line)
@@ -77,8 +77,6 @@ for name, body in string.gmatch(content,  "struct (%w+)[%s%c]*{(.-)%}") do
     end
     structs[name] = o
 end
-
--- print(inspect(structs))
 
 return datatypes, constants, structs
 
