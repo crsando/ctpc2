@@ -81,10 +81,10 @@ void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
     }
 }
 
-void ctp_md_hook(ctp_md_t * md, ctp_hook_cb hook) {
-    log_debug("ctp_md_hook | %x", hook);
-    md->hook = hook;
-}
+// void ctp_md_hook(ctp_md_t * md, ctp_hook_cb hook) {
+//     log_debug("ctp_md_hook | %x", hook);
+//     md->hook = hook;
+// }
 
 // Trader API
 #undef _spi
@@ -124,9 +124,6 @@ ctp_trader_t * ctp_trader_init(
 	pTradeUserApi->RegisterFront(trader->front_addr);              // 设置交易前置地址
 
 	return trader;
-}
-void ctp_trader_set_msg_packer(ctp_trader_t * trader, ctp_msg_pack_cb packer) {
-    trader->packer = packer;
 }
 
 ctp_trader_t * ctp_trader_start(ctp_trader_t * trader) {

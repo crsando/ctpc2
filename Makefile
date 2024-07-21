@@ -4,6 +4,7 @@ CTP_VER=openctp-6.6.9
 
 INCLUDE_PATH=$(PREFIX)/include/ctpc2
 INST_LIB_PATH=$(PREFIX)/lib
+LUA_SHARE=$(PREFIX)/share/lua/5.1
 
 all: libctpc2.so
 	@echo --- make all
@@ -55,15 +56,17 @@ uninstall:
 	rm $(INST_LIB_PATH)/libthostmduserapi_se.so
 	rm $(INST_LIB_PATH)/libthosttraderapi_se.so
 	rm $(INST_LIB_PATH)/libctpc2.so
+	rm -r $(LUA_SHARE)/lctp2
 
 install:
 	mkdir -p $(INCLUDE_PATH)
+	mkdir -p $(LUA_SHARE)/lctp2
 	cp ./$(CTP_VER)/*.h $(INCLUDE_PATH)
 	cp ./src/*.h $(INCLUDE_PATH)
 	cp ./$(CTP_VER)/libthostmduserapi_se.so $(INST_LIB_PATH)
 	cp ./$(CTP_VER)/libthosttraderapi_se.so $(INST_LIB_PATH)
-	cp libctpc2.so $(INST_LIB_PATH)
-	cp lctp2.lua /usr/local/share/lua/5.1/
+	cp ./libctpc2.so $(INST_LIB_PATH)
+	cp ./lctp2/*.lua $(LUA_SHARE)/lctp2/
 
 REMOTE=root@47.101.204.234:
 

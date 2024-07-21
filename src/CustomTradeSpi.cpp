@@ -89,7 +89,6 @@ void CustomTradeSpi::OnHeartBeatWarning(int nTimeLapse)
 
 #define ON_RSP_THEN_SEND(fn ,tp) \
 	do { \
-        void * msg = NULL; \
 		ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t)); \
 		memset(rsp, 0, sizeof(ctp_rsp_t)); \
 		rsp->req_id = nRequestID; \
@@ -111,11 +110,7 @@ void CustomTradeSpi::OnHeartBeatWarning(int nTimeLapse)
             rsp->rsp_info = (void *)malloc(sizeof(CThostFtdcRspInfoField)); \
             memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField)); \
         } \
-        if(this->_trader->packer != NULL) \
-            msg = this->_trader->packer(rsp); \
-        else \
-            msg = (void *)rsp; \
-		ctp_trader_send(this->_trader, msg); \
+		ctp_trader_send(this->_trader, rsp); \
 	} while(0)
 
 // this macro is used for Order/Trade Response

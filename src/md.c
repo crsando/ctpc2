@@ -26,12 +26,13 @@ void ctp_md_send(ctp_md_t * md, void *msg) {
     queue_push_ptr(md->q, msg);
     cond_trigger_end(md->c, 1);
 
-    if(md->hook) {
-	    md->hook(md, msg);
-    }
+    // remove hook support
+    // if(md->hook) {
+	//     md->hook(md, msg);
+    // }
 
     if(md->ext_cond) {
-        log_debug("ext_cond send");
+        // log_debug("ext_cond send");
         cond_trigger_begin(md->ext_cond);
         cond_trigger_end(md->ext_cond, 1);
     }

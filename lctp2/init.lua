@@ -1,7 +1,10 @@
 local ffi = require "ffi"
+local inspect = require "inspect"
 
--- wechat robot 
 
+--
+-- ctpc api using FFI
+--
 local ctp_ver = "ctp-6.6.9"
 local prefix = "/usr/local"
 local include_path = prefix .. "/include"
@@ -16,8 +19,11 @@ function ffi_load_header_file(fn)
     ffi.cdef(txt)
 end
 
-ffi_load_header_file(include_path .. "/ctpc2/ThostFtdcUserApiDataType.h")
-ffi_load_header_file(include_path .. "/ctpc2/ThostFtdcUserApiStruct.h")
+local fn_type = include_path .. "/ctpc2/ThostFtdcUserApiDataType.h"
+local fn_struct = include_path .. "/ctpc2/ThostFtdcUserApiStruct.h"
+
+ffi_load_header_file(fn_type)
+ffi_load_header_file(fn_struct)
 ffi_load_header_file(include_path .. "/ctpc2/position.h") -- place this line above ctpc.h
 ffi_load_header_file(include_path .. "/ctpc2/ctpc2.h")
 ffi_load_header_file(include_path .. "/ctpc2/util.h")
@@ -30,6 +36,18 @@ ffi.cdef[[
 ]]
 
 local ctpc = ffi.load("ctpc2")
+
+
+--
+-- parse C header files 
+--
+local datatypes, constants, structs = require "lctp2.parse" ( fn_type, fn_struct )
+
+print(inspect(datatypes))
+print(inspect(constants))
+print(inspect(structs))
+
+--
 
 -- set log level
 function log_set_level(lvl_str)
@@ -117,9 +135,17 @@ function new_trader(server)
         server.auth_code
     )
     local _mt = {
-        start = function(self)  
+        start = function(self, wait)  
                 ctpc.ctp_trader_start(self.trader)
-                ctpc.ctp_trader_wait_for_settle(self.trader)
+                if wait then
+                    ctpc.ctp_trader_wait_for_settle(self.trader)
+                end
+                return self
+            end,
+
+        cond = function(self, cond)
+                self.trader.ext_cond = ffi.new("void*", cond)
+                print("setting cond", cond, self.trader.ext_cond)
                 return self
             end,
 
@@ -131,12 +157,10 @@ function new_trader(server)
 
         recv = function (self, blocking)
                 -- raw receive
-                blocking = blocking or true
                 return ctpc.ctp_trader_recv(self.trader, blocking)
             end,
         
         fetch = function (self, blocking)
-                blocking = blocking or true
                 local rsp = ffi.gc(ctpc.ctp_trader_recv(self.trader, blocking), ctpc.ctp_rsp_free) 
                 if rsp.desc == "error" then 
                     return nil, rsp
@@ -203,14 +227,46 @@ function position_keeper(ptr)
     return o
 end
 
-return {
+-- finish module loading
+local function totable(cdata)
+    -- todo
+    local field_name = string.match(tostring(ffi.typeof(cdata)), "struct ([%w_]+)")
+    print("totable ", cdata, field_name)
+    local s = structs[field_name] 
+    if not s then return nil end
+
+    -- if matched
+    local o = {}
+    for attr, type in pairs(s) do 
+        print("totable parse", field_name, attr, type, datatypes[type])
+        if not datatypes[type] then 
+            o[attr] = nil
+        elseif type == "string" then
+            o[attr] = ffi.string(cdata[attr])
+        else -- int, short, char
+            o[attr] = tonumber(cdata[attr])
+        end
+    end -- end for
+    return o
+end
+
+local M = {
     new_collector = new_collector,
     new_trader = new_trader,
     servers = servers,
     ffi = ffi,
     ctpc = ctpc,
 
+    totable = totable,
+
     log_set_level = log_set_level,
 
     position_keeper = position_keeper,
 }
+
+-- load constants directly to the module
+for k, v in ipairs(constants) do 
+    M[k] = v 
+end
+
+return M

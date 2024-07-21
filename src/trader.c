@@ -20,25 +20,36 @@ ctp_trader_t * ctp_trader_new() {
     return t;
 }
 
-void ctp_trader_send(ctp_trader_t * t, void * msg) {
-    // log_debug("ctp_trader_send start %d | last: %d", msg, msg->last);
+void ctp_trader_send(ctp_trader_t * t, ctp_rsp_t * msg) {
+    log_debug("ctp_trader_send start (%s) %d | last: %d", msg->func_name, msg, msg->is_last);
 	cond_trigger_begin(t->c);
     queue_push_ptr(t->q, msg);
     cond_trigger_end(t->c, 1);
     // log_debug("ctp_trader_send end");
+
+    if(t->ext_cond) {
+        cond_trigger_begin(t->ext_cond);
+        cond_trigger_end(t->ext_cond, 1);
+    }
 }
 
 ctp_rsp_t * ctp_trader_recv(ctp_trader_t * t, bool blocking) {
     ctp_rsp_t * msg = NULL;
     cond_wait_begin(t->c);
+    log_debug("ctp_trader_recv start %lu", queue_length(t->q));
 
     if(blocking) {
-        while ( queue_length(t->q) == 0 )
+        if ( queue_length(t->q) == 0 )
             cond_wait(t->c);
     }
     msg = (ctp_rsp_t *)queue_pop_ptr(t->q);
 
+    if(msg) {
+        log_debug("ctp_trader_recv get: %s\n", msg->func_name);
+    }
+
     cond_wait_end(t->c);
+    log_debug("ctp_trader_recv end %x", msg); 
     return msg;
 }
 
