@@ -43,10 +43,6 @@ local ctpc = ffi.load("ctpc2")
 --
 local datatypes, constants, structs = require "lctp2.parse" ( fn_type, fn_struct )
 
-print(inspect(datatypes))
-print(inspect(constants))
-print(inspect(structs))
-
 --
 
 -- set log level
@@ -227,18 +223,30 @@ function position_keeper(ptr)
     return o
 end
 
+local function check_struct(cdata, struct_name)
+    local rst = string.match(tostring(ffi.typeof(cdata)), "struct ([%w_]+)")
+    if rst then 
+        if struct_name then 
+            return (rst == struct_name) and rst or nil
+        else 
+            return rst 
+        end
+    end 
+    return rst
+end
+
 -- finish module loading
 local function totable(cdata)
     -- todo
-    local field_name = string.match(tostring(ffi.typeof(cdata)), "struct ([%w_]+)")
-    print("totable ", cdata, field_name)
+    -- local field_name = string.match(tostring(ffi.typeof(cdata)), "struct ([%w_]+)")
+    local field_name = assert(check_struct(cdata), "cdata is not a struct")
+
     local s = structs[field_name] 
     if not s then return nil end
 
     -- if matched
     local o = {}
     for attr, type in pairs(s) do 
-        print("totable parse", field_name, attr, type, datatypes[type])
         if not datatypes[type] then 
             o[attr] = nil
         elseif type == "string" then
@@ -257,6 +265,7 @@ local M = {
     ffi = ffi,
     ctpc = ctpc,
 
+    check_struct = check_struct,
     totable = totable,
 
     log_set_level = log_set_level,

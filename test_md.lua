@@ -13,9 +13,9 @@ print("---")
 
 while true do 
     local tick = collector:recv()
+    tick = ctp.totable(tick)
 
-    local o = ctp.totable(tick)
-    print(inspect(o))
+    print(inspect(tick))
 
-    print(ffi.string(tick.ActionDay), tick.LastPrice)
+    -- print(ffi.string(tick.ActionDay), tick.LastPrice)
 end
