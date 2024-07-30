@@ -95,7 +95,7 @@ function new_collector(server)
             end,
         cond = function(self, cond)
                 self.md.ext_cond = ffi.new("void*", cond)
-                print("setting cond", cond, self.md.ext_cond)
+                -- print("setting cond", cond, self.md.ext_cond)
                 return self
             end,
         subscribe = function (self, symbols) 
@@ -141,7 +141,7 @@ function new_trader(server)
 
         cond = function(self, cond)
                 self.trader.ext_cond = ffi.new("void*", cond)
-                print("setting cond", cond, self.trader.ext_cond)
+                -- print("setting cond", cond, self.trader.ext_cond)
                 return self
             end,
 
