@@ -8,7 +8,7 @@
 #define CTP_TRADER_REQ(trader, cmd, field) \
     do { \
         int req_id = ++((trader)->req_id); \
-        log_info("Req%s | req_id: %d", # cmd, req_id); \
+        log_debug("Req%s | req_id: %d", # cmd, req_id); \
         ((CThostFtdcTraderApi *)((trader)->_api))->Req ## cmd(field, req_id); \
         return req_id; \
     } while(0)

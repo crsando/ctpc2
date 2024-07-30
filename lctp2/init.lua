@@ -275,8 +275,10 @@ local M = {
 }
 
 -- load constants directly to the module
-for k, v in ipairs(constants) do 
+for k, v in pairs(constants) do 
     M[k] = v 
 end
+
+M.order_book = require "lctp2.order_book"
 
 return M

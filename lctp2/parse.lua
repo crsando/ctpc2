@@ -4,7 +4,7 @@ local inspect = require "inspect"
 function load(fn_type, fn_struct)
 
 -- file names
-print("parse", fn_type, fn_struct)
+-- print("parse", fn_type, fn_struct)
 
 local prefix = "/usr/local/include/ctpc2"
 -- data types
