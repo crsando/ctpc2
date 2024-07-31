@@ -1,6 +1,6 @@
 PREFIX=/usr/local
-# CTP_VER=ctp-6.6.9
-CTP_VER=openctp-6.6.9
+CTP_VER=ctp-6.6.9
+# CTP_VER=openctp-6.6.9
 
 INCLUDE_PATH=$(PREFIX)/include/ctpc2
 INST_LIB_PATH=$(PREFIX)/lib
@@ -43,14 +43,7 @@ test: test.c
 		-o test
 
 clean:
-	rm ctpc2.o
-	rm CustomMdSpi.o
-	rm CustomTradeSpi.o
-	rm log.o
-	rm queue.o
-	rm reg.o
-	rm util.o
-	rm position.o
+	rm *.o
 
 uninstall:
 	rm $(INST_LIB_PATH)/libthostmduserapi_se.so

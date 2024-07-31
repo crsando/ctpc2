@@ -138,7 +138,9 @@ int ctp_trader_query_order(ctp_trader_t * t);
 // Order Executions
 //
 int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag);
-int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref);
+// int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref);
+// int ctp_trader_order_cancel(ctp_trader_t * t, const char * exchange_id, const char * order_sys_id);
+int ctp_trader_order_cancel(ctp_trader_t * t, const char * symbol, const char * exchange_id, const char * order_sys_id);
 
 // int ctp_trader_order_cancel(ctp_trader_t * t, )
 

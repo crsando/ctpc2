@@ -228,7 +228,24 @@ int ctp_trader_query_order(ctp_trader_t * t) {
 	CTP_TRADER_REQ(t, QryOrder, &field);
 }
 
-int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref) { 
+// int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref) { 
+//     CThostFtdcInputOrderActionField field;
+//     memset(&field, 0, sizeof(field));
+//     strcpy(field.BrokerID, t->broker);
+//     strcpy(field.InvestorID, t->user);
+//     field.ActionFlag = THOST_FTDC_AF_Delete;
+
+//     // Key 
+//     field.FrontID = front_id;
+//     field.SessionID = session_id;
+//     strcpy(field.OrderRef, order_ref);
+
+//     log_debug("ctp_trader_order_cancel %d+%d+%s", front_id, session_id, order_ref);
+
+// 	CTP_TRADER_REQ(t, OrderAction, &field);
+// }
+
+int ctp_trader_order_cancel(ctp_trader_t * t, const char * symbol, const char * exchange_id, const char * order_sys_id) { 
     CThostFtdcInputOrderActionField field;
     memset(&field, 0, sizeof(field));
     strcpy(field.BrokerID, t->broker);
@@ -236,9 +253,11 @@ int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, cons
     field.ActionFlag = THOST_FTDC_AF_Delete;
 
     // Key 
-    field.FrontID = front_id;
-    field.SessionID = session_id;
-    strcpy(field.OrderRef, order_ref);
+    strcpy(field.InstrumentID, symbol);
+    strcpy(field.ExchangeID, exchange_id);
+    strcpy(field.OrderSysID, order_sys_id);
+
+    log_info("ctp_trader_order_cancel %s: %s+%s | %d", symbol, exchange_id, order_sys_id, strlen(order_sys_id));
 
 	CTP_TRADER_REQ(t, OrderAction, &field);
 }

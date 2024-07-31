@@ -174,14 +174,15 @@ function new_trader(server)
                 return ctpc.ctp_trader_order_insert(self.trader, symbol, price, volume, flag)
             end,
         order_cancel = function (self, ...)
-                local front_id, session_id, order_ref = ...
-                if type(front_id) == "table" then
-                    local order = front_id
-                    front_id = order.FrontID
-                    session_id = order.SessionID
-                    order_ref = order.OrderRef
+                local symbol, exchange_id, order_sys_id = ...
+                if type(symbol) == "table" then
+                    local order = symbol
+                    symbol = order.InstrumentID
+                    exchange_id = order.ExchangeID
+                    order_sys_id = order.OrderSysID
+                    print("order cancel", symbol, exchange_id, order_sys_id)
                 end
-                return ctpc.ctp_trader_order_cancel(self.trader, front_id, session_id, order_ref)
+                return ctpc.ctp_trader_order_cancel(self.trader, symbol, exchange_id, order_sys_id) 
             end,
         
         query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,

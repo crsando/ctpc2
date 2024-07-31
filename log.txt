@@ -1,0 +1,13 @@
+13:24:42 DEBUG ./src/ctpc2.cpp:102: ctp_trader_init | tcp://180.169.50.131:42205 | 2071 | 0061831885 | client_tara_231031 | 20231101ZHOUYH01
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:19: OnFrontConnected | FrontAddr:tcp://180.169.50.131:42205
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:31: ReqAuthenticate | req_id: 1
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:37: OnRspAuthenticate | Success | AppID:client_tara_231031 | AuthCode:20231101ZHOUYH01
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:273: reqUserLogin | 2071 | 0061831885 | zhy19930311
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:279: ReqUserLogin | req_id: 2
+/dev/mem: Permission denied
+/dev/mem: Permission denied
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:55: OnRspUserLogin | Success | BrokerID:2071 | UserID:0061831885
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:56: OnRspUserLogin | FrontID: 2 | SessionID: -896544696 | MaxOrderRef: 1
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:294: reqSettlementInfoConfirm
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:300: ReqSettlementInfoConfirm | req_id: 3
+13:24:42 DEBUG ./src/CustomTradeSpi.cpp:152: OnRspSettlementInfoConfirm | Success | ConfirmDate:20240731 13:24:32

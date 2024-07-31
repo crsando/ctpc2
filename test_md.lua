@@ -2,11 +2,37 @@ local ctp = require "lctp2"
 local ffi = ctp.ffi
 local inspect = require "inspect"
 
-local collector = ctp.new_collector(ctp.servers.md["openctp"])
-print("cond", collector.md.c)
--- test conditional signaling
-collector:cond(collector.md.c)
-collector:subscribe({ "cu2409" })
+local servers = {
+    md = {
+        ["sim"] = { front_addr =  'tcp://121.37.80.177:20004', broker = "7090", user = "7572" },
+        ["openctp"] = { front_addr =  'tcp://121.37.80.177:20004', broker = "7090", user = "7572" },
+        ["gtja-1"] = { front_addr =  "tcp://180.169.75.18:61213", broker = "7090", user = "85194065" }
+    },
+    trader = {
+        ["openctp-7x24"] = {
+            front_addr = "tcp://121.37.80.177:20002", 
+            broker = "7090", 
+            user = "7572", 
+            pass = "123456", 
+            app_id = "client_tara_060315", 
+            auth_code = "20221011TARA000",
+        },
+        ["openctp"] = {
+            front_addr = "tcp://121.37.90.193:20002", 
+            broker = "7090", 
+            user = "7572", 
+            pass = "123456", 
+            app_id = "client_tara_060315", 
+            auth_code = "20221011TARA000",
+        }
+    }
+}
+
+local collector = ctp.new_collector(ctp.servers.md["gtja-1"])
+-- print("cond", collector.md.c)
+-- -- test conditional signaling
+-- collector:cond(collector.md.c)
+collector:subscribe({ "IF2409" })
 collector:start()
 
 print("---")

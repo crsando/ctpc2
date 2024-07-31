@@ -161,14 +161,21 @@ void CustomTradeSpi::OnRspSettlementInfoConfirm(
 CUSTOM_ON(OnRspQryTradingAccount, CThostFtdcTradingAccountField);
 CUSTOM_ON(OnRspQryInvestorPosition, CThostFtdcInvestorPositionField);
 CUSTOM_ON(OnRspQryInstrument, CThostFtdcInstrumentField);
-CUSTOM_ON(OnRspQryOrder, CThostFtdcOrderField);
 CUSTOM_ON(OnRspOrderInsert, CThostFtdcInputOrderField);
 CUSTOM_ON(OnRspOrderAction, CThostFtdcInputOrderActionField);
 
 
-// void CustomTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-//     log_debug("OnRspQryOrder %d", nRequestID);
-// }
+// CUSTOM_ON(OnRspQryOrder, CThostFtdcOrderField);
+void CustomTradeSpi::OnRspQryOrder(CThostFtdcOrderField * pField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+    if(pField)
+        log_debug("OnRspQryOrder %d | %s | %s+%s | %c", nRequestID, pField->InstrumentID, pField->ExchangeID, pField->OrderSysID, pField->OrderStatus);
+    else 
+        log_debug("OnRspQryOrder | Empty");
+    // for(int i = 0; i < 21; i ++) {
+    //     log_debug("\t>>> OrderSysID: %2d : %d", i, pField->OrderSysID[i]);
+    // }
+    ON_RSP_THEN_SEND(OnRspQryOrder, CThostFtdcOrderField);
+}
 
 // void CustomTradeSpi::OnRspOrderInsert(
 // 	CThostFtdcInputOrderField *pField, 
@@ -203,15 +210,15 @@ CUSTOM_ON(OnRspOrderAction, CThostFtdcInputOrderActionField);
 void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pField)
 {
 	// FrontID + SessionID + OrderRef
-	int front_id = this->_trader->front_id;
-	int session_id = this->_trader->session_id;
+	// int front_id = this->_trader->front_id;
+	// int session_id = this->_trader->session_id;
 	strcpy(this->_trader->lst_order_ref, pField->OrderRef);
 
 	// ExchangeID + OrderSysID
 	// log_debug("OnRtnOrder | %s | %s | %s | Info | %s | %lf | %d | %d | Status | %c | %c", 
 	log_debug("OnRtnOrder | Ref: %d+%d+%s | Sys: %s+%s | %s | %lf | #:%d | #Traded: %d | Status | %c | %c", 
-			front_id,
-			session_id,
+			pField->FrontID,
+			pField->SessionID,
 			pField->OrderRef,
 
 			pField->ExchangeID,
