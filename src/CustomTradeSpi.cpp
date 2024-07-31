@@ -161,36 +161,44 @@ void CustomTradeSpi::OnRspSettlementInfoConfirm(
 CUSTOM_ON(OnRspQryTradingAccount, CThostFtdcTradingAccountField);
 CUSTOM_ON(OnRspQryInvestorPosition, CThostFtdcInvestorPositionField);
 CUSTOM_ON(OnRspQryInstrument, CThostFtdcInstrumentField);
+CUSTOM_ON(OnRspQryOrder, CThostFtdcOrderField);
+CUSTOM_ON(OnRspOrderInsert, CThostFtdcInputOrderField);
+CUSTOM_ON(OnRspOrderAction, CThostFtdcInputOrderActionField);
 
-void CustomTradeSpi::OnRspOrderInsert(
-	CThostFtdcInputOrderField *pField, 
-	CThostFtdcRspInfoField *pRspInfo,
-	int nRequestID,
-	bool bIsLast)
-{
-	if (!isErrorRspInfo(pRspInfo)) {
-		log_debug("OnRspOrderInsert | %s | %d | %s", pField->OrderRef);
-	}
-	else {
-		log_debug("OnRspOrderInsert | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-	}
-    ON_RSP_THEN_SEND(OnRspOrderInsert, CThostFtdcInputOrderField);
-}
 
-void CustomTradeSpi::OnRspOrderAction(
-	CThostFtdcInputOrderActionField *pField,
-	CThostFtdcRspInfoField *pRspInfo,
-	int nRequestID,
-	bool bIsLast)
-{
-	if (!isErrorRspInfo(pRspInfo)) { 
-		log_debug("OnRspOrderAction | %s | %s | %d | %s", 
-			pField->ExchangeID, 
-			pField->OrderSysID, 
-			pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-	}
-    ON_RSP_THEN_SEND(OnRspOrderAction, CThostFtdcInputOrderActionField);
-}
+// void CustomTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+//     log_debug("OnRspQryOrder %d", nRequestID);
+// }
+
+// void CustomTradeSpi::OnRspOrderInsert(
+// 	CThostFtdcInputOrderField *pField, 
+// 	CThostFtdcRspInfoField *pRspInfo,
+// 	int nRequestID,
+// 	bool bIsLast)
+// {
+// 	if (!isErrorRspInfo(pRspInfo)) {
+// 		log_debug("OnRspOrderInsert | %s | %d | %s", pField->OrderRef);
+// 	}
+// 	else {
+// 		log_debug("OnRspOrderInsert | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+// 	}
+//     ON_RSP_THEN_SEND(OnRspOrderInsert, CThostFtdcInputOrderField);
+// }
+
+// void CustomTradeSpi::OnRspOrderAction(
+// 	CThostFtdcInputOrderActionField *pField,
+// 	CThostFtdcRspInfoField *pRspInfo,
+// 	int nRequestID,
+// 	bool bIsLast)
+// {
+// 	if (!isErrorRspInfo(pRspInfo)) { 
+// 		log_debug("OnRspOrderAction | %s | %s | %d | %s", 
+// 			pField->ExchangeID, 
+// 			pField->OrderSysID, 
+// 			pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+// 	}
+//     ON_RSP_THEN_SEND(OnRspOrderAction, CThostFtdcInputOrderActionField);
+// }
 
 void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pField)
 {

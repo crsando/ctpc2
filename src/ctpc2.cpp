@@ -220,4 +220,27 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
 	CTP_TRADER_REQ(t, OrderInsert, &orderInsertReq);
 }
 
+int ctp_trader_query_order(ctp_trader_t * t) {
+    CThostFtdcQryOrderField field;
+    memset(&field, 0, sizeof(field));
+	strcpy(field.BrokerID, t->broker);
+	strcpy(field.InvestorID, t->user);
+	CTP_TRADER_REQ(t, QryOrder, &field);
+}
+
+int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref) { 
+    CThostFtdcInputOrderActionField field;
+    memset(&field, 0, sizeof(field));
+    strcpy(field.BrokerID, t->broker);
+    strcpy(field.InvestorID, t->user);
+    field.ActionFlag = THOST_FTDC_AF_Delete;
+
+    // Key 
+    field.FrontID = front_id;
+    field.SessionID = session_id;
+    strcpy(field.OrderRef, order_ref);
+
+	CTP_TRADER_REQ(t, OrderAction, &field);
+}
+
 } // end extern "C"

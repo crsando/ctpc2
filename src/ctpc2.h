@@ -132,11 +132,15 @@ int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id)
 // ReqQryDepthMarketData
 // int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol);
 
+int ctp_trader_query_order(ctp_trader_t * t);
 
 //
 // Order Executions
 //
 int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag);
+int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref);
+
+// int ctp_trader_order_cancel(ctp_trader_t * t, )
 
 int ctp_trader_logout(ctp_trader_t * t);
 

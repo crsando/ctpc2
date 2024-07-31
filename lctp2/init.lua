@@ -156,24 +156,38 @@ function new_trader(server)
                 return ctpc.ctp_trader_recv(self.trader, blocking)
             end,
         
-        fetch = function (self, blocking)
-                local rsp = ffi.gc(ctpc.ctp_trader_recv(self.trader, blocking), ctpc.ctp_rsp_free) 
-                if rsp.desc == "error" then 
-                    return nil, rsp
-                else
-                    local ptr_type = "struct " .. ffi.string(rsp.desc) .. " * "
-                    local ptr = assert(ffi.cast(ptr_type, rsp.field))
-                    if ptr ~= nil then 
-                        ffi.gc(ptr, ffi.C.free)
-                    end
-                    return ptr, rsp
+        -- fetch = function (self, blocking)
+        --         local rsp = ffi.gc(ctpc.ctp_trader_recv(self.trader, blocking), ctpc.ctp_rsp_free) 
+        --         if rsp.desc == "error" then 
+        --             return nil, rsp
+        --         else
+        --             local ptr_type = "struct " .. ffi.string(rsp.desc) .. " * "
+        --             local ptr = assert(ffi.cast(ptr_type, rsp.field))
+        --             if ptr ~= nil then 
+        --                 ffi.gc(ptr, ffi.C.free)
+        --             end
+        --             return ptr, rsp
+        --         end
+        --     end,
+
+        order_insert = function (self, symbol, price, volume, flag)
+                return ctpc.ctp_trader_order_insert(self.trader, symbol, price, volume, flag)
+            end,
+        order_cancel = function (self, ...)
+                local front_id, session_id, order_ref = ...
+                if type(front_id) == "table" then
+                    local order = front_id
+                    front_id = order.FrontID
+                    session_id = order.SessionID
+                    order_ref = order.OrderRef
                 end
+                return ctpc.ctp_trader_order_cancel(self.trader, front_id, session_id, order_ref)
             end,
         
         query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,
         query_position = function(self) return ctpc.ctp_trader_query_position(self.trader) end,
-
         query_instrument = function(self, exchange_id) return ctpc.ctp_trader_query_instrument(self.trader, exchange_id) end,
+        query_order = function(self) return ctpc.ctp_trader_query_order(self.trader) end,
         -- query_marketdata = function(self, symbol) return ctpc.ctp_trader_query_marketdata(self.trader, symbol) end,
         -- fetch_account = function(self, req_id) return ctpc.ctp_trader_fetch_account(self.trader, req_id) end,
     }
@@ -239,7 +253,7 @@ end
 local function totable(cdata)
     -- todo
     -- local field_name = string.match(tostring(ffi.typeof(cdata)), "struct ([%w_]+)")
-    local field_name = assert(check_struct(cdata), "cdata is not a struct")
+    local field_name = assert(check_struct(cdata), "cdata is not a struct: " .. tostring(ffi.typeof(cdata)))
 
     local s = structs[field_name] 
     if not s then return nil end
@@ -259,6 +273,19 @@ local function totable(cdata)
     return o
 end
 
+
+local function cast_trader_rsp(rsp)
+    local rst = {}
+    rst.req_id = tonumber(rsp.req_id)
+    if rsp.field ~= nil then 
+        rst.field = totable(ffi.cast( "struct " .. ffi.string(rsp.field_name) .. " *", rsp.field))
+    end
+    rst.field_name = ffi.string(rsp.field_name)
+    rst.func_name = ffi.string(rsp.func_name)
+    rst.is_last = rsp.is_last
+    return rst
+end
+
 local M = {
     new_collector = new_collector,
     new_trader = new_trader,
@@ -268,6 +295,7 @@ local M = {
 
     check_struct = check_struct,
     totable = totable,
+    cast_trader_rsp = cast_trader_rsp,
 
     log_set_level = log_set_level,
 
