@@ -276,10 +276,14 @@ end
 
 
 local function cast_trader_rsp(rsp)
+    if rsp == nil then return nil end
     local rst = {}
     rst.req_id = tonumber(rsp.req_id)
     if rsp.field ~= nil then 
         rst.field = totable(ffi.cast( "struct " .. ffi.string(rsp.field_name) .. " *", rsp.field))
+    end
+    if rsp.rsp_info ~= nil then 
+        rst.rsp_info = totable(ffi.cast( "struct CThostFtdcRspInfoField *", rsp.rsp_info))
     end
     rst.field_name = ffi.string(rsp.field_name)
     rst.func_name = ffi.string(rsp.func_name)
