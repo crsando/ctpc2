@@ -32,7 +32,7 @@ local collector = ctp.new_collector(ctp.servers.md["gtja-1"])
 -- print("cond", collector.md.c)
 -- -- test conditional signaling
 -- collector:cond(collector.md.c)
-collector:subscribe({ "IF2409" })
+collector:subscribe({ "IF2501" })
 collector:start()
 
 print("---")
