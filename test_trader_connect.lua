@@ -25,7 +25,11 @@ end
 
 local trader = ctp.new_trader(server):start()
 
-trader:query_account()
+-- trader:query_account()
+
+uv.sleep(1000)
+
+trader:order_insert("IF2501", 0, 1, ctp.THOST_FTDC_OFEN_Open)
 
 while true do 
     -- update_position_info()

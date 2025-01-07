@@ -190,8 +190,9 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
 
     if ( price < 0.0001 ) {
         log_debug("ctp_trader_order_insert | market order");
-        orderInsertReq.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
-        orderInsertReq.LimitPrice = 0.0;
+        // orderInsertReq.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
+        orderInsertReq.OrderPriceType = THOST_FTDC_OPT_LastPrice;
+        // orderInsertReq.LimitPrice = 0.0;
         orderInsertReq.TimeCondition = THOST_FTDC_TC_IOC; // 立即成交否则撤销
     }
     else {
@@ -202,12 +203,19 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
         orderInsertReq.TimeCondition = THOST_FTDC_TC_GFD; // 当日有效
     }
 
+    // Fill or Kill
+    // orderInsertReq.TimeCondition = THOST_FTDC_TC_IOC;
+	// orderInsertReq.VolumeCondition = THOST_FTDC_VC_CV;
+
+    // Normal Order
+    // orderInsertReq.TimeCondition = THOST_FTDC_TC_GFD; // 当日有效
+	// orderInsertReq.VolumeCondition = THOST_FTDC_VC_AV;
+	// orderInsertReq.MinVolume = 1;
+
     orderInsertReq.CombOffsetFlag[0] = flag;
-    log_debug("CombOffsetFlag[0]=%c", orderInsertReq.CombOffsetFlag[0]);
 	orderInsertReq.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
 
 	orderInsertReq.Direction = (volume > 0 ? THOST_FTDC_D_Buy : THOST_FTDC_D_Sell);
-    log_debug("Direction=%c", orderInsertReq.Direction);
 	orderInsertReq.VolumeTotalOriginal = abs(volume); // input volume
 	orderInsertReq.VolumeCondition = THOST_FTDC_VC_AV;
 	orderInsertReq.MinVolume = 1;
@@ -217,6 +225,9 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
 	orderInsertReq.IsAutoSuspend = 0;
 	orderInsertReq.UserForceClose = 0;
 
+    log_debug("OrderPriceType=%c", orderInsertReq.OrderPriceType);
+    log_debug("Direction=%c", orderInsertReq.Direction);
+    log_debug("CombOffsetFlag[0]=%c", orderInsertReq.CombOffsetFlag[0]);
 	CTP_TRADER_REQ(t, OrderInsert, &orderInsertReq);
 }
 
