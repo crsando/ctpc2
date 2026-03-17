@@ -25,6 +25,11 @@ end
 
 local trader = ctp.new_trader(server):start()
 
+while true do 
+    -- update_position_info()
+    uv.sleep(1000)    
+end
+
 print("---")
 
 for i = 1, 1 do
@@ -96,10 +101,7 @@ ctp.ctpc.ctp_trader_order_insert(trader.trader, "au2406", 0, 1, -1)
 ctp.ctpc.ctp_trader_order_insert(trader.trader, "au2406", 0, -1, -1)
 
 
-while true do 
-    -- update_position_info()
-    uv.sleep(1000)    
-end
+
 
 
 os.exit(1)

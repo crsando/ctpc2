@@ -42,7 +42,7 @@ local servers = {
     }
 }
 
-local collector = ctp.new_collector(ctp.servers.md["gtja-1"])
+local collector = ctp.new_collector(ctp.servers.md["hy-sim"])
 -- print("cond", collector.md.c)
 -- -- test conditional signaling
 -- collector:cond(collector.md.c)
