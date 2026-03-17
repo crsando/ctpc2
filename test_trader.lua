@@ -25,6 +25,8 @@ end
 
 local trader = ctp.new_trader(server):start()
 
+trader:query_account()
+
 while true do 
     -- update_position_info()
     uv.sleep(1000)    
@@ -33,7 +35,6 @@ end
 print("---")
 
 for i = 1, 1 do
-    trader:query_account()
     local rsp = trader:recv()
     local act = ffi.new("struct CThostFtdcTradingAccountField *", rsp.field)
     print("Balance", act.Balance)

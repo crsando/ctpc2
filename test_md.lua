@@ -7,45 +7,22 @@ local servers = {
         ["sim"] = { front_addr =  'tcp://121.37.80.177:20004', broker = "7090", user = "7572" },
         ["openctp"] = { front_addr =  'tcp://121.37.80.177:20004', broker = "7090", user = "7572" },
         ["gtja-1"] = { front_addr =  "tcp://180.169.75.18:61213", broker = "7090", user = "85194065" },
+        ["hy"] = {
+            front_addr = "tcp://180.169.112.52:42213",
+            broker = "1080", 
+            user = "333307126", 
+        },
         ["hy-sim"] = {
-            front_addr = "tcp://180.169.112.52:",
-            broker = "3070", 
+            front_addr = "tcp://101.230.79.235:42213",
+            broker = "1080", 
             user = "333307126", 
         },
     },
-    trader = {
-        ["openctp-7x24"] = {
-            front_addr = "tcp://121.37.80.177:20002", 
-            broker = "7090", 
-            user = "7572", 
-            pass = "123456", 
-            app_id = "client_tara_060315", 
-            auth_code = "20221011TARA000",
-        },
-        ["openctp"] = {
-            front_addr = "tcp://121.37.90.193:20002", 
-            broker = "7090", 
-            user = "7572", 
-            pass = "123456", 
-            app_id = "client_tara_060315", 
-            auth_code = "20221011TARA000",
-        },
-
-        ["hy-sim"] = {
-            front_addr = "tcp://101.230.79.235:33205",
-            broker = "3070", 
-            user = "333307126", 
-            pass = "930706", 
-            app_id = "client_tara_241201", 
-            auth_code = 'CY2LFL92CISEEKVM',
-        },
-    }
 }
 
-local collector = ctp.new_collector(ctp.servers.md["hy-sim"])
--- print("cond", collector.md.c)
--- -- test conditional signaling
--- collector:cond(collector.md.c)
+local collector = ctp.new_collector(
+    servers.md["hy-sim"]
+)
 collector:subscribe({ "IF2505" })
 collector:start()
 
