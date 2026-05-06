@@ -2,6 +2,8 @@ local ctp = require "lctp2"
 local ffi = ctp.ffi
 local inspect = require "inspect"
 
+ctp.log_set_level("LOG_DEBUG")
+
 local servers = {
     md = {
         ["sim"] = { front_addr =  'tcp://121.37.80.177:20004', broker = "7090", user = "7572" },
@@ -13,7 +15,7 @@ local servers = {
             user = "333307126", 
         },
         ["hy-sim"] = {
-            front_addr = "tcp://101.230.79.235:32213"
+            front_addr = "tcp://101.230.79.235:32213",
             broker = "3070", 
             user = "333307126", 
         },
@@ -21,9 +23,10 @@ local servers = {
 }
 
 local collector = ctp.new_collector(
-    servers.md["hy-sim"]
+    servers.md["hy"]
 )
-collector:subscribe({ "IF2505" })
+
+collector:subscribe({ "IM2507" })
 collector:start()
 
 print("---")
@@ -41,7 +44,7 @@ while true do
     accum_time = accum_time + (t1 - t0)
     print(accum_time)
 
-    -- print(inspect(tick))
+    print(inspect(tick))
 
     i = i + 1
 
