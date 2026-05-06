@@ -5,7 +5,7 @@ local inspect = require "inspect"
 --
 -- ctpc api using FFI
 --
-local ctp_ver = "ctp-6.7.7"
+local ctp_ver = "ctp-6.7.11"
 -- local ctp_ver = "ctp-6.7.7"
 local prefix = "/usr/local"
 local include_path = prefix .. "/include"

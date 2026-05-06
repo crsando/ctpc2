@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#define _XOPEN_SOURCE // enable strptime
 #include <time.h>
 
 #define CTP_DATETIME_BUF_SIZE 20
@@ -39,16 +41,12 @@ char * ctp_nsecs_to_str(int64_t nsecs) {
     char tmp[24];
     unsigned int sp = nsecs % 1000000;
     time_t epoch = (time_t)((nsecs - sp) / 1000000);
-    printf("epoch:%ld sp:%d", epoch, sp);
     localtime_r(&epoch, &s);
     memset(tmp, 0, sizeof(tmp));
     strftime(tmp, 64, "%Y-%m-%dT%H:%M:%S", &s);
-    printf(tmp);
-    printf("\n");
 
     char * str;
     str = (char *)malloc(sizeof(char) * 32);
     memset(str, 0, sizeof(char)*32);
-    sprintf(str, "%s.%06d", tmp, sp);
     return str;
 }
