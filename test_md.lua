@@ -13,8 +13,8 @@ local servers = {
             user = "333307126", 
         },
         ["hy-sim"] = {
-            front_addr = "tcp://101.230.79.235:42213",
-            broker = "1080", 
+            front_addr = "tcp://101.230.79.235:32213"
+            broker = "3070", 
             user = "333307126", 
         },
     },
