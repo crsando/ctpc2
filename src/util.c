@@ -1,8 +1,9 @@
+#define _GNU_SOURCE // enable strptime
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#define _XOPEN_SOURCE // enable strptime
 #include <time.h>
 
 #define CTP_DATETIME_BUF_SIZE 20
