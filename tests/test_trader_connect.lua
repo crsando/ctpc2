@@ -1,11 +1,7 @@
 -- jit.off(true, true)
 
 local ctp = require "lctp2"
-local ffi = ctp.ffi
-local uv = require "luv"
-
--- ctp.log_set_level("LOG_ERROR")
-ctp.log_set_level("LOG_DEBUG")
+local inspect = require "inspect"
 
 -- local server = {
 --             front_addr = "tcp://101.230.79.235:33205",
@@ -34,10 +30,14 @@ local server = {
             auth_code = '20231101ZHOUYH01',
 }
 
-local trader = ctp.new_trader(server):start()
+local trader = ctp.new_trader(server):start(true)
+
+-- trader:query_account()
+trader:query_instrument("IF2607")
 
 while true do 
-    uv.sleep(1000)    
+    local rsp = trader:recv(true)
+    print(inspect(rsp))
 end
 
 os.exit(1)

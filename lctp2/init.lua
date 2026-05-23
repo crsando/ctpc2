@@ -43,7 +43,63 @@ local ctpc = ffi.load("ctpc2")
 --
 local datatypes, constants, structs = require "lctp2.parse" ( fn_type, fn_struct )
 
+
 --
+-- utiliy functions for transform ctp data struct into lua-table
+--
+
+
+-- check struct is valid
+local function check_struct(cdata, struct_name)
+    local rst = string.match(tostring(ffi.typeof(cdata)), "struct ([%w_]+)")
+    if rst then 
+        if struct_name then 
+            return (rst == struct_name) and rst or nil
+        else 
+            return rst 
+        end
+    end 
+    return rst
+end
+
+-- finish module loading
+local function totable(cdata)
+    local field_name = assert(check_struct(cdata), "cdata is not a struct: " .. tostring(ffi.typeof(cdata)))
+
+    local s = structs[field_name] 
+    if not s then return nil end
+
+    -- if matched
+    local o = {}
+    for attr, type in pairs(s) do 
+        if not datatypes[type] then 
+            o[attr] = nil
+        elseif datatypes[type] == "string" then
+            o[attr] = ffi.string(cdata[attr])
+        else -- int, short, char
+            o[attr] = tonumber(cdata[attr])
+        end
+    end -- end for
+    return o
+end
+
+
+local function cast_trader_rsp(rsp)
+    if rsp == nil then return nil end
+    local rst = {}
+    rst.req_id = tonumber(rsp.req_id)
+    if rsp.field ~= nil then 
+        rst.field = totable(ffi.cast( "struct " .. ffi.string(rsp.field_name) .. " *", rsp.field))
+    end
+    if rsp.rsp_info ~= nil then 
+        rst.rsp_info = totable(ffi.cast( "struct CThostFtdcRspInfoField *", rsp.rsp_info))
+    end
+    rst.field_name = ffi.string(rsp.field_name)
+    rst.func_name = ffi.string(rsp.func_name)
+    rst.is_last = rsp.is_last
+    return rst
+end
+
 
 -- set log level
 function log_set_level(lvl_str)
@@ -151,25 +207,19 @@ function new_trader(server)
             end,
         -- is_ready = function(self) return (self.trader.connected >= 4) end,
 
-        recv = function (self, blocking)
+        recv_raw = function (self, blocking)
                 -- raw receive
                 return ctpc.ctp_trader_recv(self.trader, blocking)
             end,
-        
-        -- fetch = function (self, blocking)
-        --         local rsp = ffi.gc(ctpc.ctp_trader_recv(self.trader, blocking), ctpc.ctp_rsp_free) 
-        --         if rsp.desc == "error" then 
-        --             return nil, rsp
-        --         else
-        --             local ptr_type = "struct " .. ffi.string(rsp.desc) .. " * "
-        --             local ptr = assert(ffi.cast(ptr_type, rsp.field))
-        --             if ptr ~= nil then 
-        --                 ffi.gc(ptr, ffi.C.free)
-        --             end
-        --             return ptr, rsp
-        --         end
-        --     end,
 
+        recv = function (self, blocking)
+                -- raw receive
+                local rsp = ctpc.ctp_trader_recv(self.trader, blocking)
+                local t =  cast_trader_rsp(rsp)
+                ctpc.ctp_rsp_free(rsp)
+                return t
+            end,
+        
         order_insert = function (self, symbol, price, volume, flag)
                 return ctpc.ctp_trader_order_insert(self.trader, symbol, price, volume, flag)
             end,
@@ -185,9 +235,12 @@ function new_trader(server)
                 return ctpc.ctp_trader_order_cancel(self.trader, symbol, exchange_id, order_sys_id) 
             end,
         
-        query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,
+        query_account = function(self) 
+            print("query_account")
+            return ctpc.ctp_trader_query_account(self.trader) 
+        end,
         query_position = function(self) return ctpc.ctp_trader_query_position(self.trader) end,
-        query_instrument = function(self, exchange_id) return ctpc.ctp_trader_query_instrument(self.trader, exchange_id) end,
+        query_instrument = function(self, symbol) return ctpc.ctp_trader_query_instrument(self.trader, symbol) end,
         query_order = function(self) return ctpc.ctp_trader_query_order(self.trader) end,
         -- query_marketdata = function(self, symbol) return ctpc.ctp_trader_query_marketdata(self.trader, symbol) end,
         -- fetch_account = function(self, req_id) return ctpc.ctp_trader_fetch_account(self.trader, req_id) end,
@@ -198,6 +251,7 @@ function new_trader(server)
     return T
 end
 
+--[[
 function position_keeper(ptr)
     local o = {}
     if ptr ~= nil then 
@@ -237,59 +291,7 @@ function position_keeper(ptr)
     setmetatable(o, _mt)
     return o
 end
-
-local function check_struct(cdata, struct_name)
-    local rst = string.match(tostring(ffi.typeof(cdata)), "struct ([%w_]+)")
-    if rst then 
-        if struct_name then 
-            return (rst == struct_name) and rst or nil
-        else 
-            return rst 
-        end
-    end 
-    return rst
-end
-
--- finish module loading
-local function totable(cdata)
-    -- todo
-    -- local field_name = string.match(tostring(ffi.typeof(cdata)), "struct ([%w_]+)")
-    local field_name = assert(check_struct(cdata), "cdata is not a struct: " .. tostring(ffi.typeof(cdata)))
-
-    local s = structs[field_name] 
-    if not s then return nil end
-
-    -- if matched
-    local o = {}
-    for attr, type in pairs(s) do 
-        -- io.stderr:write("totable", field_name, attr, type, datatypes[type], cdata[attr], "\n")
-        if not datatypes[type] then 
-            o[attr] = nil
-        elseif datatypes[type] == "string" then
-            o[attr] = ffi.string(cdata[attr])
-        else -- int, short, char
-            o[attr] = tonumber(cdata[attr])
-        end
-    end -- end for
-    return o
-end
-
-
-local function cast_trader_rsp(rsp)
-    if rsp == nil then return nil end
-    local rst = {}
-    rst.req_id = tonumber(rsp.req_id)
-    if rsp.field ~= nil then 
-        rst.field = totable(ffi.cast( "struct " .. ffi.string(rsp.field_name) .. " *", rsp.field))
-    end
-    if rsp.rsp_info ~= nil then 
-        rst.rsp_info = totable(ffi.cast( "struct CThostFtdcRspInfoField *", rsp.rsp_info))
-    end
-    rst.field_name = ffi.string(rsp.field_name)
-    rst.func_name = ffi.string(rsp.func_name)
-    rst.is_last = rsp.is_last
-    return rst
-end
+]]
 
 local M = {
     new_collector = new_collector,
@@ -312,6 +314,6 @@ for k, v in pairs(constants) do
     M[k] = v 
 end
 
-M.order_book = require "lctp2.order_book"
+-- M.order_book = require "lctp2.order_book"
 
 return M
