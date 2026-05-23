@@ -7,32 +7,36 @@ local uv = require "luv"
 -- ctp.log_set_level("LOG_ERROR")
 ctp.log_set_level("LOG_DEBUG")
 
-local server = {
-            front_addr = "tcp://101.230.79.235:33205",
-            broker = "3070", 
-            user = "333307126", 
-            pass = "930706", 
-            app_id = "client_tara_241201", 
-            auth_code = 'CY2LFL92CISEEKVM',
-        }
+-- local server = {
+--             front_addr = "tcp://101.230.79.235:33205",
+--             broker = "3070", 
+--             user = "333307126", 
+--             pass = "930706", 
+--             app_id = "client_tara_241201", 
+--             auth_code = 'CY2LFL92CISEEKVM',
+--         }
 
--- prompt
-if not server.pass then 
-    io.write("user: ", server.user, "\n")
-    io.write("password: ")
-    server.pass = io.read("*line")
-end
+-- local server = {
+--             front_addr = "tcp://180.169.50.131:42205",
+--             broker = "2071", 
+--             user = "0061831885", 
+--             pass = "zhy19930311", 
+--             app_id = "client_tara_231031", 
+--             auth_code = '20231101ZHOUYH01',
+-- }
+
+local server = {
+            front_addr = "tcp://trading.openctp.cn:30001",
+            broker = "9999", 
+            user = "7572", 
+            pass = "123456", 
+            app_id = "client_tara_231031", 
+            auth_code = '20231101ZHOUYH01',
+}
 
 local trader = ctp.new_trader(server):start()
 
--- trader:query_account()
-
-uv.sleep(1000)
-
-trader:order_insert("IF2501", 0, 1, ctp.THOST_FTDC_OFEN_Open)
-
 while true do 
-    -- update_position_info()
     uv.sleep(1000)    
 end
 

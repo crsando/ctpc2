@@ -1,6 +1,7 @@
 local ctp = require "lctp2"
 local ffi = ctp.ffi
 local inspect = require "inspect"
+local uv = require "luv"
 
 ctp.log_set_level("LOG_DEBUG")
 
@@ -26,15 +27,28 @@ local collector = ctp.new_collector(
     servers.md["hy"]
 )
 
-collector:subscribe({ "IM2507" })
+local code = arg[1] or "IM2605"
+
+collector:subscribe({ arg[1]})
 collector:start()
 
 print("---")
 
 local i = 0
-
 local accum_time = 0
 
+
+uv.new_signal():start("sigint", function(signal)
+        print("on sigint, exit")
+        uv.walk(function (handle) if not handle:is_closing() then handle:close() end end)
+        os.exit(1)
+    end)
+
+uv.run()
+
+-- local tick = collector:recv()
+
+--[[
 while true do 
     local tick = collector:recv()
 
@@ -55,3 +69,4 @@ while true do
 end
 
 print("avg", accum_time / i)
+]]
