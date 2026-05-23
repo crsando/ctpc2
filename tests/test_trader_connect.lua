@@ -1,5 +1,3 @@
--- jit.off(true, true)
-
 local ctp = require "lctp2"
 local inspect = require "inspect"
 

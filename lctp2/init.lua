@@ -235,10 +235,7 @@ function new_trader(server)
                 return ctpc.ctp_trader_order_cancel(self.trader, symbol, exchange_id, order_sys_id) 
             end,
         
-        query_account = function(self) 
-            print("query_account")
-            return ctpc.ctp_trader_query_account(self.trader) 
-        end,
+        query_account = function(self) return ctpc.ctp_trader_query_account(self.trader) end,
         query_position = function(self) return ctpc.ctp_trader_query_position(self.trader) end,
         query_instrument = function(self, symbol) return ctpc.ctp_trader_query_instrument(self.trader, symbol) end,
         query_order = function(self) return ctpc.ctp_trader_query_order(self.trader) end,
@@ -314,6 +311,6 @@ for k, v in pairs(constants) do
     M[k] = v 
 end
 
--- M.order_book = require "lctp2.order_book"
+M.order_book = require "lctp2.order_book"
 
 return M
