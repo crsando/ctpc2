@@ -14,14 +14,12 @@ local server = {
     auth_code = '20231101ZHOUYH01',
 }
 
-local trader_id = nil
-
 local function boot()
     print("root booting")
     assert(config.symbol, "no symbol provided")
 
     print("start ctp trader")
-    trader_id = service.spawn { source = "@tests/ctp_trader.lua", config = { account = server } }
+    trader_id = service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = { account = server } }
     local rsp = service.call(trader_id, "start") -- blocking, until trader starts
 
     print("start result", rsp)

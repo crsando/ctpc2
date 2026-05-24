@@ -1,21 +1,15 @@
 local inspect = require "inspect"
 local service = require "lservice2"
 
-local root_id = service.spawn { 
-    source = "@tests/root_trader.lua", 
+local script_name = arg[1] or "root_trader"
+
+local root_addr = service.new { 
+    source = "@tests/" .. script_name .. ".lua", 
     config = { 
         symbol = "IF2607",
     } 
 }
 
-service.send(root_id, "boot")
-
-
-local uv = require "luv"
-uv.new_signal():start("sigint", function(signal)
-        print("on sigint, exit")
-        uv.walk(function (handle) if not handle:is_closing() then handle:close() end end)
-        os.exit(1)
-    end)
-
-uv.run()
+service.start(root_addr)
+service.send(service.get_id(root_addr), "boot")
+service.join(root_addr)
