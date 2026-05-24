@@ -33,7 +33,7 @@ end
 --
 -- global(per-service) variables
 --
-local server, trader; local start_trader = function ()  
+local server, trader; S.start = function ()  
     server = config.account
     assert(server)
     print("trader account", inspect(server))
@@ -41,6 +41,7 @@ local server, trader; local start_trader = function ()
     trader = ctp.new_trader(server)
         :cond( service.get_cond() )
         :start( true ) -- blocking thread until settlement
+    return true
 end
 
 --
@@ -229,10 +230,6 @@ function S.query_order()
     return rst
 end
 
-function S.start()
-    start_trader()
-    return true
-end
 
 function S.quit()
     print("trader is quitting")
