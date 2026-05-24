@@ -25,17 +25,25 @@ local function boot()
     print("start result", rsp)
 end
 
+
+local function test_trader_query_queue()
+    assert(trader_id)
+    service.send(trader_id, "query_account")
+    service.send(trader_id, "query_account")
+    service.send(trader_id, "query_instrument", "IF2607")
+    service.send(trader_id, "query_account")
+end
+
 local function test() 
     print("begin test", trader_id)
-    local rst = service.call(trader_id, "query_position")
-    print("position info", inspect(rst))
+    -- local rst = service.call(trader_id, "query_position")
+    -- print("position info", inspect(rst))
 
     local rst = service.call(trader_id, "query_account")
     print("account info", inspect(rst))
-    
 
-    local rst = service.call(trader_id, "query_instrument", "IF2607")
-    print("instrument info", inspect(rst))
+    -- local rst = service.call(trader_id, "query_instrument", "IF2607")
+    -- print("instrument info", inspect(rst))
 
     -- local rst = service.call(trader_id, "order_insert", "BTC", 99999999, 1, nil)
     -- local rst = service.send(trader_id, "trade", "BTC", 1, 1, nil)

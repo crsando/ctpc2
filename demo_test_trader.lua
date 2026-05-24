@@ -1,10 +1,10 @@
 local inspect = require "inspect"
 local service = require "lservice2"
 
-local script_name = arg[1] or "root_trader"
+local script_name = arg[1] or "root_test_trader"
 
 local root_addr = service.new { 
-    source = "@tests/" .. script_name .. ".lua", 
+    source = "@services/" .. script_name .. ".lua", 
     config = { 
         symbol = "IF2607",
     } 
