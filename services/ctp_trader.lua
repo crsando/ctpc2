@@ -167,21 +167,7 @@ local query = {
 } -- end query object definitions
 
 
--- main loop
--- process trader internal messages
-function service.on_idle()
-    while true do 
-        local rsp = trader:recv(false) -- non-blocking
-        if rsp then 
-            -- process trader messages
-            local handler = R[rsp.func_name] 
-                                or function (rsp) query:update(rsp) end 
-            handler( rsp )
-        else 
-            return 
-        end
-    end -- end while
-end
+
 
 --
 -- query interfaces
@@ -252,6 +238,22 @@ function S.quit()
     print("trader is quitting")
     service.call(0, "notify", service.get_id(), "quit")
     service.quit()
+end
+
+-- main loop
+-- process trader internal messages
+function service.on_idle()
+    while true do 
+        local rsp = trader:recv(false) -- non-blocking
+        if rsp then 
+            -- process trader messages
+            local handler = R[rsp.func_name] 
+                                or function (rsp) query:update(rsp) end 
+            handler( rsp )
+        else 
+            return 
+        end
+    end -- end while
 end
 
 service.dispatch(S)
