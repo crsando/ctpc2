@@ -163,6 +163,7 @@ CUSTOM_ON(OnRspQryInvestorPosition, CThostFtdcInvestorPositionField);
 CUSTOM_ON(OnRspQryInstrument, CThostFtdcInstrumentField);
 CUSTOM_ON(OnRspOrderInsert, CThostFtdcInputOrderField);
 CUSTOM_ON(OnRspOrderAction, CThostFtdcInputOrderActionField);
+CUSTOM_ON(OnRspQryInstrumentMarginRate, CThostFtdcInstrumentMarginRateField);
 
 
 // CUSTOM_ON(OnRspQryOrder, CThostFtdcOrderField);

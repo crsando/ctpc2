@@ -62,6 +62,24 @@ local function check_struct(cdata, struct_name)
     return rst
 end
 
+
+local function trim(s)
+    if s == nil then
+        return nil
+    end
+    return s:match("^%s*(.-)%s*$")
+end
+
+local function trim_ctp(s)
+    if s == nil then
+        return nil
+    end
+
+    -- 先去掉 C 字符串里可能残留的 \0 后内容，再去首尾空白
+    s = s:match("^[^\0]*") or s
+    return s:match("^%s*(.-)%s*$")
+end
+
 -- finish module loading
 local function totable(cdata)
     local field_name = assert(check_struct(cdata), "cdata is not a struct: " .. tostring(ffi.typeof(cdata)))
@@ -221,7 +239,15 @@ function new_trader(server)
             end,
         
         order_insert = function (self, symbol, price, volume, flag)
-                return ctpc.ctp_trader_order_insert(self.trader, symbol, price, volume, flag)
+                ctpc.ctp_trader_order_insert(self.trader, symbol, price, volume, flag)
+                local order; do 
+                    order.BrokerID = ffi.string(self.trader.broker)
+                    order.InvestorID = ffi.string(self.trader.user)
+                    order.FrontID = tonumber(self.trader.front_id)
+                    order.SessionID = tonumber(self.trader.session_id)
+                    order.OrderRef = ffi.string(self.trader.lst_order_ref)
+                end 
+                return order
             end,
         order_cancel = function (self, ...)
                 local symbol, exchange_id, order_sys_id = ...

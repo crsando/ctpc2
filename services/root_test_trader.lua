@@ -35,12 +35,13 @@ local function test_trader_query_queue()
 end
 
 local function test() 
-    print("begin test", trader_id)
-    -- local rst = service.call(trader_id, "query_position")
-    -- print("position info", inspect(rst))
+    service.call(trader_id, "test")
+    -- print("begin test", trader_id)
+    -- -- local rst = service.call(trader_id, "query_position")
+    -- -- print("position info", inspect(rst))
 
-    local rst = service.call(trader_id, "query_account")
-    print("account info", inspect(rst))
+    -- local rst = service.call(trader_id, "query_account")
+    -- print("account info", inspect(rst))
 
     -- local rst = service.call(trader_id, "query_instrument", "IF2607")
     -- print("instrument info", inspect(rst))
@@ -82,12 +83,13 @@ local S = {}
 function S.boot()
     boot()
     test()
+    -- service.send(0, "quit")
 end
 
 function S.quit()
-    for _, id in ipairs{collector_id, trader_id, bot_id} do 
-        service.send(id, "quit")
-    end
+    print("root is quiting")
+    service.send(trader_id, "quit")
+    service.quit()
 end
 
 service.dispatch(S)

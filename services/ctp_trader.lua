@@ -142,7 +142,7 @@ local query = {
 
             -- check request id for a match, ignore if not matched
             if not ( q.req_id == rsp.req_id ) then 
-                io.stderr:write("req_id not match, ignore reponse | req_id : " .. rsp.req_id)
+                io.stderr:write("req_id not match, ignore reponse | req_id : " .. rsp.req_id .. "\n")
                 return 
             end
 
@@ -158,9 +158,6 @@ local query = {
             end
         end,
 } -- end query object definitions
-
-
-
 
 --
 -- query interfaces
@@ -185,6 +182,8 @@ end
 ]]
 function S.query_position()
     local ok, rst = query:request("query_position")
+
+    print(inspect(rst))
 
     local pt = {}
     for _, field in ipairs(rst) do 
@@ -222,6 +221,28 @@ function S.query_order()
     return rst
 end
 
+--
+-- Order Related Stuffs
+-- 
+
+local order = {
+    insert = function (self, symbol, price, volume, flag)
+            local order = trader:order_insert(symbol, price, volume, flag)
+            -- order_book:insert(order)
+            return order
+        end,
+    cancel = function (self)
+        end,
+    update = function (self, rsp)
+        end,
+}
+
+
+
+--
+-- Fundemental Stuffs
+--
+
 
 function S.quit()
     print("trader is quitting")
@@ -243,6 +264,17 @@ function service.on_idle()
             return 
         end
     end -- end while
+end
+
+
+function S.test()
+    print("begin trader insider test")
+    local rst = service.call(service.get_id(), "query_position")
+    print(inspect(rst))
+
+    print("begin trader order insert test")
+    -- order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
+    return 1
 end
 
 service.dispatch(S)

@@ -53,6 +53,7 @@ public:
 	///询价通知
 	void OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp);
 
+
 	// attributes
 	CThostFtdcMdApi *g_pMdUserApi;            // 行情指针
 

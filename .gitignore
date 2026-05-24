@@ -1,5 +1,3 @@
 *.o
-*.so
 *.con
 *.log
-test_gtja_sim.lua

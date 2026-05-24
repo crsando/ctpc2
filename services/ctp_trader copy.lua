@@ -279,11 +279,7 @@ local function order_insert(symbol, price, volume, flag)
         flag = determine_order_flag(symbol, volume)
     end
     -- ctp.ctpc.ctp_trader_order_insert(trader.trader, symbol, price, volume, flag)
-    trader:order_insert(symbol, price, volume, flag)
-    local order = {}
-    order.FrontID = tonumber(trader.trader.front_id)
-    order.SessionID = tonumber(trader.trader.session_id)
-    order.OrderRef = ffi.string(trader.trader.lst_order_ref)
+    local order = trader:order_insert(symbol, price, volume, flag)
     order_book:insert(order)
     return order
 end
