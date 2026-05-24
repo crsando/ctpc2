@@ -21,14 +21,6 @@ end
 --
 local R = {} -- handle trader response
 local S = {} -- handle service request/response
-local internal_suspend_lookup = {}
-
-local function resume_session_by_lookup(key, ...)
-    local co = internal_suspend_lookup[key]
-    if co then 
-        service.resume_session(co, ...)
-    end
-end
 
 --
 -- global(per-service) variables
