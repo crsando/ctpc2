@@ -31,7 +31,15 @@ local server_list = {
             pass = "123456", 
             app_id = "client_tara_231031", 
             auth_code = '20231101ZHOUYH01',
-        }
+        },
+        ["simnow"]=  {
+            front_addr = "tcp://182.254.243.31:40001",
+            broker = "9999", 
+            user = "264530", 
+            pass = "bE@453162948", 
+            app_id = "simnow_client_test", 
+            auth_code = '0000000000000000',
+        },
     }
 
 
@@ -54,7 +62,7 @@ local S = {} -- handle service request/response
 --
 local server, trader; S.start = function ()  
     -- server = assert(config.account or server_list["gtja-sim"])
-    server = assert(config.account or server_list["openctp"])
+    server = assert(config.account or server_list["simnow"])
     ctp.log_debug("trader account %s", inspect(server, {newline = " "}))
 
     trader = ctp.new_trader(server)
@@ -223,7 +231,6 @@ function S.query_position()
 
     position_table = pt -- update global variable
 
-    -- return slice(T,"field")
     return slice(rst, "field")
 end
 

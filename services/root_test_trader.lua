@@ -15,14 +15,12 @@ local trader_id = nil
 -- }
 
 local function boot()
-    print("root booting")
+    ctp.log_debug("booting root")
     assert(config.symbol, "no symbol provided")
-
-    print("start ctp trader")
     trader_id = service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = { account = server } }
     local rsp = service.call(trader_id, "start") -- blocking, until trader starts
 
-    print("start result", rsp)
+    ctp.log_debug("start result", rsp)
 end
 
 
@@ -47,7 +45,7 @@ function S.boot()
 end
 
 function S.quit()
-    print("root is quiting")
+    ctp.log_debug("root is quiting")
     service.send(trader_id, "quit")
     service.quit()
 end
