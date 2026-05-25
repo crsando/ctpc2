@@ -1,4 +1,7 @@
 local inspect = require "inspect"
+local ctp = require "lctp2"
+ctp.log_set_level("LOG_INFO")
+
 local service = require "lservice2" .input(...)
 local config = service.config
 
@@ -19,12 +22,16 @@ local server_list = {
             app_id = "client_tara_241201", 
             auth_code = 'CY2LFL92CISEEKVM',
         },
-}
+        ["openctp"] = {
+            front_addr = "tcp://trading.openctp.cn:30001",
+            broker = "9999", 
+            user = "7572", 
+            pass = "123456", 
+            app_id = "client_tara_231031", 
+            auth_code = '20231101ZHOUYH01',
+        }
+    }
 
-
-local ctp = require "lctp2"
-local ffi = ctp.ffi
-ctp.log_set_level("LOG_DEBUG")
 
 local function slice(t, k)
     local o = {}
@@ -298,7 +305,13 @@ local order = {
     insert = function (self, symbol, price, volume, flag)
             local o = trader:order_insert(symbol, price, volume, flag)
             local key = make_order_hashkey(o)
-            o._key = key
+            do 
+                o._key = key
+                o._symbol = symbol
+                o._price = price
+                o._volume = volume
+                o._flag = flag
+            end 
             self.cache[key] = o
             print("order inserted", key, inspect(o))
             return o
@@ -409,14 +422,14 @@ local order = {
 
             -- 一般是报单阶段产生错误，来自OnRspOrderInsert
             if (trim(rsp.func_name) == "OnRspOrderInsert") and rsp.rsp_info and rsp.rsp_info.ErrorID then 
-                print("finish order on *insert error*")
+                print("finish order ", key, "on *insert error*")
                 self:finish(key, "invalid: (" .. rsp.rsp_info.ErrorID ..")" )
             -- 仅在OnRtnTrade，且Volume达标（不在OnRtnOrder时结束订单）
             elseif (trim(rsp.func_name) == "OnRtnTrade") and (entry.OrderStatus == ctp.THOST_FTDC_OST_AllTraded) then 
-                print("finish order on *all-traded*")
+                print("finish order ", key, "on *all-traded*")
                 self:finish(key, "complete")
             elseif entry.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
-                print("finish order on *cancel*")
+                print("finish order ", key, "on *cancel*")
                 self:finish(key, "canceled")
             end 
 

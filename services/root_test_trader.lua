@@ -36,46 +36,6 @@ end
 
 local function test() 
     service.call(trader_id, "test")
-    -- print("begin test", trader_id)
-    -- -- local rst = service.call(trader_id, "query_position")
-    -- -- print("position info", inspect(rst))
-
-    -- local rst = service.call(trader_id, "query_account")
-    -- print("account info", inspect(rst))
-
-    -- local rst = service.call(trader_id, "query_instrument", "IF2607")
-    -- print("instrument info", inspect(rst))
-
-    -- local rst = service.call(trader_id, "order_insert", "BTC", 99999999, 1, nil)
-    -- local rst = service.send(trader_id, "trade", "BTC", 1, 1, nil)
-    -- local rst = service.call(trader_id, "trade", "cu2409", 0, 1, nil)
-    -- print("traded", inspect(rst))
-    -- local rst = service.call(trader_id, "start")
-
-    -- local rst = service.send(trader_id, "query_order")
-    -- local rst = service.send(trader_id, "query_account")
-    -- print(inspect(rst))
-end
-
-local function test_cancel()
-    local rst = service.call(trader_id, "query_order")
-    print("Num of orders", #rst)
-    for _, order in ipairs(rst) do 
-        if order and order.InstrumentID then
-            print("order: ", order.ExchangeID, order.OrderSysID, order.OrderStatus, order.LimitPrice, order.VolumeTraded)
-            if (order.OrderStatus ~= ctp.THOST_FTDC_OST_Canceled) and (order.OrderStatus ~= ctp.THOST_FTDC_OST_AllTraded) then 
-                -- print("order: ", order.FrontID, order.SessionID, order.OrderRef, order.InstrumentID, order.OrderStatus, order.InsertDate, order.InsertTime)
-                print("to cancel", order.OrderSysID)
-                service.call(trader_id, "cancel", order)
-                return 0
-            end
-
-            -- if (order.OrderStatus ~= ctp.THOST_FTDC_OST_Canceled) and (order.OrderStatus ~= ctp.THOST_FTDC_OST_AllTraded) then 
-            --     service.call(trader_id, "cancel", order)
-            -- end
-        end
-    end
-    -- print("query_order", inspect(rst))
 end
 
 local S = {}
@@ -83,7 +43,7 @@ local S = {}
 function S.boot()
     boot()
     test()
-    -- service.send(0, "quit")
+    service.send(0, "quit")
 end
 
 function S.quit()
