@@ -5,14 +5,14 @@ local ctp = require "lctp2"
 
 local trader_id = nil
 
-local server = {
-    front_addr = "tcp://trading.openctp.cn:30001",
-    broker = "9999", 
-    user = "7572", 
-    pass = "123456", 
-    app_id = "client_tara_231031", 
-    auth_code = '20231101ZHOUYH01',
-}
+-- local server = {
+--     front_addr = "tcp://trading.openctp.cn:30001",
+--     broker = "9999", 
+--     user = "7572", 
+--     pass = "123456", 
+--     app_id = "client_tara_231031", 
+--     auth_code = '20231101ZHOUYH01',
+-- }
 
 local function boot()
     print("root booting")

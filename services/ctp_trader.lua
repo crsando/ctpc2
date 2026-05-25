@@ -2,7 +2,9 @@ local inspect = require "inspect"
 local service = require "lservice2" .input(...)
 local config = service.config
 
-assert(config.account)
+local server = {
+
+}
 
 local ctp = require "lctp2"
 local ffi = ctp.ffi
@@ -26,8 +28,7 @@ local S = {} -- handle service request/response
 -- global(per-service) variables
 --
 local server, trader; S.start = function ()  
-    server = config.account
-    assert(server)
+    server = assert(server or config.account)
     print("trader account", inspect(server))
 
     trader = ctp.new_trader(server)
@@ -204,6 +205,12 @@ function S.query_position()
     return position_table
 end
 
+function S.query_instrument_margin_rate(symbol)
+    local ok, rst = query:request("query_instrument_margin_rate", symbol)
+    print("query instrument margin rate", ok, inspect(rst))
+    return rst
+end
+
 function S.query_instrument(symbol)
     local ok, rst = query:request("query_instrument", symbol)
     print("query instrument", ok, inspect(rst))
@@ -269,7 +276,10 @@ end
 
 function S.test()
     print("begin trader insider test")
-    local rst = service.call(service.get_id(), "query_position")
+    -- local rst = service.call(service.get_id(), "query_position")
+    -- print(inspect(rst))
+
+    local rst = service.call(service.get_id(), "query_instrument_margin_rate", "IF2607")
     print(inspect(rst))
 
     print("begin trader order insert test")

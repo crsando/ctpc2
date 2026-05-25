@@ -164,6 +164,14 @@ int ctp_trader_query_instrument(ctp_trader_t * trader, const char * symbol) {
 	CTP_TRADER_REQ(trader, QryInstrument, &field);
 }
 
+int ctp_trader_query_instrument_margin_rate(ctp_trader_t * trader, const char * symbol) {
+    assert(symbol != NULL);
+	CThostFtdcQryInstrumentMarginRateField field;
+	memset(&field, 0, sizeof(field));
+    strcpy(field.InstrumentID, symbol);
+	CTP_TRADER_REQ(trader, QryInstrumentMarginRate, &field);
+}
+
 // int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id) {
 // 	CThostFtdcQryInstrumentField field;
 // 	memset(&field, 0, sizeof(field));

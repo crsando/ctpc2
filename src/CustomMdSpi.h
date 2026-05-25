@@ -2,6 +2,7 @@
 // ---- 派生的行情类 ---- //
 // #include <vector>
 #include "ThostFtdcMdApi.h"
+
 extern "C" {
 	#include "ctpc2.h"
 }

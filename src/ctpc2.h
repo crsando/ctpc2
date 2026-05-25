@@ -128,6 +128,7 @@ void ctp_rsp_free(ctp_rsp_t * r);
 int ctp_trader_query_account(ctp_trader_t * trader); 
 int ctp_trader_query_position(ctp_trader_t * trader);
 int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id);
+int ctp_trader_query_instrument_margin_rate(ctp_trader_t * trader, const char * symbol);
 
 // ReqQryDepthMarketData
 // int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol);
