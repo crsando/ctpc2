@@ -42,17 +42,20 @@ function log_set_level(lvl_str)
     local lvl = ffi.C[lvl_str]
     lvl = lvl or ffi.C.LOG_INFO
     ctpc.log_set_level(lvl)
+
+    -- set local lvl
+    _log_level = lvl_str
 end
 
 local function log(level, msg)
-    if ffi.C[_log_level] >= ffi.C[level] then 
+    if ffi.C[_log_level] >= ffi.C["LOG_" .. level] then 
     -- 2 表示获取调用 log() 的上一层位置
         local info = debug.getinfo(3, "Sl")
         local time = os.date("%H:%M:%S")
         local file = info.short_src or "unknown"
         local line = info.currentline or 0
-        print(string.format(
-            "%s %s %s:%d: %s",
+        io.stderr:write(string.format(
+            "%s %s %s:%d: %s\n",
             time,
             level,
             file,
@@ -362,8 +365,8 @@ local M = {
 
     -- position_keeper = position_keeper,
 
-    log_debug = function (...) local msg = string.format(...); log("LOG_DEBUG", msg) end,
-    log_info = function (...) local msg = string.format(...); log("LOG_INFO", msg) end,
+    log_debug = function (...) local msg = string.format(...); log("DEBUG", msg) end,
+    log_info = function (...) local msg = string.format(...); log("INFO", msg) end,
 }
 
 -- load constants directly to the module
