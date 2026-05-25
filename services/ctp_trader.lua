@@ -60,10 +60,10 @@ local S = {} -- handle service request/response
 --
 -- global(per-service) variables
 --
-local server, trader; S.start = function ()  
+local server, trader; S.start = function () 
     -- server = assert(config.account or server_list["gtja-sim"])
-    server = assert(config.account or server_list["simnow"])
-    ctp.log_debug("trader account %s", inspect(server, {newline = " "}))
+    server = assert(config.account or server_list["gtja-sim"])
+    -- ctp.log_debug("trader account %s", inspect(server, {newline = " "}))
 
     trader = ctp.new_trader(server)
         :cond( service.get_cond() )
@@ -176,7 +176,7 @@ local query = {
 
             -- check request id for a match, ignore if not matched
             if not ( q.req_id == rsp.req_id ) then 
-                io.stderr:write("req_id not match, ignore reponse | req_id : " .. rsp.req_id .. "\n")
+                ctp.log_deubg("req_id not match, ignore reponse | %s | req_id : %d", rsp.func_name, rsp.req_id)
                 return 
             end
 
@@ -443,7 +443,7 @@ local order = {
                 self:finish(key, "complete")
             elseif entry.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
                 local error_msg = rsp and rsp.rsp_info and rsp.rsp_info.ErrorMsg or ""
-                ctp.log_debug("finish order %s | %s", key, error_msg)
+                ctp.log_debug("finish order %s | %s | $s", key, error_msg)
                 self:finish(key, "canceled")
             end 
 
@@ -452,6 +452,7 @@ local order = {
 }
 
 
+-- Explicit Define OnRtnOrder/OnRtnTrade
 function R.OnRtnOrder(rsp) order:update(rsp) end
 function R.OnRtnTrade(rsp) order:update(rsp) end
 function R.OnRspOrderAction(rsp) order:update(rsp) end
@@ -516,15 +517,13 @@ end
 
 function S.test()
     ctp.log_debug("begin trader test sequence")
-    do  
-        return 1
-    end
-
-    print("begin trader insider test")
 
     local rst = service.call(service.get_id(), "query_position")
     print("positions", inspect(rst))
 
+    ctp.log_debug("---")
+    ctp.log_debug("nuke all")
+    ctp.log_debug("---")
     local rst = service.call(service.get_id(), "nuke")
 
     -- local rst = service.call(service.get_id(), "query_account")
@@ -537,9 +536,9 @@ function S.test()
     -- local rst = service.call(service.get_id(), "query_instrument_margin_rate", "IF2507")
     -- print(inspect(rst))
 
-    print("------")
-    print("begin trader order insert test")
-    print("------")
+    ctp.log_debug("------")
+    ctp.log_debug("begin trader order insert test")
+    ctp.log_debug("------")
 
     -- 测试无效单（价格过高）
     do 

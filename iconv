@@ -1,0 +1,2 @@
+21:35:17 ERROR src/service.c:208: FATAL THREAD PANIC: (loadstring) cannot open file 'services/-f.lua'
+21:35:17 DEBUG src/service.c:288: service_routine_wrap : service exited
