@@ -210,14 +210,81 @@ void CustomTradeSpi::OnRspQryOrder(CThostFtdcOrderField * pField, CThostFtdcRspI
 
 void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pField)
 {
+    char submit_status[128];
+    char order_status[128];
 	// FrontID + SessionID + OrderRef
 	// int front_id = this->_trader->front_id;
 	// int session_id = this->_trader->session_id;
 	strcpy(this->_trader->lst_order_ref, pField->OrderRef);
 
+    switch (pField->OrderSubmitStatus) {
+    case THOST_FTDC_OSS_InsertSubmitted:
+        snprintf(submit_status, 128, "THOST_FTDC_OSS_InsertSubmitted");
+        break;
+    case THOST_FTDC_OSS_CancelSubmitted:
+        snprintf(submit_status, 128, "THOST_FTDC_OSS_CancelSubmitted");
+        break;
+    case THOST_FTDC_OSS_ModifySubmitted:
+        snprintf(submit_status, 128, "THOST_FTDC_OSS_ModifySubmitted");
+        break;
+    case THOST_FTDC_OSS_Accepted:
+        snprintf(submit_status, 128, "THOST_FTDC_OSS_Accepted");
+        break;
+    case THOST_FTDC_OSS_InsertRejected:
+        snprintf(submit_status, 128, "THOST_FTDC_OSS_InsertRejected");
+        break;
+    case THOST_FTDC_OSS_CancelRejected:
+        snprintf(submit_status, 128, "THOST_FTDC_OSS_CancelRejected");
+        break;
+    case THOST_FTDC_OSS_ModifyRejected:
+        snprintf(submit_status, 128, "THOST_FTDC_OSS_ModifyRejected");
+        break;
+    default:
+        snprintf(submit_status, 128, "UNKNOWN_OrderSubmitStatus(%d)",
+                 (int)(unsigned char)(pField->OrderSubmitStatus));
+        break;
+    }
+
+    // order status
+    switch (pField->OrderStatus) {
+    case THOST_FTDC_OST_AllTraded:
+        snprintf(order_status, 128, "AllTraded");
+        break;
+    case THOST_FTDC_OST_PartTradedQueueing:
+        snprintf(order_status, 128, "PartTradedQueueing");
+        break;
+    case THOST_FTDC_OST_PartTradedNotQueueing:
+        snprintf(order_status, 128, "PartTradedNotQueueing");
+        break;
+    case THOST_FTDC_OST_NoTradeQueueing:
+        snprintf(order_status, 128, "NoTradeQueueing");
+        break;
+    case THOST_FTDC_OST_NoTradeNotQueueing:
+        snprintf(order_status, 128, "NoTradeNotQueueing");
+        break;
+    case THOST_FTDC_OST_Canceled:
+        snprintf(order_status, 128, "Canceled");
+        break;
+    case THOST_FTDC_OST_Unknown:
+        snprintf(order_status, 128, "Unknown");
+        break;
+    case THOST_FTDC_OST_NotTouched:
+        snprintf(order_status, 128, "NotTouched");
+        break;
+    case THOST_FTDC_OST_Touched:
+        snprintf(order_status, 128, "Touched");
+        break;
+    default:
+        snprintf(order_status, 128, "InvalidOrderStatus(%d)",
+                 (int)(unsigned char)(pField->OrderStatus));
+        break;
+    }
+
+
+
 	// ExchangeID + OrderSysID
 	// log_debug("OnRtnOrder | %s | %s | %s | Info | %s | %lf | %d | %d | Status | %c | %c", 
-	log_debug("OnRtnOrder | Ref: %d+%d+%s | Sys: %s+%s | %s | %lf | #:%d | #Traded: %d | Status | %c | %c", 
+	log_debug("OnRtnOrder | Ref: %d+%d+%s | Sys: %s+%s | %s | %lf | #:%d | #Traded: %d | Status | %s | %s", 
 			pField->FrontID,
 			pField->SessionID,
 			pField->OrderRef,
@@ -230,8 +297,8 @@ void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pField)
 			pField->VolumeTotal,
 			pField->VolumeTraded,
 
-			pField->OrderSubmitStatus,
-			pField->OrderStatus
+            submit_status,
+            order_status
 		);
 
 	ON_RSP_THEN_SEND_COMPACT(OnRtnOrder, CThostFtdcOrderField);

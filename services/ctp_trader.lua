@@ -200,7 +200,7 @@ end
 function S.query_position()
     local ok, rst = query:request("query_position")
 
-    print(inspect(rst))
+    -- print(inspect(rst))
 
     local pt = {}
     for _, field in ipairs(rst) do 
@@ -218,7 +218,7 @@ function S.query_position()
     position_table = pt -- update global variable
 
     -- return slice(T,"field")
-    return position_table
+    return slice(rst, "field")
 end
 
 function S.query_instrument_margin_rate(symbol)
@@ -239,33 +239,131 @@ function S.query_instrument(symbol)
     end
 end
 
-function S.query_order()
-    local ok, rst = query:request("query_order")
-    return rst
-end
 
 --
 -- Order Related Stuffs
 -- 
 
+local function trim(s)
+    if s == nil then
+        return nil
+    end
+    return s:match("^%s*(.-)%s*$")
+end
+
+local function make_order_hashkey(o)
+    if o and 
+        (o.BrokerID ~= nil) and 
+         (o.InvestorID ~= nil) and 
+         (o.FrontID ~= nil) and 
+         (o.SessionID ~= nil) and 
+         (o.OrderRef ~= nil) then  
+
+        local key = string.format("%s+%s+%s+%s+%s",
+            trim(o.BrokerID),
+            trim(o.InvestorID),
+            tostring(o.FrontID),
+            tostring(o.SessionID),
+            trim(o.OrderRef)
+        )
+
+        return key
+    else 
+        return nil
+    end 
+end
+
+local function match_order_sysid(o1, o2)
+    if (trim(o1.ExchangeID) == trim(o2.ExchangeID)) and 
+        (trim(o2.OrderSysID) == trim(o2.OrderSysID)) then 
+        return true 
+    else 
+        return false 
+    end
+end
+
+-- order book
 local order = {
+    cache = { },
+
+    -- methods
+    
     insert = function (self, symbol, price, volume, flag)
-            local order = trader:order_insert(symbol, price, volume, flag)
-            -- order_book:insert(order)
-            return order
+            local o = trader:order_insert(symbol, price, volume, flag)
+            local key = make_order_hashkey(o)
+            print("order inserted", key)
+            self.cache[key] = o
+            return o
         end,
     cancel = function (self)
         end,
     update = function (self, rsp)
+            local function merge(dst, src)
+                local o = dst or {}
+                for k, v in pairs(o) do 
+                    o[k] = src[k] or o[k]
+                end
+                return dst
+            end 
+
+            local count = 0
+            local key = make_order_hashkey(rsp.field)
+
+            -- update entry, create new if needed
+            if key then 
+                -- Translation
+                do 
+                    if rsp.field.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
+                        print("order update: status : cancel", key)
+                    elseif rsp.field.OrderStatus == ctp.THOST_FTDC_OST_AllTraded then 
+                        print("order update: status : all traded", key)
+                    end
+                end 
+
+
+                self.cache[key] = merge(self.cache[key], rsp.field)
+                count = count + 1
+            end 
+
+            -- OnRtnTrade has no OrderRef, using ExchangeID and OrderSysID
+            if not key then 
+                for k, entry in pairs(self.cache) do 
+                    if match_order_sysid(entry, rsp.field) then 
+                        self.cache[k] = merge(entry, rsp.field)
+                        count = count + 1
+                    end
+                end
+            end
+
+            print("get order ", rsp.func_name, key, "number of entries updated : ", count)
+
+            return count
         end,
 }
 
+function S.query_order()
+    local ok, rst = query:request("query_order")
+    return rst
+end
 
+function R.OnRtnOrder(rsp)
+    -- print("OnRtnOrder", inspect(rsp))
+    order:update(rsp)
+end
+
+function R.OnRtnTrade(rsp)
+    -- print("OnRtnTrade", inspect(rsp))
+    order:update(rsp)
+    -- print(inspect(order.cache))
+end
+
+function R.OnRspOrderAction(rsp)
+    order:update(rsp)
+end
 
 --
 -- Fundemental Stuffs
 --
-
 
 function S.quit()
     print("trader is quitting")
@@ -284,22 +382,85 @@ function service.on_idle()
                                 or function (rsp) query:update(rsp) end 
             handler( rsp )
         else 
+            -- exit idle status when there is no remaing messages
             return 
         end
-    end -- end while
+    end
 end
 
+-- close all positions one by one
+function S.nuke_all()
+    while true do 
+        local pt = service.call(service.get_id(), "query_position")
+
+        local found = false
+        local symbol, long, short
+        while not found do 
+            local n = 0
+            for s, entry in pairs(pt) do 
+                symbol = s
+                long, short = unpack(entry)
+                n = n + (long or 0) + (short or 0)
+                if n > 0 then
+                    found = true 
+                    break
+                end
+            end
+
+            if n == 0 then 
+                return
+            end
+        end
+
+        if long > 0 then
+            local rst = service.call(service.get_id(), "trade", symbol, 0, -1)
+            -- print("short", rst.InstrumentID, rst.VolumeTraded)
+        elseif short > 0 then
+            local rst = service.call(service.get_id(), "trade", symbol, 0, 1)
+            -- print("long", rst.InstrumentID, rst.VolumeTraded)
+        else
+            break
+        end
+    end -- end while true
+end
+
+-- Nuke Every Existing Positions
+function S.nuke()
+    local rst = service.call(service.get_id(), "query_position")
+
+    for _, entry in ipairs(rst) do 
+        local volume; do 
+                volume = entry.Position
+                if entry.PosiDirection == ctp.THOST_FTDC_PD_Long then 
+                    volume = (-1) * volume
+                end
+            end
+        if volume ~= 0 then 
+            order:insert(entry.InstrumentID, 0, volume, ctp.THOST_FTDC_OF_Close)
+        end
+    end
+end
 
 function S.test()
     print("begin trader insider test")
-    -- local rst = service.call(service.get_id(), "query_position")
+
+    local rst = service.call(service.get_id(), "query_position")
+    print("positions", inspect(rst))
+
+    local rst = service.call(service.get_id(), "nuke")
+
+    -- local rst = service.call(service.get_id(), "query_account")
     -- print(inspect(rst))
 
-    local rst = service.call(service.get_id(), "query_instrument_margin_rate", "IF2607")
-    print(inspect(rst))
+    -- local rst = service.call(service.get_id(), "query_order")
+    -- print(inspect(rst))
+
+
+    -- local rst = service.call(service.get_id(), "query_instrument_margin_rate", "IF2507")
+    -- print(inspect(rst))
 
     print("begin trader order insert test")
-    -- order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
+    order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
     return 1
 end
 

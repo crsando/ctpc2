@@ -239,7 +239,7 @@ function new_trader(server)
         
         order_insert = function (self, symbol, price, volume, flag)
                 ctpc.ctp_trader_order_insert(self.trader, symbol, price, volume, flag)
-                local order; do 
+                local order = {}; do 
                     order.BrokerID = ffi.string(self.trader.broker)
                     order.InvestorID = ffi.string(self.trader.user)
                     order.FrontID = tonumber(self.trader.front_id)
