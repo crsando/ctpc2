@@ -1,12 +1,10 @@
-local inspect = require "inspect"
+-- local inspect = require "inspect"
 
 
-function load(fn_type, fn_struct)
+function load(prefix, fn_type, fn_struct)
 
 -- file names
--- print("parse", fn_type, fn_struct)
-
-local prefix = "/usr/local/include/ctpc2"
+-- local prefix = "/usr/local/include/ctpc2"
 -- data types
 
 local fn = fn_type or (prefix .. "/ThostFtdcUserApiDataType.h")
@@ -62,9 +60,6 @@ for line in io.open(fn):lines() do
     local name, value = parse_constant(line)
     if name then constants[name] = value end
 end
-
--- print(inspect(datatypes))
-
 
 local fn2 = (fn_struct) or (prefix .. "/ThostFtdcUserApiStruct.h")
 local content = io.open(fn2):read("*all")

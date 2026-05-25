@@ -36,7 +36,15 @@ ffi.cdef[[
 
 local ctpc = ffi.load("ctpc2")
 
+--
+-- parse C header files 
+--
+local datatypes, constants, structs = require "lctp2.parse" ( include_path .. "/ctpc2", fn_type, fn_struct )
+
+--
 -- set log level
+--
+
 local _log_level = "LOG_DEBUG"
 function log_set_level(lvl_str)
     local lvl = ffi.C[lvl_str]
@@ -65,17 +73,9 @@ local function log(level, msg)
     end
 end
 
-
---
--- parse C header files 
---
-local datatypes, constants, structs = require "lctp2.parse" ( fn_type, fn_struct )
-
-
 --
 -- utiliy functions for transform ctp data struct into lua-table
 --
-
 
 -- check struct is valid
 local function check_struct(cdata, struct_name)
@@ -88,24 +88,6 @@ local function check_struct(cdata, struct_name)
         end
     end 
     return rst
-end
-
-
-local function trim(s)
-    if s == nil then
-        return nil
-    end
-    return s:match("^%s*(.-)%s*$")
-end
-
-local function trim_ctp(s)
-    if s == nil then
-        return nil
-    end
-
-    -- 先去掉 C 字符串里可能残留的 \0 后内容，再去首尾空白
-    s = s:match("^[^\0]*") or s
-    return s:match("^%s*(.-)%s*$")
 end
 
 -- finish module loading
@@ -306,65 +288,15 @@ function new_trader(server)
     return T
 end
 
---[[
-function position_keeper(ptr)
-    local o = {}
-    if ptr ~= nil then 
-        o.core = ffi.cast("ctp_position_keeper_t *", ptr)
-    else 
-        o.core = ctpc.ctp_position_keeper_new()
-    end
-    local _mt = {
-        update = function (self, rsp)
-                assert(self.core)
-                if rsp == nil then return nil, "empty response message" end 
-                local pos = ffi.new("struct CThostFtdcInvestorPositionField *", rsp.field)
-                ctpc.ctp_position_keeper_update(self.core, pos, rsp.last)
-                return (rsp.last == 1)
-            end,
-        localcopy = function (self)
-                local pos = ctpc.ctp_position_keeper_localcopy(self.core)
-                ffi.gc(pos, ctpc.ctp_position_free)
-                self._localcopy = pos
-                return pos
-            end,
-        table = function (self)
-                self:localcopy() -- this will update self._localcopy
-                local p = self._localcopy
-                local T = {}
-                while p ~= nil do 
-                    local symbol = ffi.string(p.field.InstrumentID)
-                    local num = p.field.Position
-                    local direction = (p.field.PosiDirection == 50) and "long" or "short"
-                    T[#T+1] = { symbol = symbol, direction = direction, num = num, }
-                    p = p.nxt
-                end
-                return T
-            end,
-    }
-    _mt.__index = _mt
-    setmetatable(o, _mt)
-    return o
-end
-]]
-
+--
+-- Final
+--
 
 local M = {
     new_collector = new_collector,
     new_trader = new_trader,
-    -- servers = servers,
-
-    -- ffi = ffi,
-    -- ctpc = ctpc,
-
-    -- check_struct = check_struct,
-    -- totable = totable,
-    -- cast_trader_rsp = cast_trader_rsp,
 
     log_set_level = log_set_level,
-
-    -- position_keeper = position_keeper,
-
     log_debug = function (...) local msg = string.format(...); log("DEBUG", msg) end,
     log_info = function (...) local msg = string.format(...); log("INFO", msg) end,
 }
@@ -373,7 +305,5 @@ local M = {
 for k, v in pairs(constants) do 
     M[k] = v 
 end
-
--- M.order_book = require "lctp2.order_book"
 
 return M
