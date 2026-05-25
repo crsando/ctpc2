@@ -1,3 +1,5 @@
+-- ctp trader
+
 local inspect = require "inspect"
 local ctp = require "lctp2"
 ctp.log_set_level("LOG_INFO")
@@ -51,8 +53,9 @@ local S = {} -- handle service request/response
 -- global(per-service) variables
 --
 local server, trader; S.start = function ()  
-    server = assert(config.account or server_list["gtja-sim"])
-    print("trader account", inspect(server))
+    -- server = assert(config.account or server_list["gtja-sim"])
+    server = assert(config.account or server_list["openctp"])
+    ctp.log_debug("trader account %s", inspect(server, {newline = " "}))
 
     trader = ctp.new_trader(server)
         :cond( service.get_cond() )
@@ -125,7 +128,6 @@ local query = {
             do 
                 self.last_index = self.last_index + 1
                 self[self.last_index] = entity
-                -- print("query enqueued at", self.last_index, inspect(self[self.last_index]))
             end
         end,
     dequeue = function(self)
@@ -189,7 +191,6 @@ local query = {
 
 function S.query_account()
     local ok, rst = query:request("query_account")
-    print("query account: ", ok, inspect(rst))
     return rst[1]
 end
 
@@ -206,8 +207,6 @@ end
 ]]
 function S.query_position()
     local ok, rst = query:request("query_position")
-
-    -- print(inspect(rst))
 
     local pt = {}
     for _, field in ipairs(rst) do 
@@ -230,8 +229,7 @@ end
 
 function S.query_instrument_margin_rate(symbol)
     local ok, rst = query:request("query_instrument_margin_rate", symbol)
-    print("query instrument margin rate", ok, inspect(rst))
-    return rst
+    return ok, rst
 end
 
 function S.query_instrument(symbol)
@@ -246,6 +244,10 @@ function S.query_instrument(symbol)
     end
 end
 
+function S.query_order()
+    local ok, rst = query:request("query_order")
+    return rst
+end
 
 --
 -- Order Related Stuffs
@@ -313,7 +315,7 @@ local order = {
                 o._flag = flag
             end 
             self.cache[key] = o
-            print("order inserted", key, inspect(o))
+            ctp.log_debug("order inserted %s | %s", key, inspect(o, {newline =""}))
             return o
         end,
 
@@ -323,6 +325,7 @@ local order = {
     --
 
     -- 执行交易，等待交易完成
+    -- return: msg, entry
     trade = function (self, ...)
             local symbol, price, volume, flag
             local n_args = select("#", ...)
@@ -345,12 +348,15 @@ local order = {
             flag = flag or ctp.THOST_FTDC_OFEN_Open
 
             local o = self:insert(symbol, price, volume, flag)
-            self.cache[o._key]._session = service.get_session()
 
-            -- wait for order to trade
-            local ok, msg = coroutine.yield()
-
-            return ok, msg
+            if o and o._key then 
+                self.cache[o._key]._session = service.get_session()
+                -- wait for order to trade
+                local msg, entry = coroutine.yield()
+                return msg, entry
+            else 
+                    return 0, "order insertion failed"
+            end 
         end,
 
     -- 主动取消一个挂单
@@ -362,6 +368,7 @@ local order = {
     -- Traded: OnRtnTrade + Volume 满足条件
     -- Canceled: 订单被取消
     -- 这个函数不校验（校验在update中进行），而是直接结束这个订单，清理cache
+    -- return: ok, error_msg
     finish = function (self, key, msg)
             if not key then return 0, "no key provied" end 
 
@@ -393,7 +400,6 @@ local order = {
 
             local count = 0
             local key = make_order_hashkey(rsp.field)
-            -- print("update on ", rsp.func_name, key)
 
             -- update entry, create new if needed
             if key then 
@@ -422,14 +428,15 @@ local order = {
 
             -- 一般是报单阶段产生错误，来自OnRspOrderInsert
             if (trim(rsp.func_name) == "OnRspOrderInsert") and rsp.rsp_info and rsp.rsp_info.ErrorID then 
-                print("finish order ", key, "on *insert error*")
+                ctp.log_debug("finish order %s | %s", key, "on *insert error*")
                 self:finish(key, "invalid: (" .. rsp.rsp_info.ErrorID ..")" )
             -- 仅在OnRtnTrade，且Volume达标（不在OnRtnOrder时结束订单）
             elseif (trim(rsp.func_name) == "OnRtnTrade") and (entry.OrderStatus == ctp.THOST_FTDC_OST_AllTraded) then 
-                print("finish order ", key, "on *all-traded*")
+                ctp.log_debug("finish order %s | %s", key, "all-traded")
                 self:finish(key, "complete")
             elseif entry.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
-                print("finish order ", key, "on *cancel*")
+                local error_msg = rsp and rsp.rsp_info and rsp.rsp_info.ErrorMsg or ""
+                ctp.log_debug("finish order %s | %s", key, error_msg)
                 self:finish(key, "canceled")
             end 
 
@@ -437,29 +444,13 @@ local order = {
         end,
 }
 
-function S.query_order()
-    local ok, rst = query:request("query_order")
-    return rst
-end
 
-function R.OnRtnOrder(rsp)
-    -- print("OnRtnOrder", inspect(rsp))
-    order:update(rsp)
-end
-
-function R.OnRtnTrade(rsp)
-    order:update(rsp)
-end
-
-
-function R.OnRspOrderAction(rsp)
-    order:update(rsp)
-end
-
+function R.OnRtnOrder(rsp) order:update(rsp) end
+function R.OnRtnTrade(rsp) order:update(rsp) end
+function R.OnRspOrderAction(rsp) order:update(rsp) end
 
 -- 这只在报单异常时才会出现
 function R.OnRspOrderInsert(rsp)
-    print("OnRspOrderInsert")
     -- 这个巨坑，我们手动补几个字段 
     for k, v in pairs(trader:session_info()) do 
         rsp.field[k] = v
@@ -473,7 +464,7 @@ end
 --
 
 function S.quit()
-    print("trader is quitting")
+    ctp.log_debug("trader is quitting")
     service.call(0, "notify", service.get_id(), "quit")
     service.quit()
 end
@@ -485,8 +476,7 @@ function service.on_idle()
         local rsp = trader:recv(false) -- non-blocking
         if rsp then 
             -- process trader messages
-            local handler = R[rsp.func_name] 
-                                or function (rsp) query:update(rsp) end 
+            local handler = R[rsp.func_name] or function (rsp) query:update(rsp) end 
             handler( rsp )
         else 
             -- exit idle status when there is no remaing messages
@@ -518,6 +508,11 @@ function S.trade(...)
 end
 
 function S.test()
+    ctp.log_debug("begin trader test sequence")
+    do  
+        return 1
+    end
+
     print("begin trader insider test")
 
     local rst = service.call(service.get_id(), "query_position")
@@ -540,15 +535,20 @@ function S.test()
     print("------")
 
     -- 测试无效单（价格过高）
-    local msg, rst = service.call(service.get_id(), "trade", "IF2607", 9999, 1, ctp.THOST_FTDC_OFEN_Open)
-    print("trade result", msg, rst.VolumeTraded or 0)
+    do 
+        local msg, rst = service.call(service.get_id(), "trade", "IF2607", -100, 1, ctp.THOST_FTDC_OFEN_Open)
+        print("trade result", msg, rst.VolumeTraded or 0)
+    end
 
-    -- 市价单 + 及时平仓
-    local msg, rst = service.call(service.get_id(), "trade", "IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
-    print("trade result", msg, rst.VolumeTraded or 0)
-
-    local msg, rst = service.call(service.get_id(), "trade", "IF2607", 0, -1, ctp.THOST_FTDC_OFEN_Close)
-    print("trade result", msg, rst.VolumeTraded or 0)
+    -- 市价单，成交后平仓
+    --[[
+    do 
+        local msg, rst = service.call(service.get_id(), "trade", "IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
+        print("trade result", msg, rst.VolumeTraded or 0)
+        local msg, rst = service.call(service.get_id(), "trade", "IF2607", 0, -1, ctp.THOST_FTDC_OFEN_Close)
+        print("trade result", msg, rst.VolumeTraded or 0)
+    end 
+    ]]
 
     
     -- order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)

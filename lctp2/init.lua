@@ -36,6 +36,32 @@ ffi.cdef[[
 
 local ctpc = ffi.load("ctpc2")
 
+-- set log level
+local _log_level = "LOG_DEBUG"
+function log_set_level(lvl_str)
+    local lvl = ffi.C[lvl_str]
+    lvl = lvl or ffi.C.LOG_INFO
+    ctpc.log_set_level(lvl)
+end
+
+local function log(level, msg)
+    if ffi.C[_log_level] >= ffi.C[level] then 
+    -- 2 表示获取调用 log() 的上一层位置
+        local info = debug.getinfo(3, "Sl")
+        local time = os.date("%H:%M:%S")
+        local file = info.short_src or "unknown"
+        local line = info.currentline or 0
+        print(string.format(
+            "%s %s %s:%d: %s",
+            time,
+            level,
+            file,
+            line,
+            tostring(msg)
+        ))
+    end
+end
+
 
 --
 -- parse C header files 
@@ -118,12 +144,6 @@ local function cast_trader_rsp(rsp)
 end
 
 
--- set log level
-function log_set_level(lvl_str)
-    local lvl = ffi.C[lvl_str]
-    lvl = lvl or ffi.C.LOG_INFO
-    ctpc.log_set_level(lvl)
-end
 
 -- configurations
 
@@ -329,17 +349,21 @@ end
 local M = {
     new_collector = new_collector,
     new_trader = new_trader,
-    servers = servers,
-    ffi = ffi,
-    ctpc = ctpc,
+    -- servers = servers,
 
-    check_struct = check_struct,
-    totable = totable,
-    cast_trader_rsp = cast_trader_rsp,
+    -- ffi = ffi,
+    -- ctpc = ctpc,
+
+    -- check_struct = check_struct,
+    -- totable = totable,
+    -- cast_trader_rsp = cast_trader_rsp,
 
     log_set_level = log_set_level,
 
-    position_keeper = position_keeper,
+    -- position_keeper = position_keeper,
+
+    log_debug = function (...) local msg = string.format(...); log("LOG_DEBUG", msg) end,
+    log_info = function (...) local msg = string.format(...); log("LOG_INFO", msg) end,
 }
 
 -- load constants directly to the module
