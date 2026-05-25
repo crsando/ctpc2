@@ -1,5 +1,14 @@
 PREFIX=/usr/local
-CTP_VER=ctp-6.7.10
+# CTP_VER=ctp-6.7.10
+
+
+# HY的仿真环境需要用该版本
+CTP_VER=ctp-6.6.7
+
+
+
+
+# OpenCTP 日常测试使用
 # CTP_VER=openctp-6.7.10
 
 INCLUDE_PATH=$(PREFIX)/include/ctpc2
@@ -38,6 +47,7 @@ libctpc2.so: ctpc2.o md.o trader.o queue.o log.o CustomMdSpi.o CustomTradeSpi.o 
 
 clean:
 	rm *.o
+	rm ./libctpc2.so
 
 uninstall:
 	rm $(INST_LIB_PATH)/libthostmduserapi_se.so

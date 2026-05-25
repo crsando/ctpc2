@@ -2,9 +2,25 @@ local inspect = require "inspect"
 local service = require "lservice2" .input(...)
 local config = service.config
 
-local server = {
-
+local server_list = {
+        ["gtja-sim"] = {
+            front_addr = "tcp://180.169.50.131:42205",
+            broker = "2071", 
+            user = "0061831885", 
+            pass = "zhy19930311", 
+            app_id = "client_tara_231031", 
+            auth_code = '20231101ZHOUYH01',
+        },
+        ["hy-sim"] = {
+            front_addr = "tcp://101.230.79.235:33205",
+            broker = "3070", 
+            user = "333307126", 
+            pass = "930706", 
+            app_id = "client_tara_241201", 
+            auth_code = 'CY2LFL92CISEEKVM',
+        },
 }
+
 
 local ctp = require "lctp2"
 local ffi = ctp.ffi
@@ -28,7 +44,7 @@ local S = {} -- handle service request/response
 -- global(per-service) variables
 --
 local server, trader; S.start = function ()  
-    server = assert(server or config.account)
+    server = assert(config.account or server_list["gtja-sim"])
     print("trader account", inspect(server))
 
     trader = ctp.new_trader(server)
