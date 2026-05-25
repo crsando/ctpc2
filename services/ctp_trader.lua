@@ -275,7 +275,7 @@ end
 
 local function match_order_sysid(o1, o2)
     if (trim(o1.ExchangeID) == trim(o2.ExchangeID)) and 
-        (trim(o2.OrderSysID) == trim(o2.OrderSysID)) then 
+        (trim(o1.OrderSysID) == trim(o2.OrderSysID)) then 
         return true 
     else 
         return false 
@@ -284,58 +284,141 @@ end
 
 -- order book
 local order = {
+    --
+    -- cache 的作用是存放提交中、未交易完成的订单，追踪状态更新
+    -- 理论上全部成交后就可以清楚了
+    --
     cache = { },
 
+    --
     -- methods
+    --
     
+    -- 单纯的插入订单，不等待
     insert = function (self, symbol, price, volume, flag)
             local o = trader:order_insert(symbol, price, volume, flag)
             local key = make_order_hashkey(o)
-            print("order inserted", key)
+            o._key = key
             self.cache[key] = o
+            print("order inserted", key, inspect(o))
             return o
         end,
-    cancel = function (self)
+
+
+    --
+    -- 正常交易执行的链路：发起发调用trade/cancel（对应coroutine挂起），结束收到消息后调用finish（coroutine继续）
+    --
+
+    -- 执行交易，等待交易完成
+    trade = function (self, ...)
+            local symbol, price, volume, flag
+            local n_args = select("#", ...)
+            local args = {...}
+
+            if (n_args == 1) and (type(args[1]) == "table") then 
+                symbol, price, volume, flag = args.symbol, args.price, args.volume, args.flag
+            elseif n_args == 4 then 
+                symbol, price, volume, flag = ...
+            end
+
+            if not symbol then 
+                return 0, "no symbol"
+            elseif not volume then 
+                return 0, "no volume"
+            end
+
+            -- defaults
+            price = price or 0.0
+            flag = flag or ctp.THOST_FTDC_OFEN_Open
+
+            local o = self:insert(symbol, price, volume, flag)
+            self.cache[o._key]._session = service.get_session()
+
+            -- wait for order to trade
+            local ok, msg = coroutine.yield()
+
+            return ok, msg
         end,
+
+    -- 主动取消一个挂单
+    cancel = function (self, ...)
+        end,
+
+    -- 订单结束有几种情况
+    -- Time-out: 暂时未实现
+    -- Traded: OnRtnTrade + Volume 满足条件
+    -- Canceled: 订单被取消
+    -- 这个函数不校验（校验在update中进行），而是直接结束这个订单，清理cache
+    finish = function (self, key, msg)
+            if not key then return 0, "no key provied" end 
+
+            local entry = self.cache[key]
+            if not entry then return 0, "no entry provied" end 
+
+            self.cache[key] = nil  -- release cache
+
+            if entry._session then 
+                local co = entry._session
+                entry._session = nil -- release session
+                service.resume_session( co, msg, entry )
+                -- success
+                return 1, nil
+            else 
+                return 0, "no coroutine found"
+            end 
+        end,
+
+    -- 跟新cache信息，同时判断这个订单是否需要被结束
     update = function (self, rsp)
-            local function merge(dst, src)
-                local o = dst or {}
-                for k, v in pairs(o) do 
-                    o[k] = src[k] or o[k]
+            local function _merge_entry(dst, src)
+                dst = dst or {}
+                for k, v in pairs(src) do 
+                    dst[k] = src[k] or dst[k]
                 end
                 return dst
             end 
 
             local count = 0
             local key = make_order_hashkey(rsp.field)
+            -- print("update on ", rsp.func_name, key)
 
             -- update entry, create new if needed
             if key then 
                 -- Translation
-                do 
-                    if rsp.field.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
-                        print("order update: status : cancel", key)
-                    elseif rsp.field.OrderStatus == ctp.THOST_FTDC_OST_AllTraded then 
-                        print("order update: status : all traded", key)
-                    end
-                end 
-
-
-                self.cache[key] = merge(self.cache[key], rsp.field)
+                self.cache[key] = _merge_entry(self.cache[key], rsp.field)
                 count = count + 1
-            end 
-
-            -- OnRtnTrade has no OrderRef, using ExchangeID and OrderSysID
-            if not key then 
+            else -- OnRtnTrade has no OrderRef, using ExchangeID and OrderSysID
                 for k, entry in pairs(self.cache) do 
                     if match_order_sysid(entry, rsp.field) then 
-                        self.cache[k] = merge(entry, rsp.field)
+                        key = k 
+                        self.cache[k] = _merge_entry(entry, rsp.field)
                         count = count + 1
+                        break
                     end
                 end
             end
 
-            print("get order ", rsp.func_name, key, "number of entries updated : ", count)
+            if not key then 
+                return count, "key match error on update"
+            else 
+                -- print("update cached ok", key, inspect(self.cache[key]))
+            end
+
+            local entry = self.cache[key]
+            -- 判断是否需要结束这个订单
+
+            -- 一般是报单阶段产生错误，来自OnRspOrderInsert
+            if (trim(rsp.func_name) == "OnRspOrderInsert") and rsp.rsp_info and rsp.rsp_info.ErrorID then 
+                print("finish order on *insert error*")
+                self:finish(key, "invalid: (" .. rsp.rsp_info.ErrorID ..")" )
+            -- 仅在OnRtnTrade，且Volume达标（不在OnRtnOrder时结束订单）
+            elseif (trim(rsp.func_name) == "OnRtnTrade") and (entry.OrderStatus == ctp.THOST_FTDC_OST_AllTraded) then 
+                print("finish order on *all-traded*")
+                self:finish(key, "complete")
+            elseif entry.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
+                print("finish order on *cancel*")
+                self:finish(key, "canceled")
+            end 
 
             return count
         end,
@@ -352,12 +435,23 @@ function R.OnRtnOrder(rsp)
 end
 
 function R.OnRtnTrade(rsp)
-    -- print("OnRtnTrade", inspect(rsp))
     order:update(rsp)
-    -- print(inspect(order.cache))
 end
 
+
 function R.OnRspOrderAction(rsp)
+    order:update(rsp)
+end
+
+
+-- 这只在报单异常时才会出现
+function R.OnRspOrderInsert(rsp)
+    print("OnRspOrderInsert")
+    -- 这个巨坑，我们手动补几个字段 
+    for k, v in pairs(trader:session_info()) do 
+        rsp.field[k] = v
+    end
+
     order:update(rsp)
 end
 
@@ -388,42 +482,6 @@ function service.on_idle()
     end
 end
 
--- close all positions one by one
-function S.nuke_all()
-    while true do 
-        local pt = service.call(service.get_id(), "query_position")
-
-        local found = false
-        local symbol, long, short
-        while not found do 
-            local n = 0
-            for s, entry in pairs(pt) do 
-                symbol = s
-                long, short = unpack(entry)
-                n = n + (long or 0) + (short or 0)
-                if n > 0 then
-                    found = true 
-                    break
-                end
-            end
-
-            if n == 0 then 
-                return
-            end
-        end
-
-        if long > 0 then
-            local rst = service.call(service.get_id(), "trade", symbol, 0, -1)
-            -- print("short", rst.InstrumentID, rst.VolumeTraded)
-        elseif short > 0 then
-            local rst = service.call(service.get_id(), "trade", symbol, 0, 1)
-            -- print("long", rst.InstrumentID, rst.VolumeTraded)
-        else
-            break
-        end
-    end -- end while true
-end
-
 -- Nuke Every Existing Positions
 function S.nuke()
     local rst = service.call(service.get_id(), "query_position")
@@ -436,9 +494,14 @@ function S.nuke()
                 end
             end
         if volume ~= 0 then 
-            order:insert(entry.InstrumentID, 0, volume, ctp.THOST_FTDC_OF_Close)
+            -- order:insert(entry.InstrumentID, 0, volume, ctp.THOST_FTDC_OF_Close)
+            service.call(service.get_id(), "trade", entry.InstrumentID, 0, volume, ctp.THOST_FTDC_OF_Close)
         end
     end
+end
+
+function S.trade(...)
+    return order:trade(...)
 end
 
 function S.test()
@@ -459,8 +522,23 @@ function S.test()
     -- local rst = service.call(service.get_id(), "query_instrument_margin_rate", "IF2507")
     -- print(inspect(rst))
 
+    print("------")
     print("begin trader order insert test")
-    order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
+    print("------")
+
+    -- 测试无效单（价格过高）
+    local msg, rst = service.call(service.get_id(), "trade", "IF2607", 9999, 1, ctp.THOST_FTDC_OFEN_Open)
+    print("trade result", msg, rst.VolumeTraded or 0)
+
+    -- 市价单 + 及时平仓
+    local msg, rst = service.call(service.get_id(), "trade", "IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
+    print("trade result", msg, rst.VolumeTraded or 0)
+
+    local msg, rst = service.call(service.get_id(), "trade", "IF2607", 0, -1, ctp.THOST_FTDC_OFEN_Close)
+    print("trade result", msg, rst.VolumeTraded or 0)
+
+    
+    -- order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
     return 1
 end
 

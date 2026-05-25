@@ -267,6 +267,15 @@ function new_trader(server)
         query_order = function(self) return ctpc.ctp_trader_query_order(self.trader) end,
         -- query_marketdata = function(self, symbol) return ctpc.ctp_trader_query_marketdata(self.trader, symbol) end,
         -- fetch_account = function(self, req_id) return ctpc.ctp_trader_fetch_account(self.trader, req_id) end,
+
+        session_info = function (self)
+                return {
+                    BrokerID = ffi.string(self.trader.broker),
+                    InvestorID = ffi.string(self.trader.user),
+                    FrontID = tonumber(self.trader.front_id),
+                    SessionID = tonumber(self.trader.session_id),
+                }
+            end,
     }
 
     local T = { trader = trader }
@@ -316,6 +325,7 @@ function position_keeper(ptr)
 end
 ]]
 
+
 local M = {
     new_collector = new_collector,
     new_trader = new_trader,
@@ -337,6 +347,6 @@ for k, v in pairs(constants) do
     M[k] = v 
 end
 
-M.order_book = require "lctp2.order_book"
+-- M.order_book = require "lctp2.order_book"
 
 return M
