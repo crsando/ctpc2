@@ -171,9 +171,12 @@ function new_collector(server)
                 ctpc.ctp_md_hook(self.md, hook)
                 return self
             end,
+        async = function (self, async)
+                self.md.async = ffi.new("void *", async)
+                return self
+            end,
         cond = function(self, cond)
                 self.md.ext_cond = ffi.new("void*", cond)
-                -- print("setting cond", cond, self.md.ext_cond)
                 return self
             end,
         subscribe = function (self, symbols) 
@@ -217,9 +220,12 @@ function new_trader(server)
                 return self
             end,
 
+        async = function(self, async)
+                self.trader.async = ffi.new("void*", async)
+                return self
+            end,
         cond = function(self, cond)
                 self.trader.ext_cond = ffi.new("void*", cond)
-                -- print("setting cond", cond, self.trader.ext_cond)
                 return self
             end,
 

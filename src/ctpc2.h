@@ -9,6 +9,8 @@
 #include <stdbool.h>
 #include "cond.h"
 
+#include "uv.h"
+
 // typedef void (*ctp_func_cb_t)(void * tick, void * _ctx);
 // typedef void (*ctp_tick_cb)(struct CThostFtdcDepthMarketDataField * tick);
 
@@ -38,6 +40,7 @@ typedef struct {
     // ctp_hook_cb hook;
 
     void * ext_cond;
+    void * async; // libuv async handler
 } ctp_md_t;
 
 
@@ -88,6 +91,7 @@ typedef struct _ctp_trader_t {
 
     // external conditional variable
     void * ext_cond;
+    void * async; // libuv async handler
 } ctp_trader_t;
 
 ctp_trader_t * ctp_trader_new();

@@ -4,7 +4,7 @@ local inspect = require "inspect"
 local ctp = require "lctp2"
 ctp.log_set_level("LOG_DEBUG")
 
-local service = require "lservice2" .input(...)
+local service = require "lservice3" .input(...)
 local config = service.config
 
 local server_list = {
@@ -74,7 +74,8 @@ local server, trader; S.start = function ()
     -- ctp.log_debug("trader account %s", inspect(server, {newline = " "}))
 
     trader = ctp.new_trader(server)
-        :cond( service.get_cond() )
+        :async(service.get_async())
+        -- :cond( service.get_cond() )
         :start( true ) -- blocking thread until settlement
     return true
 end
@@ -584,4 +585,4 @@ function S.test()
     return 1
 end
 
-service.dispatch(S)
+return service.dispatch(S)

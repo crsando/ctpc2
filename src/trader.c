@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "uv.h"
+
 #define _SERVICE_MQ_DEF_SIZE_ (1024)
 
 ctp_trader_t * ctp_trader_new() {
@@ -26,6 +28,10 @@ void ctp_trader_send(ctp_trader_t * t, ctp_rsp_t * msg) {
     if(t->ext_cond) {
         cond_trigger_begin(t->ext_cond);
         cond_trigger_end(t->ext_cond, 1);
+    }
+
+    if(t->async) {
+        uv_async_send(t->async);
     }
 }
 

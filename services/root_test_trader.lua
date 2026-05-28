@@ -1,5 +1,5 @@
 local inspect = require "inspect"
-local service = require "lservice2".input(...)
+local service = require "lservice3".input(...)
 local config = service.config
 local ctp = require "lctp2"
 
@@ -50,4 +50,4 @@ function S.quit()
     service.quit()
 end
 
-service.dispatch(S)
+return service.dispatch(S)
