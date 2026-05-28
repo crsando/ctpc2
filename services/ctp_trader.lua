@@ -443,7 +443,7 @@ local order = {
                 self:finish(key, "complete")
             elseif entry.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
                 local error_msg = rsp and rsp.rsp_info and rsp.rsp_info.ErrorMsg or ""
-                ctp.log_debug("finish order %s | %s | $s", key, error_msg)
+                ctp.log_debug("finish order %s | %s", key, error_msg)
                 self:finish(key, "canceled")
             end 
 
