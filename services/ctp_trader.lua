@@ -33,6 +33,14 @@ local server_list = {
             auth_code = '20231101ZHOUYH01',
         },
         ["simnow"]=  {
+            front_addr = "tcp://182.254.243.31:30001",
+            broker = "9999", 
+            user = "264530", 
+            pass = "bE@453162948", 
+            app_id = "simnow_client_test", 
+            auth_code = '0000000000000000',
+        },
+        ["simnow-7x24"]=  {
             front_addr = "tcp://182.254.243.31:40001",
             broker = "9999", 
             user = "264530", 
@@ -61,8 +69,8 @@ local S = {} -- handle service request/response
 -- global(per-service) variables
 --
 local server, trader; S.start = function () 
-    -- server = assert(config.account or server_list["gtja-sim"])
-    server = assert(config.account or server_list["gtja-sim"])
+    -- server = assert(server_list["gtja-sim"])
+    server = assert(server_list["simnow-7x24"])
     -- ctp.log_debug("trader account %s", inspect(server, {newline = " "}))
 
     trader = ctp.new_trader(server)
@@ -443,7 +451,7 @@ local order = {
                 self:finish(key, "complete")
             elseif entry.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
                 local error_msg = rsp and rsp.rsp_info and rsp.rsp_info.ErrorMsg or ""
-                ctp.log_debug("finish order %s | %s", key, error_msg)
+                ctp.log_debug("finish order %s | %s | %s", key, error_msg, rsp.field.StatusMsg)
                 self:finish(key, "canceled")
             end 
 
@@ -526,8 +534,8 @@ function S.test()
     ctp.log_debug("---")
     local rst = service.call(service.get_id(), "nuke")
 
-    -- local rst = service.call(service.get_id(), "query_account")
-    -- print(inspect(rst))
+    local rst = service.call(service.get_id(), "query_account")
+    print(inspect(rst))
 
     -- local rst = service.call(service.get_id(), "query_order")
     -- print(inspect(rst))
@@ -542,7 +550,22 @@ function S.test()
 
     -- 测试无效单（价格过高）
     do 
-        local msg, rst = service.call(service.get_id(), "trade", "IF2607", -100, 1, ctp.THOST_FTDC_OFEN_Open)
+        local msg, rst = service.call(service.get_id(), "trade", "IM2607", 8000, 1, ctp.THOST_FTDC_OFEN_Open)
+        print("trade result", msg, rst.VolumeTraded or 0)
+        return 1
+    end
+
+
+
+    -- 测试项目：资金不足
+    do 
+        local msg, rst = service.call(service.get_id(), "trade", "IM2607", 8535, 1000, ctp.THOST_FTDC_OFEN_Open)
+        print("trade result", msg, rst.VolumeTraded or 0)
+    end
+
+    -- 测试项目：资金不足
+    do 
+        local msg, rst = service.call(service.get_id(), "trade", "IM2607", 8535, -1000, ctp.THOST_FTDC_OFEN_Close)
         print("trade result", msg, rst.VolumeTraded or 0)
     end
 

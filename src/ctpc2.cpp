@@ -27,8 +27,10 @@ void ctp_md_join(ctp_md_t * md) {
 	_api(md)->Join();
 }
 
+
 ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker[], const char user[]) 
 {
+    log_debug("ctp_md_init | api version | %s", CThostFtdcMdApi::GetApiVersion());
     log_debug("ctp_md_init | %s | %s", front_addr, broker);
 	// <TODO> Check string length
 	strcpy(md->front_addr, &front_addr[0]);
@@ -99,6 +101,7 @@ ctp_trader_t * ctp_trader_init(
     const char app_id[], const char auth_code[]
     )
 {
+    log_debug("ctp_trader_init | api version | %s", CThostFtdcTraderApi::GetApiVersion());
 	log_debug("ctp_trader_init | %s | %s | %s | %s | %s", front_addr, broker, user, app_id, auth_code);
     if(trader == NULL) {
         trader = ctp_trader_new();
