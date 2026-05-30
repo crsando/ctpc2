@@ -11,10 +11,10 @@ local server_list = {
         ["gtja-sim"] = {
             front_addr = "tcp://180.169.50.131:42205",
             broker = "2071", 
-            user = "0061831885", 
-            pass = "zhy19930311", 
-            app_id = "client_tara_231031", 
-            auth_code = '20231101ZHOUYH01',
+            user = "0061841498", 
+            pass = "bE19930706", 
+            app_id = "client_tifa_260501", 
+            auth_code = '20260527TIFATIFA',
         },
         ["hy-sim"] = {
             front_addr = "tcp://101.230.79.235:33205",
@@ -69,8 +69,8 @@ local S = {} -- handle service request/response
 -- global(per-service) variables
 --
 local server, trader; S.start = function () 
-    -- server = assert(server_list["gtja-sim"])
-    server = assert(server_list["simnow-7x24"])
+    server = assert(server_list["gtja-sim"])
+    -- server = assert(server_list["simnow-7x24"])
     -- ctp.log_debug("trader account %s", inspect(server, {newline = " "}))
 
     trader = ctp.new_trader(server)
@@ -347,36 +347,60 @@ local order = {
             local n_args = select("#", ...)
             local args = {...}
 
+            args.timeout = tonumber(args.timeout)
+
             if (n_args == 1) and (type(args[1]) == "table") then 
+                args = args[1]
                 symbol, price, volume, flag = args.symbol, args.price, args.volume, args.flag
             elseif n_args == 4 then 
                 symbol, price, volume, flag = ...
+            else 
+                return "invalid args", nil
             end
 
             if not symbol then 
-                return 0, "no symbol"
+                return "no symbol", nil
             elseif not volume then 
-                return 0, "no volume"
+                return "no volume", nil
             end
 
             -- defaults
-            price = price or 0.0
-            flag = flag or ctp.THOST_FTDC_OFEN_Open
+            price = price or 0.0 -- 默认市价单
+            flag = flag or ctp.THOST_FTDC_OFEN_Open -- 默认开仓
 
             local o = self:insert(symbol, price, volume, flag)
 
             if o and o._key then 
-                self.cache[o._key]._session = service.get_session()
+                local co = service.get_session()
+                self.cache[o._key]._session = co
+                
+                -- timeout mechanisim
+
+                if args.timeout then 
+                    -- 超时自动撤单
+                    service.set_timeout(args.timeout, function()
+                            -- 注意我们假定 cancel一定会完成，这里不额外的超时处理
+                            -- cancel 成功后，会自动执行 order:finish()，进而resume回到下面的coroutine.yield()那里
+                            self:cancel(o)
+                        end)
+                end
+
                 -- wait for order to trade
-                local msg, entry = coroutine.yield()
+                local msg, entry = service.yield_session()
                 return msg, entry
             else 
-                    return 0, "order insertion failed"
+                return "order insertion failed", nil
             end 
         end,
 
     -- 主动取消一个挂单
     cancel = function (self, ...)
+            local o = ...
+            ctp.log_debug("order cancel : %s | %s | %s | %s", o._key, o.InstrumentID, o.ExchangeID, o.OrderSysID)
+            trader:order_cancel(o)
+
+            o._status = "timedout"
+            -- self:finish(o._key, "timedout")
         end,
 
     -- 订单结束有几种情况
@@ -527,8 +551,8 @@ end
 function S.test()
     ctp.log_debug("begin trader test sequence")
 
-    local rst = service.call(service.get_id(), "query_position")
-    print("positions", inspect(rst))
+    -- local rst = service.call(service.get_id(), "query_position")
+    -- print("positions", inspect(rst))
 
     ctp.log_debug("---")
     ctp.log_debug("nuke all")
@@ -536,7 +560,7 @@ function S.test()
     local rst = service.call(service.get_id(), "nuke")
 
     local rst = service.call(service.get_id(), "query_account")
-    print(inspect(rst))
+    ctp.log_debug("balance %d", rst.field.Balance)
 
     -- local rst = service.call(service.get_id(), "query_order")
     -- print(inspect(rst))
@@ -549,25 +573,35 @@ function S.test()
     ctp.log_debug("begin trader order insert test")
     ctp.log_debug("------")
 
+    -- 测试低价单（无法成交，超时自动取消挂单）
+    do 
+        local msg, rst = service.call(service.get_id(), "trade", {
+                symbol = "IC2607", 
+                price = 8000, 
+                volume = 1, 
+                flag = ctp.THOST_FTDC_OFEN_Open,
+                timeout = 5000
+            })
+        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
+    end
+
     -- 测试无效单（价格过高）
     do 
-        local msg, rst = service.call(service.get_id(), "trade", "IM2607", 8000, 1, ctp.THOST_FTDC_OFEN_Open)
-        print("trade result", msg, rst.VolumeTraded or 0)
-        return 1
+        local msg, rst = service.call(service.get_id(), "trade", "IC2607", 20000, 1, ctp.THOST_FTDC_OFEN_Open)
+        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
     end
-
 
 
     -- 测试项目：资金不足
     do 
-        local msg, rst = service.call(service.get_id(), "trade", "IM2607", 8535, 1000, ctp.THOST_FTDC_OFEN_Open)
-        print("trade result", msg, rst.VolumeTraded or 0)
+        local msg, rst = service.call(service.get_id(), "trade", "IC2607", 8535, 10, ctp.THOST_FTDC_OFEN_Open)
+        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
     end
 
     -- 测试项目：资金不足
     do 
-        local msg, rst = service.call(service.get_id(), "trade", "IM2607", 8535, -1000, ctp.THOST_FTDC_OFEN_Close)
-        print("trade result", msg, rst.VolumeTraded or 0)
+        local msg, rst = service.call(service.get_id(), "trade", "IC2607", 8535, -1000, ctp.THOST_FTDC_OFEN_Close)
+        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
     end
 
     -- 市价单，成交后平仓
@@ -580,7 +614,6 @@ function S.test()
     end 
     ]]
 
-    
     -- order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
     return 1
 end
