@@ -149,6 +149,10 @@ int ctp_trader_order_cancel(ctp_trader_t * t, const char * symbol, const char * 
 
 // int ctp_trader_order_cancel(ctp_trader_t * t, )
 
+// password
+
+int ctp_trader_password_update(ctp_trader_t * t, const char * pass_old, const char * pass_new);
+
 int ctp_trader_logout(ctp_trader_t * t);
 
 #endif

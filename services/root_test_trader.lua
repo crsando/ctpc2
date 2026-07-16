@@ -33,7 +33,8 @@ local function test_trader_query_queue()
 end
 
 local function test() 
-    service.call(trader_id, "test")
+    -- service.call(trader_id, "test")
+    service.call(trader_id, "test_2")
 end
 
 local S = {}

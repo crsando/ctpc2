@@ -50,6 +50,15 @@ local server_list = {
         },
     }
 
+local order_insert_count = 0 
+local order_cancel_count = 0 
+
+
+local threshold = {
+    max_order_insert_count = 3, 
+    max_order_cancel_count = 2, 
+}
+
 
 local function slice(t, k)
     local o = {}
@@ -321,6 +330,8 @@ local order = {
     
     -- 单纯的插入订单，不等待
     insert = function (self, symbol, price, volume, flag)
+            order_insert_count = order_insert_count + 1
+
             local o = trader:order_insert(symbol, price, volume, flag)
             local key = make_order_hashkey(o)
             do 
@@ -348,6 +359,10 @@ local order = {
             local args = {...}
 
             args.timeout = tonumber(args.timeout)
+
+            if order_insert_count >= threshold.max_order_insert_count then 
+                return "order insert threshold reached", nil
+            end
 
             if (n_args == 1) and (type(args[1]) == "table") then 
                 args = args[1]
@@ -381,12 +396,15 @@ local order = {
                     service.set_timeout(args.timeout, function()
                             -- 注意我们假定 cancel一定会完成，这里不额外的超时处理
                             -- cancel 成功后，会自动执行 order:finish()，进而resume回到下面的coroutine.yield()那里
-                            self:cancel(o)
+                            if not o._traded then 
+                                self:cancel(o)
+                            end
                         end)
                 end
 
                 -- wait for order to trade
-                local msg, entry = service.yield_session()
+                -- local msg, entry = service.yield_session()
+                local msg, entry = coroutine.yield()
                 return msg, entry
             else 
                 return "order insertion failed", nil
@@ -395,6 +413,12 @@ local order = {
 
     -- 主动取消一个挂单
     cancel = function (self, ...)
+            order_cancel_count = order_cancel_count + 1
+
+            if order_cancel_count > threshold.max_order_cancel_count then 
+                ctp.log_debug("order cancel threshold reached")
+            end
+
             local o = ...
             ctp.log_debug("order cancel : %s | %s | %s | %s", o._key, o.InstrumentID, o.ExchangeID, o.OrderSysID)
             trader:order_cancel(o)
@@ -472,6 +496,7 @@ local order = {
                 self:finish(key, "invalid: (" .. rsp.rsp_info.ErrorID ..")" )
             -- 仅在OnRtnTrade，且Volume达标（不在OnRtnOrder时结束订单）
             elseif (trim(rsp.func_name) == "OnRtnTrade") and (entry.OrderStatus == ctp.THOST_FTDC_OST_AllTraded) then 
+                self.cache[key]._traded = true
                 ctp.log_debug("finish order %s | %s", key, "all-traded")
                 self:finish(key, "complete")
             elseif entry.OrderStatus == ctp.THOST_FTDC_OST_Canceled then 
@@ -573,6 +598,31 @@ function S.test()
     ctp.log_debug("begin trader order insert test")
     ctp.log_debug("------")
 
+    -- 测试市价单
+    do 
+        local msg, rst = service.call(service.get_id(), "trade", {
+                symbol = "IC2607", 
+                price = 0,  -- market order
+                volume = 1, 
+                flag = ctp.THOST_FTDC_OFEN_Open,
+                timeout = 5000
+            })
+        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
+    end
+
+    -- 平仓之前的挂单
+    do 
+        local msg, rst = service.call(service.get_id(), "trade", {
+                symbol = "IC2607", 
+                price = 0,  -- market order
+                volume = -1, 
+                flag = ctp.THOST_FTDC_OFEN_Close,
+                timeout = 5000
+            })
+        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
+    end
+
+
     -- 测试低价单（无法成交，超时自动取消挂单）
     do 
         local msg, rst = service.call(service.get_id(), "trade", {
@@ -582,27 +632,28 @@ function S.test()
                 flag = ctp.THOST_FTDC_OFEN_Open,
                 timeout = 5000
             })
-        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
+        -- ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
+        ctp.log_debug("order timeout - cancelled")
     end
 
     -- 测试无效单（价格过高）
-    do 
+    --[[do 
         local msg, rst = service.call(service.get_id(), "trade", "IC2607", 20000, 1, ctp.THOST_FTDC_OFEN_Open)
         ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-    end
+    end]]
 
 
     -- 测试项目：资金不足
-    do 
+    --[[do 
         local msg, rst = service.call(service.get_id(), "trade", "IC2607", 8535, 10, ctp.THOST_FTDC_OFEN_Open)
         ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-    end
+    end]]
 
     -- 测试项目：资金不足
-    do 
+    --[[do 
         local msg, rst = service.call(service.get_id(), "trade", "IC2607", 8535, -1000, ctp.THOST_FTDC_OFEN_Close)
         ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-    end
+    end]]
 
     -- 市价单，成交后平仓
     --[[
@@ -616,6 +667,27 @@ function S.test()
 
     -- order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
     return 1
+end
+
+function S.test_2()
+    ctp.log_debug("---")
+    ctp.log_debug("begin test 2")
+    ctp.log_debug("---")
+    local rst = service.call(service.get_id(), "nuke")
+
+    for i = 1, 4 do 
+        local msg, rst = service.call(service.get_id(), "trade", {
+                symbol = "IC2607", 
+                price = 8000, 
+                volume = 1, 
+                flag = ctp.THOST_FTDC_OFEN_Open,
+                timeout = 1000
+        })
+        ctp.log_debug(msg, rst)
+    end
+
+    print("total order insert count", order_insert_count)
+    print("total order cancel count", order_cancel_count)
 end
 
 return service.dispatch(S)
