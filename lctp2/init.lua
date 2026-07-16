@@ -279,6 +279,8 @@ function new_trader(server)
         -- query_marketdata = function(self, symbol) return ctpc.ctp_trader_query_marketdata(self.trader, symbol) end,
         -- fetch_account = function(self, req_id) return ctpc.ctp_trader_fetch_account(self.trader, req_id) end,
 
+        password_update = function (self, pass_old, pass_new) return ctpc.ctp_trader_password_update(self.trader, pass_old, pass_new) end,
+
         session_info = function (self)
                 return {
                     BrokerID = ffi.string(self.trader.broker),

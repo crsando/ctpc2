@@ -335,6 +335,40 @@ void CustomTradeSpi::OnRspUserLogout(
     ON_RSP_THEN_SEND(OnRspUserLogout, CThostFtdcUserLogoutField);
 }
 
+void CustomTradeSpi::OnRspUserPasswordUpdate(
+    CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate,
+    CThostFtdcRspInfoField *pRspInfo,
+    int nRequestID, bool bIsLast)
+{
+    if (pRspInfo && pRspInfo->ErrorID != 0) {
+        // 改密失败
+        std::cerr << "=== 密码修改失败 ===" << std::endl;
+        std::cerr << "ErrorID: " << pRspInfo->ErrorID << std::endl;
+        std::cerr << "ErrorMsg: " << pRspInfo->ErrorMsg << std::endl;
+
+        switch (pRspInfo->ErrorID) {
+        case 3:
+            std::cerr << "原因: 旧密码错误" << std::endl;
+            break;
+        case 34:
+            std::cerr << "原因: 新密码不符合复杂度要求" << std::endl;
+            break;
+        case 140:
+            std::cerr << "原因: 新旧密码不能相同" << std::endl;
+            break;
+        default:
+            break;
+        }
+    } else {
+        std::cout << "=== 密码修改成功 ===" << std::endl;
+        if (pUserPasswordUpdate) {
+            std::cout << "BrokerID: " << pUserPasswordUpdate->BrokerID << std::endl;
+            std::cout << "UserID: " << pUserPasswordUpdate->UserID << std::endl;
+        }
+        // 下次登录用新密码，当前会话不受影响
+    }
+}
+
 bool CustomTradeSpi::isErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);

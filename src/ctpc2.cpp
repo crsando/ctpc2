@@ -295,7 +295,7 @@ int ctp_trader_order_cancel(ctp_trader_t * t, const char * symbol, const char * 
 int ctp_trader_password_update(ctp_trader_t * t, const char * pass_old, const char * pass_new) {
     CThostFtdcUserPasswordUpdateField field;
     memset(&field, 0, sizeof(field));
-    strcpy(field.BrokerID, "9999");           // 经纪公司代码
+    strcpy(field.BrokerID, t->broker);           // 经纪公司代码
     strcpy(field.UserID, t->user);     // 用户代码
     strcpy(field.OldPassword, pass_old);     // 原密码
     strcpy(field.NewPassword, pass_new);     // 新密码
@@ -305,7 +305,7 @@ int ctp_trader_password_update(ctp_trader_t * t, const char * pass_old, const ch
 
     log_debug("ctp_trader_password_update | %d", field.UserID);
 
-	CTP_TRADER_REQ(t, OrderAction, &field);
+	CTP_TRADER_REQ(t, UserPasswordUpdate, &field);
 }
 
 } // end extern "C"
