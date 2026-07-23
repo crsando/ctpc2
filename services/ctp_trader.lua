@@ -1,54 +1,11 @@
--- ctp trader
-
 local inspect = require "inspect"
 local ctp = require "lctp2"
 ctp.log_set_level("LOG_DEBUG")
 
 local service = require "lservice3" .input(...)
-local config = service.config
-
-local server_list = {
-        ["gtja-sim"] = {
-            front_addr = "tcp://180.169.50.131:42205",
-            broker = "2071", 
-            user = "0061841498", 
-            pass = "bE19930706", 
-            app_id = "client_tifa_260501", 
-            auth_code = '20260527TIFATIFA',
-        },
-        ["hy-sim"] = {
-            front_addr = "tcp://101.230.79.235:33205",
-            broker = "3070", 
-            user = "333307126", 
-            pass = "930706", 
-            app_id = "client_tara_241201", 
-            auth_code = 'CY2LFL92CISEEKVM',
-        },
-        ["openctp"] = {
-            front_addr = "tcp://trading.openctp.cn:30001",
-            broker = "9999", 
-            user = "7572", 
-            pass = "123456", 
-            app_id = "client_tara_231031", 
-            auth_code = '20231101ZHOUYH01',
-        },
-        ["simnow"]=  {
-            front_addr = "tcp://182.254.243.31:30001",
-            broker = "9999", 
-            user = "264530", 
-            pass = "bE@453162948", 
-            app_id = "simnow_client_test", 
-            auth_code = '0000000000000000',
-        },
-        ["simnow-7x24"]=  {
-            front_addr = "tcp://182.254.243.31:40001",
-            broker = "9999", 
-            user = "264530", 
-            pass = "bE@453162948", 
-            app_id = "simnow_client_test", 
-            auth_code = '0000000000000000',
-        },
-    }
+local config = service.config; do 
+        assert(config.server, "no config.server")
+    end
 
 local order_insert_count = 0 
 local order_cancel_count = 0 
@@ -78,13 +35,10 @@ local S = {} -- handle service request/response
 -- global(per-service) variables
 --
 local server, trader; S.start = function () 
-    server = assert(server_list["gtja-sim"])
-    -- server = assert(server_list["simnow-7x24"])
-    -- ctp.log_debug("trader account %s", inspect(server, {newline = " "}))
+    server = config.server
 
     trader = ctp.new_trader(server)
         :async(service.get_async())
-        -- :cond( service.get_cond() )
         :start( true ) -- blocking thread until settlement
     return true
 end
@@ -243,11 +197,11 @@ function S.query_position()
             direction = field.PosiDirection - 49 -- an hack
             entry[direction] = (entry[direction] or 0) + field.Position
 
-            print(symbol, direction, field.Position)
+            ctp.log_debug(">>> %s \t %s \t %d", symbol, direction, field.Position)
         end
     end
 
-    position_table = pt -- update global variable
+    -- position_table = pt -- update global variable
 
     return slice(rst, "field")
 end
@@ -573,6 +527,14 @@ function S.trade(...)
     return order:trade(...)
 end
 
+
+function S.test_1()
+    ctp.log_debug("begin trader test sequence")
+    local rst = service.call(service.get_id(), "query_account")
+    ctp.log_debug("balance %d", rst.field.Balance)
+end
+
+--[=[
 function S.test()
     ctp.log_debug("begin trader test sequence")
 
@@ -689,5 +651,6 @@ function S.test_2()
     print("total order insert count", order_insert_count)
     print("total order cancel count", order_cancel_count)
 end
+]=]
 
 return service.dispatch(S)
