@@ -56,7 +56,7 @@ function log_set_level(lvl_str)
 end
 
 local function log(level, msg)
-    if ffi.C[_log_level] >= ffi.C["LOG_" .. level] then 
+    if ffi.C[_log_level] <= ffi.C["LOG_" .. level] then 
     -- 2 表示获取调用 log() 的上一层位置
         local info = debug.getinfo(3, "Sl")
         local time = os.date("%H:%M:%S")
@@ -72,6 +72,9 @@ local function log(level, msg)
         ))
     end
 end
+
+local log_debug = function (...) local msg = string.format(...); log("DEBUG", msg) end
+local log_info = function (...) local msg = string.format(...); log("INFO", msg) end
 
 --
 -- utiliy functions for transform ctp data struct into lua-table
@@ -110,7 +113,6 @@ local function totable(cdata)
     end -- end for
     return o
 end
-
 
 local function cast_trader_rsp(rsp)
     if rsp == nil then return nil end
@@ -189,9 +191,16 @@ function new_collector(server)
                 ctpc.ctp_md_start(self.md)
                 return self 
             end,
-        recv = function (self)
-                -- return ffi.gc(ctpc.ctp_md_recv(self.md), ctpc.ctp_md_tick_free)
-                return ctpc.ctp_md_recv(self.md)
+        recv = function (self, blocking)
+                local ptr = ctpc.ctp_md_recv(self.md, blocking)
+                local tick_data = nil
+
+                if ptr ~= nil then 
+                    tick_data = totable(ptr)
+                    ctpc.ctp_md_tick_free(ptr)
+                end
+
+                return tick_data
             end,
     }
     _mt.__index = _mt
@@ -305,8 +314,8 @@ local M = {
     new_trader = new_trader,
 
     log_set_level = log_set_level,
-    log_debug = function (...) local msg = string.format(...); log("DEBUG", msg) end,
-    log_info = function (...) local msg = string.format(...); log("INFO", msg) end,
+    log_debug = log_debug,
+    log_info = log_info,
 }
 
 -- load constants directly to the module

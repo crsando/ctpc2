@@ -2,10 +2,20 @@ local inspect = require "inspect"
 local ctp = require "lctp2"
 ctp.log_set_level("LOG_DEBUG")
 
+--[[
+
+***TODO***
+- 修改一下 query_position 的返回值，使得该值可以更好被后续策略和监控所使用？
+
+]]
+
 local service = require "lservice3" .input(...)
 local config = service.config; do 
         assert(config.server, "no config.server")
     end
+
+-- read only: 只允许query, 禁止所有 order
+local _read_only = config.read_only or true
 
 local order_insert_count = 0 
 local order_cancel_count = 0 
@@ -68,6 +78,13 @@ local query = {
         end,
 
     -- entry point
+    -- 一个request的链路是这样的
+    -- lua 段发出request  -> C-side 执行 ctp_trader_query_xxxx 
+    -- 此时在query:request() 中会coroutine.yield，把当前service的session挂起
+    -- 进而等候OnRspXXXX，这个阶段会由service.on_idle给到handler去处理，如果发现是query类的，通过query:update()收集rsp_info等信息，
+    -- 最后确认bLast = True后，通过resume_session，把执行回到对应的session
+    -- 此时，在query:request()中，收到的是两个，一个ok/err，一个rst，后者rst是所有OnRspXXX的结果的一个table。
+    -- 
     request = function(self, name, ...)
             local entity = {
                     session = service.get_session(),
@@ -80,15 +97,26 @@ local query = {
             self:enqueue(entity)
             self:process()
 
-            local ok, rst = coroutine.yield() -- wait for response
-            return ok, rst
+            local err, rst = coroutine.yield() -- wait for response
+
+            --
+            -- 现在的策略是：把rst进行一些处理后再返回
+            -- 由于rst这里其实是包含了各种rsp_info, req_id之类的东西的，所以我们需要去除，只保留field
+            --
+            local body = slice(rst, "field")
+            if #body == 1 then 
+                body = body[1]
+            end
+
+            return err, body
         end,
     -- exit point
     response = function(self)
             local q = self:first()
             if q then 
                 if q.session then 
-                    service.resume_session(q.session, 1, q.cache)
+                    -- err: 0, no error
+                    service.resume_session(q.session, 0, q.cache)
                 end
                 self:dequeue()
             end
@@ -170,8 +198,8 @@ local query = {
 --
 
 function S.query_account()
-    local ok, rst = query:request("query_account")
-    return rst[1]
+    local err, rst = query:request("query_account")
+    return err, rst
 end
 
 --[[
@@ -186,8 +214,10 @@ end
 #define THOST_FTDC_PD_Short '3'
 ]]
 function S.query_position()
-    local ok, rst = query:request("query_position")
+    local err, rst = query:request("query_position")
+    return err, rst
 
+    --[[
     local pt = {}
     for _, field in ipairs(rst) do 
         if (field ~= nil) and (field.InstrumentID) then 
@@ -204,28 +234,22 @@ function S.query_position()
     -- position_table = pt -- update global variable
 
     return slice(rst, "field")
+    ]]
 end
 
 function S.query_instrument_margin_rate(symbol)
-    local ok, rst = query:request("query_instrument_margin_rate", symbol)
-    return ok, rst
+    local err, rst = query:request("query_instrument_margin_rate", symbol)
+    return err, rst
 end
 
 function S.query_instrument(symbol)
     local ok, rst = query:request("query_instrument", symbol)
-    print("query instrument", ok, inspect(rst))
-
-
-    if rst[1] and type(rst[1] == "table") then 
-        return rst[1]
-    else 
-        return {}
-    end
+    return err, rst
 end
 
 function S.query_order()
-    local ok, rst = query:request("query_order")
-    return rst
+    local err, rst = query:request("query_order")
+    return err, rst
 end
 
 --
@@ -522,11 +546,6 @@ function S.nuke()
         end
     end
 end
-
-function S.trade(...)
-    return order:trade(...)
-end
-
 
 function S.test_1()
     ctp.log_debug("begin trader test sequence")

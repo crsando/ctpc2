@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "uv.h"
 
 #define _SERVICE_MQ_DEF_SIZE_ 1024
 
@@ -36,19 +37,23 @@ void ctp_md_send(ctp_md_t * md, void *msg) {
         cond_trigger_begin(md->ext_cond);
         cond_trigger_end(md->ext_cond, 1);
     }
+
+    if(md->async) {
+        uv_async_send(md->async);
+    }
 }
 
-ctp_md_tick_t * ctp_md_recv(ctp_md_t * md) {
+ctp_md_tick_t * ctp_md_recv(ctp_md_t * md, bool blocking) {
     ctp_md_tick_t * msg = NULL;
-    while ( msg == NULL ) {
-        cond_wait_begin(md->c);
+    cond_wait_begin(md->c);
 
-        while( queue_length(md->q) == 0 )
+    if(blocking) {
+        if( queue_length(md->q) == 0 )
             cond_wait(md->c);
-        msg = (ctp_md_tick_t *)queue_pop_ptr(md->q);
-
-        cond_wait_end(md->c);
     }
+    msg = (ctp_md_tick_t *)queue_pop_ptr(md->q);
+
+    cond_wait_end(md->c);
     return msg;
 }
 

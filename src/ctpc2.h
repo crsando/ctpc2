@@ -53,7 +53,7 @@ void ctp_md_start(ctp_md_t * md);
 
 typedef struct CThostFtdcDepthMarketDataField ctp_md_tick_t;
 void ctp_md_send(ctp_md_t * md, void *msg);
-ctp_md_tick_t * ctp_md_recv(ctp_md_t * md);
+ctp_md_tick_t * ctp_md_recv(ctp_md_t * md, bool blocking);
 void ctp_md_tick_free(ctp_md_tick_t * t);
 
 
@@ -146,8 +146,6 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
 // int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref);
 // int ctp_trader_order_cancel(ctp_trader_t * t, const char * exchange_id, const char * order_sys_id);
 int ctp_trader_order_cancel(ctp_trader_t * t, const char * symbol, const char * exchange_id, const char * order_sys_id);
-
-// int ctp_trader_order_cancel(ctp_trader_t * t, )
 
 // password
 

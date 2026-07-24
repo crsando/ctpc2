@@ -25,7 +25,7 @@ local function load_accounts()
 end
 
 local script_name = "root_test_trader"
-local server = assert(load_accounts()["gtja-3"])
+local server = assert(load_accounts()["trader"]["gtja-3"])
 
 print("using server", inspect(server))
 

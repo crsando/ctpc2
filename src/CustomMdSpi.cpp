@@ -15,7 +15,7 @@ void CustomMdSpi::OnFrontConnected()
 	this->_md->connected = 1;
 	// 开始登录
 	CThostFtdcReqUserLoginField loginReq;
-	memset(&loginReq, 0, sizeof(loginReq));
+	memset(&loginReq, 0, sizeof(loginReq))collector
 	strcpy(loginReq.BrokerID, this->_md->broker);
 	strcpy(loginReq.UserID, this->_md->user);
 	// strcpy(loginReq.Password, this->_md->password);

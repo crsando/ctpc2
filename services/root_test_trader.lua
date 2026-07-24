@@ -5,31 +5,30 @@ local ctp = require "lctp2"
 
 local trader_id = nil
 
--- local server = {
---     front_addr = "tcp://trading.openctp.cn:30001",
---     broker = "9999", 
---     user = "7572", 
---     pass = "123456", 
---     app_id = "client_tara_231031", 
---     auth_code = '20231101ZHOUYH01',
--- }
-
 local function boot()
     ctp.log_debug("booting root")
     assert(config.symbol, "no symbol provided")
-    trader_id = service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = config }
-    local rsp = service.call(trader_id, "start") -- blocking, until trader starts
+    service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { symbol = "sc2609" } }
+    service.call("collector", "start")
+
+    
+    --[[
+    service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = config }
+    local rsp = service.call("trader", "start") -- blocking, until trader starts
 
     ctp.log_debug("start result", rsp)
+    test_trader_query()
+    ]]
 end
 
 
-local function test_trader_query_queue()
-    assert(trader_id)
-    service.send(trader_id, "query_account")
-    service.send(trader_id, "query_account")
-    service.send(trader_id, "query_instrument", "IF2607")
-    service.send(trader_id, "query_account")
+local function test_trader_query()
+    local err, rst = service.call("trader", "query_account")
+    ctp.log_info("query_account: %s", inspect(rst))
+    local err, rst = service.call("trader", "query_instrument", "IM2703")
+    ctp.log_info("query_instrument: %s", inspect(rst))
+    local err, rst = service.call("trader", "query_position")
+    ctp.log_info("query_position: %s", inspect(rst))
 end
 
 local function test() 
@@ -41,13 +40,13 @@ local S = {}
 
 function S.boot()
     boot()
-    test()
-    service.send(0, "quit")
+    -- test()
+    -- service.send(0, "quit")
 end
 
 function S.quit()
     ctp.log_debug("root is quiting")
-    service.send(trader_id, "quit")
+    service.send("trader", "quit")
     service.quit()
 end
 
