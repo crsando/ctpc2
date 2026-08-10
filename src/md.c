@@ -27,17 +27,6 @@ void ctp_md_send(ctp_md_t * md, void *msg) {
     queue_push_ptr(md->q, msg);
     cond_trigger_end(md->c, 1);
 
-    // remove hook support
-    // if(md->hook) {
-	//     md->hook(md, msg);
-    // }
-
-    if(md->ext_cond) {
-        // log_debug("ext_cond send");
-        cond_trigger_begin(md->ext_cond);
-        cond_trigger_end(md->ext_cond, 1);
-    }
-
     if(md->async) {
         uv_async_send(md->async);
     }

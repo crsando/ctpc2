@@ -25,11 +25,6 @@ void ctp_trader_send(ctp_trader_t * t, ctp_rsp_t * msg) {
     queue_push_ptr(t->q, msg);
     cond_trigger_end(t->c, 1);
 
-    if(t->ext_cond) {
-        cond_trigger_begin(t->ext_cond);
-        cond_trigger_end(t->ext_cond, 1);
-    }
-
     if(t->async) {
         uv_async_send(t->async);
     }
@@ -59,9 +54,9 @@ void ctp_rsp_free(ctp_rsp_t * r) {
         free(r);
 }
 
-void ctp_trader_wait_for_settle(ctp_trader_t * t) {
-    while(t->connected != 4) {
-        ctp_rsp_t * rsp = ctp_trader_recv(t, true);
-        ctp_rsp_free(rsp);
-    }
-}
+// void ctp_trader_wait_for_settle(ctp_trader_t * t) {
+//     while(t->connected != 4) {
+//         ctp_rsp_t * rsp = ctp_trader_recv(t, true);
+//         ctp_rsp_free(rsp);
+//     }
+// }

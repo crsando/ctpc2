@@ -11,9 +11,6 @@
 
 #include "uv.h"
 
-// typedef void (*ctp_func_cb_t)(void * tick, void * _ctx);
-// typedef void (*ctp_tick_cb)(struct CThostFtdcDepthMarketDataField * tick);
-
 // common callback type
 typedef void (*ctp_hook_cb)(void * self, void * data);
 
@@ -24,7 +21,7 @@ typedef struct {
     char user[13]; // InvestorID
 
     // status
-    int connected; // 0: not connected; 1: connected; 2: logined; 3: subscribe complete
+    int connected; // 0: not connected; 1: connected; 2: logined
 
     char ** symbols;
     int symbols_num;
@@ -36,10 +33,6 @@ typedef struct {
     struct queue * q;
     struct cond * c;
 
-    // external hook
-    // ctp_hook_cb hook;
-
-    void * ext_cond;
     void * async; // libuv async handler
 } ctp_md_t;
 
@@ -94,8 +87,6 @@ typedef struct _ctp_trader_t {
     struct queue * q;
     struct cond * c;
 
-    // external conditional variable
-    void * ext_cond;
     void * async; // libuv async handler
 } ctp_trader_t;
 
@@ -104,7 +95,6 @@ ctp_trader_t * ctp_trader_init(ctp_trader_t * trader, const char front_addr[], c
     const char user[], const char password[], const char app_id[], const char auth_code[]);
 
 ctp_trader_t * ctp_trader_start(ctp_trader_t * trader);
-void ctp_trader_wait_for_settle(ctp_trader_t * t);
 
 typedef struct {
     // header
@@ -125,7 +115,6 @@ typedef struct {
 } ctp_rsp_t;
 
 void ctp_trader_send(ctp_trader_t * t, ctp_rsp_t * msg);
-// ctp_rsp_t * ctp_trader_recv(ctp_trader_t * t);
 ctp_rsp_t * ctp_trader_recv(ctp_trader_t * t, bool blocking);
 void ctp_rsp_free(ctp_rsp_t * r);
 

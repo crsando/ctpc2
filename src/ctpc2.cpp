@@ -37,7 +37,6 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
 	strcpy(md->broker, &broker[0]);
 	strcpy(md->user, &user[0]);
 
-
     // symbols
     const int max_symbols_num = 16;
     md->symbols = (char **)malloc(sizeof(char *) * (max_symbols_num + 1));
@@ -59,44 +58,12 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
 	return md;
 }
 
-// refactor
-/*
-void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
-{
-    log_debug("ctp_md_subscribe | %s", symbol);
-    char * buf;
-	int n = strlen(symbol);
-	const int buf_size = 81;
-    assert(n < 9);
-
-    buf = (char *)malloc(sizeof(char) * buf_size);
-    memset(buf, 0, sizeof(char) * buf_size);
-    strncpy(buf, symbol, sizeof(char) * (n));
-
-
-    // add
-    md->symbols[md->symbols_num] = buf;
-    md->symbols_num ++;
-
-
-    int j;
-    for(j = 0; j < md->symbols_num; j++) {
-        log_debug("ctp_md_subscribe | iter | %d | %s", j, (md->symbols)[j]);
-    }
-}
-*/
-
 int ctp_md_subscribe(ctp_md_t * md, char * symbols [], int num) {
     return _api(md)->SubscribeMarketData(symbols, num);
 }
 int ctp_md_unsubscribe(ctp_md_t * md, char * symbols [], int num) {
     return _api(md)->UnSubscribeMarketData(symbols, num);
 }
-
-// void ctp_md_hook(ctp_md_t * md, ctp_hook_cb hook) {
-//     log_debug("ctp_md_hook | %x", hook);
-//     md->hook = hook;
-// }
 
 // Trader API
 #undef _spi
@@ -185,15 +152,6 @@ int ctp_trader_query_instrument_margin_rate(ctp_trader_t * trader, const char * 
 	CTP_TRADER_REQ(trader, QryInstrumentMarginRate, &field);
 }
 
-// int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id) {
-// 	CThostFtdcQryInstrumentField field;
-// 	memset(&field, 0, sizeof(field));
-//     if (exchange_id) {
-//         strcpy(field.ExchangeID, exchange_id);
-//     }
-// 	CTP_TRADER_REQ(trader, QryInstrument, &field);
-// }
-
 // useless, it is for options not for futures
 // int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
 //     CThostFtdcQryDepthMarketDataField field;
@@ -232,15 +190,6 @@ int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price,
         orderInsertReq.TimeCondition = THOST_FTDC_TC_GFD; // 当日有效
     }
 
-    // Fill or Kill
-    // orderInsertReq.TimeCondition = THOST_FTDC_TC_IOC;
-	// orderInsertReq.VolumeCondition = THOST_FTDC_VC_CV;
-
-    // Normal Order
-    // orderInsertReq.TimeCondition = THOST_FTDC_TC_GFD; // 当日有效
-	// orderInsertReq.VolumeCondition = THOST_FTDC_VC_AV;
-	// orderInsertReq.MinVolume = 1;
-
     orderInsertReq.CombOffsetFlag[0] = flag;
 	orderInsertReq.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
 
@@ -267,23 +216,6 @@ int ctp_trader_query_order(ctp_trader_t * t) {
 	strcpy(field.InvestorID, t->user);
 	CTP_TRADER_REQ(t, QryOrder, &field);
 }
-
-// int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref) { 
-//     CThostFtdcInputOrderActionField field;
-//     memset(&field, 0, sizeof(field));
-//     strcpy(field.BrokerID, t->broker);
-//     strcpy(field.InvestorID, t->user);
-//     field.ActionFlag = THOST_FTDC_AF_Delete;
-
-//     // Key 
-//     field.FrontID = front_id;
-//     field.SessionID = session_id;
-//     strcpy(field.OrderRef, order_ref);
-
-//     log_debug("ctp_trader_order_cancel %d+%d+%s", front_id, session_id, order_ref);
-
-// 	CTP_TRADER_REQ(t, OrderAction, &field);
-// }
 
 int ctp_trader_order_cancel(ctp_trader_t * t, const char * symbol, const char * exchange_id, const char * order_sys_id) { 
     CThostFtdcInputOrderActionField field;
