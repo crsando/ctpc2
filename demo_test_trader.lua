@@ -32,7 +32,7 @@ print("using server", inspect(server))
 local root_addr = service.new { 
     source = "@services/" .. script_name .. ".lua", 
     config = { 
-        symbol = "IF2607",
+        symbol = "IM2703",
         server = server,
     } 
 }

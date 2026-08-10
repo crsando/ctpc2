@@ -8,7 +8,7 @@ local trader_id = nil
 local function boot()
     ctp.log_debug("booting root")
     assert(config.symbol, "no symbol provided")
-    service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { symbol = "sc2609" } }
+    service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { symbol = config.symbol } }
     service.call("collector", "start")
 
     

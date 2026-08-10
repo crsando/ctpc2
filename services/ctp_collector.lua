@@ -6,7 +6,6 @@ local service = require "lservice3" .input(...)
 local config = service.config; do 
         config.server = { front_addr =  "tcp://180.169.75.18:61213", broker = "7090", user = "85506493" }
         assert(config.server, "no config.server")
-        config.symbol = "sc2609"
         assert(config.symbol, "no config.symbol")
     end
 
@@ -20,7 +19,8 @@ function S.start()
 end
 
 local function on_tick(tick)
-    print("on_tick", inspect(tick))
+    ctp.log_debug("on_tick | %s | %d", tick.InstrumentID, tick.LastPrice)
+    -- print("on_tick", inspect(tick))
 end
 
 function service.on_idle()
