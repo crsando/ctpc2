@@ -117,7 +117,7 @@ typedef struct {
 void ctp_trader_send(ctp_trader_t * t, ctp_rsp_t * msg);
 ctp_rsp_t * ctp_trader_recv(ctp_trader_t * t, bool blocking);
 void ctp_rsp_free(ctp_rsp_t * r);
-
+void ctp_trader_wait_for_settle(ctp_trader_t * t);
 //
 // query/fetch model (with req_id as the key)
 // query_xxx => OnRspXXX => reg update => fetch => (optional) free

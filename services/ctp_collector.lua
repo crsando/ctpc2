@@ -33,6 +33,10 @@ function S.start()
     return 1
 end
 
+function S.quit()
+    service.quit()
+end
+
 function S.subscribe(symbols)
     if (type(symbols) == "string") then 
         symbols = { symbols }
