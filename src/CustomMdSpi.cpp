@@ -15,7 +15,7 @@ void CustomMdSpi::OnFrontConnected()
 	this->_md->connected = 1;
 	// 开始登录
 	CThostFtdcReqUserLoginField loginReq;
-	memset(&loginReq, 0, sizeof(loginReq))collector
+	memset(&loginReq, 0, sizeof(loginReq));
 	strcpy(loginReq.BrokerID, this->_md->broker);
 	strcpy(loginReq.UserID, this->_md->user);
 	// strcpy(loginReq.Password, this->_md->password);
@@ -50,7 +50,10 @@ void CustomMdSpi::OnRspUserLogin(
 	{
 		this->_md->connected = 2;
 		log_debug("OnRspUserLogin | Success | BrokerID:%s | UserID:%s", this->_md->broker, this->_md->user);
+
 		// 开始订阅行情
+        // refactor: 我们不在这里行情订阅了，把行情订阅单独拉出来放到另一个地方
+        /*
         int i;
         log_debug("OnRspUserLogin | SubscribeMarketData | symbols_num %d", this->_md->symbols_num);
         for(i = 0; i < this->_md->symbols_num; i++) {
@@ -63,6 +66,7 @@ void CustomMdSpi::OnRspUserLogin(
 			this->_md->connected = 3;
 			log_debug("OnRspUserLogin | SubscribeMarketData | Success");
 		}
+        */
 	}
 	else
 		log_debug("OnRspUserLogin | Fail | ErrorID:%d", pRspInfo->ErrorID);
@@ -101,8 +105,12 @@ void CustomMdSpi::OnRspSubMarketData(
 {
     log_debug("OnRspSubMarketData | %s", pSpecificInstrument->InstrumentID);
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
-	if (bResult)
+	if (bResult) {
 		log_error("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+    }
+    else {
+        this->subscribed.insert(pSpecificInstrument->InstrumentID);
+    }
 }
 
 // 取消订阅行情应答
@@ -112,6 +120,14 @@ void CustomMdSpi::OnRspUnSubMarketData(
 	int nRequestID, 
 	bool bIsLast)
 {
+    log_debug("OnRspUnSubMarketData | %s", pSpecificInstrument->InstrumentID);
+	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
+	if (bResult) {
+		log_error("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+    }
+    else {
+        subscribed.erase(pSpecificInstrument->InstrumentID);
+    }
 }
 
 // 订阅询价应答

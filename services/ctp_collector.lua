@@ -13,13 +13,46 @@ local S = {}
 local collector = ctp.new_collector(config.server)
 
 function S.start()
-    collector:subscribe({ config.symbol })
+    ctp.log_debug("is_ready: %s", collector:is_ready() and "true" or "false")
     collector:async(service.get_async())
     collector:start()
+
+    --
+    -- wait for the collector to be ready
+    --
+    local ready = false
+    while not ready do  
+        ready = collector:is_ready()
+        ctp.log_debug("is_ready: %s", ready and "true" or "false")
+        service.sleep(50)
+    end
+
+    -- 连接成功后再subscribe
+    collector:subscribe { config.symbol }
+
+    return 1
+end
+
+function S.subscribe(symbols)
+    if (type(symbols) == "string") then 
+        symbols = { symbols }
+    end
+
+    collector:subscribe(symbols)
+    return 1
+end
+
+function S.unsubscribe(symbols)
+    if (type(symbols) == "string") then 
+        symbols = { symbols }
+    end
+
+    collector:unsubscribe(symbols)
+    return 1
 end
 
 local function on_tick(tick)
-    ctp.log_debug("on_tick | %s | %d", tick.InstrumentID, tick.LastPrice)
+    ctp.log_debug("on_tick | %s | %f", tick.InstrumentID, tick.LastPrice)
     -- print("on_tick", inspect(tick))
 end
 

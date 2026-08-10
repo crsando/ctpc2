@@ -160,13 +160,53 @@ local servers = {
     }
 }
 
+local function table_to_char_pp(items)
+    local count = #items
+
+
+    -- 保存每个字符串对应的 cdata，防止被 GC 回收
+    local buffers = {}
+
+
+
+    -- symbols[count] 保持为 NULL
+    return symbols, count, buffers
+end
+
+local function symbols_table_to_char_pp(symbols)
+    assert(type(symbols) == "table")
+    local num = #symbols
+
+    if num == 0 then 
+        return 0, "no valid symbol table"
+    end
+
+    local c_symbols = ffi.new("char *[?]", num)
+    local buffers = {} -- 在lua里保存一下，避免被错误的gc回收
+    for i = 1, num do
+        local value = assert(symbols[i], "invalid symbol item")
+        assert(type(value) == "string", "invalid symbol time: not string")
+
+        -- +1 用于字符串末尾的 \0
+        local buffer = ffi.new("char[?]", #value + 1)
+
+        -- ffi.new 创建的内存默认清零，因此末尾已经是 \0
+        ffi.copy(buffer, value, #value)
+
+        buffers[i] = buffer
+        c_symbols[i - 1] = buffer -- C 数组从 0 开始
+    end
+
+    return c_symbols, num, buffers
+end
+
 
 -- function new_collector(server, symbols, on_tick)
 function new_collector(server)
-    server = server or servers.md['sim']
+server = server or servers.md['sim']
 
-    local md = ctpc.ctp_md_new()
-    ctpc.ctp_md_init(md, server.front_addr, server.broker, server.user)
+local md = ctpc.ctp_md_new()
+ctpc.ctp_md_init(md, server.front_addr, server.broker, server.user)
 
     local _mt = {
         hook = function (self, hook)
@@ -177,14 +217,20 @@ function new_collector(server)
                 self.md.async = ffi.new("void *", async)
                 return self
             end,
+        --[[
         cond = function(self, cond)
                 self.md.ext_cond = ffi.new("void*", cond)
                 return self
             end,
-        subscribe = function (self, symbols) 
-                for _, symbol in ipairs(symbols) do 
-                    ctpc.ctp_md_subscribe(self.md, symbol) 
-                end
+        ]]
+        subscribe = function (self, symbols)
+                local c_symbols, num, buffers = symbols_table_to_char_pp(symbols)
+                ctpc.ctp_md_subscribe(self.md, c_symbols, num) 
+                return self
+            end,
+        unsubscribe = function (self, symbols)
+                local c_symbols, num, buffers = symbols_table_to_char_pp(symbols)
+                ctpc.ctp_md_unsubscribe(self.md, c_symbols, num) 
                 return self
             end,
         start = function (self) 
@@ -201,6 +247,9 @@ function new_collector(server)
                 end
 
                 return tick_data
+            end,
+        is_ready = function (self)
+                return (self.md.connected >= 2)
             end,
     }
     _mt.__index = _mt

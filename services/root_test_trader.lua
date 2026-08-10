@@ -11,6 +11,11 @@ local function boot()
     service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { symbol = config.symbol } }
     service.call("collector", "start")
 
+    service.sleep(3000)
+    service.call("collector", "subscribe", "IF2703")
+
+    service.sleep(3000)
+    service.call("collector", "unsubscribe", "IM2703")
     
     --[[
     service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = config }

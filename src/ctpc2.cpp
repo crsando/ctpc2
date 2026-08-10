@@ -59,6 +59,8 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
 	return md;
 }
 
+// refactor
+/*
 void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
 {
     log_debug("ctp_md_subscribe | %s", symbol);
@@ -81,6 +83,14 @@ void ctp_md_subscribe(ctp_md_t * md, const char symbol[])
     for(j = 0; j < md->symbols_num; j++) {
         log_debug("ctp_md_subscribe | iter | %d | %s", j, (md->symbols)[j]);
     }
+}
+*/
+
+int ctp_md_subscribe(ctp_md_t * md, char * symbols [], int num) {
+    return _api(md)->SubscribeMarketData(symbols, num);
+}
+int ctp_md_unsubscribe(ctp_md_t * md, char * symbols [], int num) {
+    return _api(md)->UnSubscribeMarketData(symbols, num);
 }
 
 // void ctp_md_hook(ctp_md_t * md, ctp_hook_cb hook) {
