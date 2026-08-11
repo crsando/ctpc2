@@ -161,7 +161,7 @@ void CustomMdSpi::OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpec
 // 行情详情通知
 void CustomMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	log_debug("OnRtnDepthMarketData | InstrumentID:%s | LastPrice:%lf", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice);
+	// log_debug("OnRtnDepthMarketData | InstrumentID:%s | LastPrice:%lf", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice);
 	// clock_t start, end;
 
 	// start = clock();

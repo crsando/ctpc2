@@ -104,9 +104,12 @@ local query = {
             -- 由于rst这里其实是包含了各种rsp_info, req_id之类的东西的，所以我们需要去除，只保留field
             --
             local body = slice(rst, "field")
+            -- 需要自己决定是否只取第一个返回结果
+            --[[
             if #body == 1 then 
                 body = body[1]
             end
+            ]]
 
             return err, body
         end,
@@ -199,7 +202,11 @@ local query = {
 
 function S.query_account()
     local err, rst = query:request("query_account")
-    return err, rst
+    if rst and rst[1] then 
+        return rst[1]
+    else 
+        return nil, err
+    end
 end
 
 --[[
@@ -215,7 +222,7 @@ end
 ]]
 function S.query_position()
     local err, rst = query:request("query_position")
-    return err, rst
+    return rst
 
     --[[
     local pt = {}
@@ -239,17 +246,29 @@ end
 
 function S.query_instrument_margin_rate(symbol)
     local err, rst = query:request("query_instrument_margin_rate", symbol)
-    return err, rst
+    if rst and rst[1] then 
+        return rst[1]
+    else 
+        return nil, err
+    end
 end
 
 function S.query_instrument(symbol)
     local ok, rst = query:request("query_instrument", symbol)
-    return err, rst
+    if rst and rst[1] then 
+        return rst[1]
+    else 
+        return nil, err 
+    end
 end
 
 function S.query_order()
     local err, rst = query:request("query_order")
-    return err, rst
+    if rst and rst[1] then 
+        return rst[1]
+    else 
+        return nil, err 
+    end
 end
 
 --

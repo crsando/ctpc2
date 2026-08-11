@@ -47,6 +47,6 @@ ctp_md_tick_t * ctp_md_recv(ctp_md_t * md, bool blocking) {
 }
 
 void ctp_md_tick_free(ctp_md_tick_t * t) {
-    log_debug("ctp_md_tick_free");
+    // log_debug("ctp_md_tick_free");
     free(t);
 }

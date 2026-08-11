@@ -36,14 +36,10 @@ local function boot()
             server = accounts["collector"]["gtja-3"],
             symbol = symbol
         } }
+
     service.call("collector", "start")
+    service.call("collector", "subscribe", "sc2609")
 
-    service.sleep(3000)
-    service.call("collector", "subscribe", "IF2703")
-
-    service.sleep(3000)
-    service.call("collector", "unsubscribe", "IM2703")
-    
     service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
             server = accounts["trader"]["gtja-3"],
             symbol = symbol
@@ -58,13 +54,17 @@ local function boot()
     ctp.log_info("query_instrument: %s", inspect(rst))
     local err, rst = service.call("trader", "query_position")
     ctp.log_info("query_position: %s", inspect(rst))
+
+    -- service.call("trader", "quit")
+
+    service.spawn { name = "bot", source = "@services/bot.lua", config = { } }
 end
 
 local S = {}
 
 function S.boot()
     boot()
-    service.send(0, "quit")
+    -- service.send(0, "quit")
 end
 
 function S.quit()

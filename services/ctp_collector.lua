@@ -4,13 +4,14 @@ ctp.log_set_level("LOG_DEBUG")
 
 local service = require "lservice3" .input(...)
 local config = service.config; do 
-        config.server = { front_addr =  "tcp://180.169.75.18:61213", broker = "7090", user = "85506493" }
+        -- config.server = { front_addr =  "tcp://180.169.75.18:61213", broker = "7090", user = "85506493" }
         assert(config.server, "no config.server")
-        assert(config.symbol, "no config.symbol")
     end
 
 local S = {}
 local collector = ctp.new_collector(config.server)
+
+local quotes = {}
 
 function S.start()
     ctp.log_debug("is_ready: %s", collector:is_ready() and "true" or "false")
@@ -56,8 +57,13 @@ function S.unsubscribe(symbols)
 end
 
 local function on_tick(tick)
-    ctp.log_debug("on_tick | %s | %f", tick.InstrumentID, tick.LastPrice)
+    quotes[tick.InstrumentID] = tick.LastPrice
+    -- ctp.log_debug("on_tick | %s | %f", tick.InstrumentID, tick.LastPrice)
     -- print("on_tick", inspect(tick))
+end
+
+function S.get_quotes()
+    return quotes
 end
 
 function service.on_idle()
