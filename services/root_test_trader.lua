@@ -48,16 +48,18 @@ local function boot()
 
     ctp.log_debug("start result", rsp)
 
-    local err, rst = service.call("trader", "query_account")
+    local rst = service.call("trader", "query_account")
     ctp.log_info("query_account: %s", inspect(rst))
-    local err, rst = service.call("trader", "query_instrument", "IM2703")
+    local rst = service.call("trader", "query_instrument", "IM2703")
     ctp.log_info("query_instrument: %s", inspect(rst))
-    local err, rst = service.call("trader", "query_position")
+    local rst = service.call("trader", "query_position")
     ctp.log_info("query_position: %s", inspect(rst))
 
     -- service.call("trader", "quit")
 
-    service.spawn { name = "bot", source = "@services/bot.lua", config = { } }
+    -- service.spawn { name = "bot", source = "@services/bot.lua", config = { } }
+
+    service.spawn { name = "gateway", source = "@services/gateway.lua", config = { } }
 end
 
 local S = {}
