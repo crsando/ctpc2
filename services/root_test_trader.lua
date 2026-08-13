@@ -42,18 +42,20 @@ local function boot()
 
     service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
             server = accounts["trader"]["gtja-3"],
-            symbol = symbol
+            -- symbol = symbol
         } }
     local rsp = service.call("trader", "start") -- blocking, until trader starts
 
-    ctp.log_debug("start result", rsp)
-
-    local rst = service.call("trader", "query_account")
-    ctp.log_info("query_account: %s", inspect(rst))
-    local rst = service.call("trader", "query_instrument", "IM2703")
-    ctp.log_info("query_instrument: %s", inspect(rst))
-    local rst = service.call("trader", "query_position")
-    ctp.log_info("query_position: %s", inspect(rst))
+    --[[
+    do 
+        local rst = service.call("trader", "query_account")
+        ctp.log_info("query_account: %s", inspect(rst))
+        local rst = service.call("trader", "query_instrument", "IM2703")
+        ctp.log_info("query_instrument: %s", inspect(rst))
+        local rst = service.call("trader", "query_position")
+        ctp.log_info("query_position: %s", inspect(rst))
+    end
+    ]]
 
     -- service.call("trader", "quit")
 

@@ -17,16 +17,6 @@ local config = service.config; do
 -- read only: 只允许query, 禁止所有 order
 local _read_only = config.read_only or true
 
-local order_insert_count = 0 
-local order_cancel_count = 0 
-
-
-local threshold = {
-    max_order_insert_count = 3, 
-    max_order_cancel_count = 2, 
-}
-
-
 local function slice(t, k)
     local o = {}
     for i, e in ipairs(t) do 
@@ -254,11 +244,16 @@ function S.query_instrument_margin_rate(symbol)
 end
 
 function S.query_instrument(symbol)
+    symbol = symbol or ""
+
     local ok, rst = query:request("query_instrument", symbol)
-    if rst and rst[1] then 
-        return rst[1]
+
+    print("query_instrument", inspect(rst))
+
+    if symbol == "" then 
+        return rst
     else 
-        return nil, err 
+        return (rst and rst[1] or {})
     end
 end
 
@@ -327,8 +322,6 @@ local order = {
     
     -- 单纯的插入订单，不等待
     insert = function (self, symbol, price, volume, flag)
-            order_insert_count = order_insert_count + 1
-
             local o = trader:order_insert(symbol, price, volume, flag)
             local key = make_order_hashkey(o)
             do 
@@ -356,10 +349,6 @@ local order = {
             local args = {...}
 
             args.timeout = tonumber(args.timeout)
-
-            if order_insert_count >= threshold.max_order_insert_count then 
-                return "order insert threshold reached", nil
-            end
 
             if (n_args == 1) and (type(args[1]) == "table") then 
                 args = args[1]
@@ -410,12 +399,6 @@ local order = {
 
     -- 主动取消一个挂单
     cancel = function (self, ...)
-            order_cancel_count = order_cancel_count + 1
-
-            if order_cancel_count > threshold.max_order_cancel_count then 
-                ctp.log_debug("order cancel threshold reached")
-            end
-
             local o = ...
             ctp.log_debug("order cancel : %s | %s | %s | %s", o._key, o.InstrumentID, o.ExchangeID, o.OrderSysID)
             trader:order_cancel(o)
@@ -686,8 +669,6 @@ function S.test_2()
         ctp.log_debug(msg, rst)
     end
 
-    print("total order insert count", order_insert_count)
-    print("total order cancel count", order_cancel_count)
 end
 ]=]
 
