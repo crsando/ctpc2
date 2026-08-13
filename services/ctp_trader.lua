@@ -2,6 +2,12 @@ local inspect = require "inspect"
 local ctp = require "lctp2"
 ctp.log_set_level("LOG_DEBUG")
 
+
+-- 我自己的库，帮我解决一些编码问题
+local iconv = require "iconv"
+
+local cv, err = iconv.open("UTF-8", "GB18030") -- to, from
+
 --[[
 
 ***TODO***
@@ -247,6 +253,16 @@ function S.query_instrument(symbol)
     symbol = symbol or ""
 
     local ok, rst = query:request("query_instrument", symbol)
+
+    -- 由于当前我们只关心期货数据，不关心期权，所以这里做一个非常简单的过滤
+    local info = {}; do 
+        for _, entry in ipairs(rst) do 
+            if entry.OptionsType == 0 then 
+                entry.InstrumentName = cv and cv:convert(entry.InstrumentName) or "" -- workaround for gbk bug
+                table.insert(info ,entry)
+            end
+        end
+    end
 
     print("query_instrument", inspect(rst))
 
@@ -547,6 +563,11 @@ function S.nuke()
             service.call(service.get_id(), "trade", entry.InstrumentID, 0, volume, ctp.THOST_FTDC_OF_Close)
         end
     end
+end
+
+function S.trade(...)
+    if _read_only then return nil end
+    return order:trade(...)
 end
 
 function S.test_1()

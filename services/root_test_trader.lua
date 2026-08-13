@@ -62,6 +62,9 @@ local function boot()
     -- service.spawn { name = "bot", source = "@services/bot.lua", config = { } }
 
     service.spawn { name = "gateway", source = "@services/gateway.lua", config = { } }
+
+    service.spawn { name = "book", source = "@services/book.lua", config = { } }
+    print(service.call("book", "quote", "sc2609"))
 end
 
 local S = {}

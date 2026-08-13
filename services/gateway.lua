@@ -57,7 +57,7 @@ local CMD = {}
 function CMD.debug(rsp, ...)
     -- 这是一个特殊的用于给ctp_trader测试用的
     ctp.log_debug("on_prompt | debug | %s", table.concat({...}, " "))
-    local rst = service.call("trader", ...)
+    local rst = service.call(...)
     rsp(inspect(rst))
 end
 

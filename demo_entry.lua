@@ -3,8 +3,6 @@ local service = require "lservice3"
 
 local script_name = arg[1] or "root_test_trader"
 
-print("using server", inspect(server))
-
 local root_addr = service.new { 
     source = "@services/" .. script_name .. ".lua", 
     config = { } 
