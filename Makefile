@@ -1,6 +1,7 @@
 PREFIX=/usr/local
 
 CTP_VER=ctp-6.7.10
+# CTP_VER=openctp-6.7.10
 
 
 # HY的仿真环境需要用该版本
@@ -8,7 +9,6 @@ CTP_VER=ctp-6.7.10
 
 # OpenCTP 日常测试使用
 # CTP_VER=openctp-6.7.7
-# CTP_VER=openctp-6.7.10
 
 INCLUDE_PATH=$(PREFIX)/include/ctpc2
 INST_LIB_PATH=$(PREFIX)/lib

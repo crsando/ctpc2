@@ -40,12 +40,15 @@ local S = {} -- handle service request/response
 --
 -- global(per-service) variables
 --
-local server, trader; S.start = function () 
+local server, trader; do
     server = config.server
-
     trader = ctp.new_trader(server)
         :async(service.get_async())
-        :start( true ) -- blocking thread until settlement
+end
+
+
+function S.start()
+    trader:start( true ) -- blocking thread until settlement
     return true
 end
 

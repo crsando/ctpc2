@@ -12,6 +12,9 @@ local S = {}
 
 local uv = require "luv"
 
+-- 
+-- 临时方案，我们启动一个外部进程来在非交易时间获取数据
+--
 local function run_akquote(symbol)
     local co = service.get_session()
 
@@ -20,7 +23,7 @@ local function run_akquote(symbol)
 
 
     assert(symbol and (type(symbol)=="string"))
-    local cmd = string.format("akquote %s", symbol)
+    local cmd = string.format("akquote.lua %s", symbol)
 
     -- 我们需要包装成bash去运行，来解决一些环境变量的问题
     local options = {

@@ -33,7 +33,7 @@ local function boot()
 
     ctp.log_debug("booting root")
     service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
-            server = accounts["collector"]["gtja-3"],
+            server = accounts["collector"]["openctp-7x24"],
             symbol = symbol
         } }
 
@@ -41,7 +41,8 @@ local function boot()
     service.call("collector", "subscribe", "sc2609")
 
     service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
-            server = accounts["trader"]["gtja-3"],
+            -- server = accounts["trader"]["gtja-3"],
+            server = accounts["trader"]["openctp-7x24"],
             -- symbol = symbol
         } }
     local rsp = service.call("trader", "start") -- blocking, until trader starts
@@ -64,7 +65,6 @@ local function boot()
     service.spawn { name = "gateway", source = "@services/gateway.lua", config = { } }
 
     service.spawn { name = "book", source = "@services/book.lua", config = { } }
-    print(service.call("book", "quote", "sc2609"))
 end
 
 local S = {}

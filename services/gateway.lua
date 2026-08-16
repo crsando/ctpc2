@@ -88,12 +88,15 @@ function CMD.position(rsp, ...)
         end -- end direction
 
         local info = service.call("trader", "query_instrument", entry.InstrumentID)
+        local quote = service.call("book", "quote", entry.InstrumentID) -- get last price
 
-        table.insert(lines, string.format( "%s | %s | %d | %d",
+        table.insert(lines, string.format( "%s | %s | %d | %d | %f | %f",
             entry.InstrumentID,
             direction,
             entry.Position,
-            (info and info.VolumeMultiple or 0)
+            (info and info.VolumeMultiple or 0),
+            quote,
+            entry.Position * (info and info.VolumeMultiple or 0) * quote -- Nominal Value
         ))
 
     end
