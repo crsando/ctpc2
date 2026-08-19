@@ -267,8 +267,6 @@ function S.query_instrument(symbol)
         end
     end
 
-    print("query_instrument", inspect(rst))
-
     if symbol == "" then 
         return rst
     else 

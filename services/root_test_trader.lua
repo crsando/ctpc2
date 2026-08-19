@@ -34,6 +34,7 @@ local function boot()
     ctp.log_debug("booting root")
     service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
             server = accounts["collector"]["openctp-7x24"],
+            -- server = accounts["collector"]["gtja-3"],
             symbol = symbol
         } }
 
@@ -65,6 +66,7 @@ local function boot()
     service.spawn { name = "gateway", source = "@services/gateway.lua", config = { } }
 
     service.spawn { name = "book", source = "@services/book.lua", config = { } }
+    service.call("book", "init")
 end
 
 local S = {}
