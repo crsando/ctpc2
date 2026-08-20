@@ -62,7 +62,7 @@ local function init_instrument()
         return nil
     end
 
-    local path = config.cache_dir .. "/instrument.csv"
+    local path = config.cache_dir .. "/instrument.json"
     local ok, rst = pcall(exam_and_load, path)
 
     -- 有错误或者是未能加载成功，则重新处理

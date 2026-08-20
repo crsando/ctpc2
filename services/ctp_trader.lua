@@ -567,7 +567,7 @@ function S.nuke()
 end
 
 function S.trade(...)
-    if _read_only then return nil end
+    -- if _read_only then return nil end
     return order:trade(...)
 end
 
