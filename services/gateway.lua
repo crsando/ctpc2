@@ -61,6 +61,11 @@ function CMD.debug(rsp, ...)
     rsp(inspect(rst))
 end
 
+function CMD.shutdown(rsp, ...)
+    local rst = service.call("root", "quit")
+    rsp(rst)
+end
+
 function CMD.account(rsp, ...)
     local act = service.call("trader", "query_account")
     local keys = { "BrokerID", "AccountID", "Balance", "Available", "PositionProfit" }
