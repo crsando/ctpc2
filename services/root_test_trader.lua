@@ -35,7 +35,8 @@ local function boot()
     service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
             -- server = accounts["collector"]["openctp-7x24"],
             server = accounts["collector"]["gtja-3"],
-            symbol = symbol
+            -- server = accounts["collector"]["hy"],
+            -- symbol = symbol
         } }
 
     service.call("collector", "start")
@@ -43,7 +44,8 @@ local function boot()
 
     service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
             -- server = accounts["trader"]["gtja-sim"],
-            server = accounts["trader"]["gtja-3"],
+            -- server = accounts["trader"]["gtja-3"],
+            server = accounts["trader"]["hy"],
             -- server = accounts["trader"]["openctp-7x24"],
             -- symbol = symbol
         } }

@@ -29,7 +29,7 @@ function S.start()
     end
 
     -- 连接成功后再subscribe
-    collector:subscribe { config.symbol }
+    -- collector:subscribe { config.symbol }
 
     return 1
 end

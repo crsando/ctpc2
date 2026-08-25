@@ -24,6 +24,7 @@ local config = service.config; do
 local _read_only = config.read_only or true
 
 local function slice(t, k)
+    if not t then return nil end
     local o = {}
     for i, e in ipairs(t) do 
         o[i] = e[k]
@@ -96,6 +97,15 @@ local query = {
             self:enqueue(entity)
             self:process()
 
+            local q = self:first()
+
+            -- 10 seconds
+            -- <TODO: Test>
+            service.set_timeout(10 * 1000, function() self:timedout(q.req_id) end)
+
+            -- 
+            -- 正常来说，这里是由 query:response() 完成 resume
+            --
             local err, rst = coroutine.yield() -- wait for response
 
             --
@@ -103,21 +113,27 @@ local query = {
             -- 由于rst这里其实是包含了各种rsp_info, req_id之类的东西的，所以我们需要去除，只保留field
             --
             local body = slice(rst, "field")
+
             -- 需要自己决定是否只取第一个返回结果
-            --[[
-            if #body == 1 then 
-                body = body[1]
-            end
-            ]]
 
             return err, body
         end,
+
+    timedout = function(self, req_id)
+            local q = self:first()
+            if q and (q.req_id == req_id) then 
+                q.cache = nil
+                self:response()
+            end
+        end,
+
     -- exit point
     response = function(self)
             local q = self:first()
             if q then 
                 if q.session then 
                     -- err: 0, no error
+                    -- ctp.log_debug("resume session %s", inspect(q))
                     service.resume_session(q.session, 0, q.cache)
                 end
                 self:dequeue()
@@ -253,9 +269,12 @@ function S.query_instrument_margin_rate(symbol)
 end
 
 function S.query_instrument(symbol)
+    ctp.log_debug("S.query_instrument | %s", symbol)
     symbol = symbol or ""
 
     local ok, rst = query:request("query_instrument", symbol)
+
+    if not rst then return nil end
 
     -- 由于当前我们只关心期货数据，不关心期权，所以这里做一个非常简单的过滤
     local info = {}; do 
@@ -511,6 +530,26 @@ local order = {
 function R.OnRtnOrder(rsp) order:update(rsp) end
 function R.OnRtnTrade(rsp) order:update(rsp) end
 function R.OnRspOrderAction(rsp) order:update(rsp) end
+
+-- Handle Error
+function R.OnRspError(rsp)
+    if rsp and rsp.rsp_info then 
+        rsp.rsp_info.ErrorMsg  = cv:convert(rsp.rsp_info.ErrorMsg) or ""
+    end
+    ctp.log_debug("R.OnRspError: %s", inspect(rsp))
+    -- ctp.log_debug("Current Request: %s", inspect(query:first()))
+
+    query:update(rsp)
+
+    --[[
+    ctp.log_debug("R.OnRspError : %d | ErrorID %d | ErrorMsg: %s", 
+        (rsp and rsp.req_id or 0), 
+        (rsp and rsp.rsp_info.ErrorID or 0),
+        (cv:convert(rsp.rsp_info.ErrorMsg) or "")
+    )
+        ]]
+
+end
 
 -- 这只在报单异常时才会出现
 function R.OnRspOrderInsert(rsp)

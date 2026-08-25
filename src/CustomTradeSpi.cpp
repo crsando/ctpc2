@@ -73,6 +73,23 @@ void CustomTradeSpi::OnRspUserLogin(
 void CustomTradeSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	log_debug("OnRspError | %d | %s", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+
+    ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t));
+    memset(rsp, 0, sizeof(ctp_rsp_t));
+    rsp->req_id = nRequestID;
+    rsp->last = (bIsLast ? 1 : 0);
+    rsp->is_last = bIsLast;
+    strcpy(rsp->desc, "");
+    strcpy(rsp->func_name, "OnRspError"); \
+    strcpy(rsp->field_name, ""); 
+    rsp->field = NULL;
+    rsp->size = 0;
+    if(pRspInfo) {
+        rsp->rsp_info = (void *)malloc(sizeof(CThostFtdcRspInfoField));
+        memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField));
+    }
+    ctp_trader_send(this->_trader, rsp);
+
 }
 
 void CustomTradeSpi::OnFrontDisconnected(int nReason)

@@ -92,7 +92,8 @@ function CMD.position(rsp, ...)
             end
         end -- end direction
 
-        local info = service.call("trader", "query_instrument", entry.InstrumentID)
+        -- local info = service.call("trader", "query_instrument", entry.InstrumentID)
+        local info = service.call("book", "instrument", entry.InstrumentID)
         local quote = service.call("book", "quote", entry.InstrumentID) -- get last price
 
         table.insert(lines, string.format( "%s | %s | %d | %d | %f | %f",
