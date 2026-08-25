@@ -260,7 +260,7 @@ function S.query_instrument(symbol)
     -- 由于当前我们只关心期货数据，不关心期权，所以这里做一个非常简单的过滤
     local info = {}; do 
         for _, entry in ipairs(rst) do 
-            if entry.OptionsType == 0 then 
+            if entry.ProductClass == ctp.THOST_FTDC_PC_Futures then 
                 entry.InstrumentName = cv and cv:convert(entry.InstrumentName) or "" -- workaround for gbk bug
                 table.insert(info ,entry)
             end
