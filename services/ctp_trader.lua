@@ -123,17 +123,17 @@ local query = {
                     service.resume_session(co, "timedout")
                 end)
 
-            local err, rst = coroutine.yield_session()
+            -- 
+            -- 正常来说，这里是由 query:response() 完成 resume
+            --
+            -- local err, rst = coroutine.yield() -- wait for response
+            local err, rst = service.yield_session()
 
             if err == "timedout" then 
                 return nil, "timedout"
             end
 
-            -- 
-            -- 正常来说，这里是由 query:response() 完成 resume
-            --
-            -- local err, rst = coroutine.yield() -- wait for response
-            local err, rst = coroutine.yield_session()
+            -- 正常返回值的处理
 
             --
             -- 现在的策略是：把rst进行一些处理后再返回
@@ -230,7 +230,7 @@ local query = {
                         delta_ms = (delta_ms > 0) and delta_ms or 0
                     end
                 
-                self.timer:start(delta_ms, diff_ms, function()
+                self.timer:start(delta_ms, interval_ms, function()
                         if not self:first() then 
                             self.timer:stop()
                         else 
