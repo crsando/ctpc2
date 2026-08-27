@@ -4,15 +4,7 @@ ctp.log_set_level("LOG_DEBUG")
 
 -- 我自己的库，帮我解决一些编码问题
 local iconv = require "iconv"
-
 local cv, err = iconv.open("UTF-8", "GB18030") -- to, from
-
---[[
-
-***TODO***
-- 修改一下 query_position 的返回值，使得该值可以更好被后续策略和监控所使用？
-
-]]
 
 local service = require "lservice3" .input(...)
 local scheduler = require "lservice3.scheduler"
@@ -108,30 +100,22 @@ local query = {
             -- 注意：我们这里永远只是enqueue，我们并不会在这里立即处理
             -- 所有的处理在on_idle里头进行流量控制
             self:enqueue(entity)
+
+            -- 这个process本质是在维护一个timer
+            -- 如果query中有东西，那么每隔interval_ms就执行一次
+            -- 否则就停止timer
+            -- 此处的目的是如果还有东西的话，保证timer会继续执行下去
             self:process()
-
-            -- local q = self:first()
-            -- service.set_timeout(10 * 1000, function() self:timedout(q.req_id) end)
-
 
             -- request 的硬性约束：一个request最多接受等待10秒，否则强制结束，避免让一个session一直挂在那里
             scheduler:at(os.time() + 10, function()
                     service.resume_session(co, "timedout")
                 end)
 
-            while true do 
-                local err, rst = coroutine.yield_session()
+            local err, rst = coroutine.yield_session()
 
-                if err == "timedout" then 
-                    return nil, "timedout"
-                end
-
-                if err == "process" then 
-                    self:process()
-                end
-
-                if rst then 
-                end
+            if err == "timedout" then 
+                return nil, "timedout"
             end
 
             -- 
@@ -140,7 +124,6 @@ local query = {
             -- local err, rst = coroutine.yield() -- wait for response
             local err, rst = coroutine.yield_session()
 
-
             --
             -- 现在的策略是：把rst进行一些处理后再返回
             -- 由于rst这里其实是包含了各种rsp_info, req_id之类的东西的，所以我们需要去除，只保留field
@@ -148,7 +131,6 @@ local query = {
             local body = slice(rst, "field")
 
             -- 需要自己决定是否只取第一个返回结果
-
             return err, body
         end,
 
@@ -181,10 +163,12 @@ local query = {
                 self[self.last_index] = entity
             end
         end,
+
     dequeue = function(self)
             self[self.start_index] = nil 
             self.start_index = self.start_index + 1
         end,
+
     first = function(self)
             if self.last_index >= self.start_index then 
                 return self[self.start_index]
@@ -272,38 +256,6 @@ local query = {
 --
 -- query interfaces
 --
-local process_query, delay_process_query; do 
-    local next_process_query_epoch = nil
-    delay_process_query = function (delta_epoch)
-        local np = os.time() + delta_epoch
-        if (not next_process_query_epoch) or (next_process_query_epoch > np) then 
-            next_process_query_epoch = np 
-            scheduler:at(np, process_query)
-        end
-    end
-    process_query = corotuine.wrap(function ()
-        end)
-end
-
-
-local process_query; do
-    local last_query_epoch = nil; 
-    process_query_routine = coroutine.warp(function ()
-        while true do 
-            local epoch = os.time()
-            if (not last_query_epoch) or (epoch > last_query_epoch) then 
-                query:process()
-
-                if not query:first() then 
-                    -- run self at 1 seconds later
-                    scheduler:at(epoch + 1, process_query)
-                end
-            end
-
-            coroutine.yield()
-        end
-    end)
-end
 
 function S.query_account()
     local err, rst = query:request("query_account")
@@ -328,25 +280,6 @@ end
 function S.query_position()
     local err, rst = query:request("query_position")
     return rst
-
-    --[[
-    local pt = {}
-    for _, field in ipairs(rst) do 
-        if (field ~= nil) and (field.InstrumentID) then 
-            local symbol = field.InstrumentID
-            pt[symbol] = pt[symbol] or {}
-            entry = pt[symbol]
-            direction = field.PosiDirection - 49 -- an hack
-            entry[direction] = (entry[direction] or 0) + field.Position
-
-            ctp.log_debug(">>> %s \t %s \t %d", symbol, direction, field.Position)
-        end
-    end
-
-    -- position_table = pt -- update global variable
-
-    return slice(rst, "field")
-    ]]
 end
 
 function S.query_instrument_margin_rate(symbol)
