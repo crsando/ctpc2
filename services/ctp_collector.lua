@@ -8,13 +8,21 @@ local config = service.config; do
         assert(config.server, "no config.server")
     end
 
+if config.auto_disconnect do 
+    local myid = service.get_id()
+    scheduler:daily("08:45:00", function() service.send(myid, "start") end)
+    scheduler:daily("17:00:00", function() service.send(myid, "stop") end)
+    scheduler:daily("20:45:00", function() service.send(myid, "start") end)
+    scheduler:daily("04:00:00", function() service.send(myid, "stop") end)
+end
+
 local S = {}
 local collector = ctp.new_collector(config.server)
 
 local quotes = {}
 
 function S.start()
-    ctp.log_debug("is_ready: %s", collector:is_ready() and "true" or "false")
+    ctp.log_debug("S.start | is_ready: %s", collector:is_ready() and "true" or "false")
     collector:async(service.get_async())
     collector:start()
 
@@ -28,10 +36,13 @@ function S.start()
         service.sleep(50)
     end
 
-    -- 连接成功后再subscribe
-    -- collector:subscribe { config.symbol }
-
+    -- 这个地方我们不做subscribe
     return 1
+end
+
+function S.stop()
+    ctp.log_debug("S.stop | is_ready: %s", collector:is_ready() and "true" or "false")
+    collector:stop()
 end
 
 function S.quit()

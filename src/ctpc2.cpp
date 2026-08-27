@@ -19,10 +19,51 @@ extern "C" {
 #define _api(md) ((CThostFtdcMdApi *)((md)->_api))
 #define _spi(md) ((CustomMdSpi *)((md)->_spi))
 
-void ctp_md_start(ctp_md_t * md) {
-    log_debug("ctp_md_start");
+int ctp_md_start(ctp_md_t * md) {
+    if( (md->_api != NULL) || (md->_spi != NULL) ) { 
+        log_debug("api/spi already initialized, abort ctp_md_start");
+        return 0;
+    }
+
+    log_debug("ctp_md_start | init Spi/Api");
+
+	CustomMdSpi * pMdUserSpi = new CustomMdSpi();       // 创建行情回调实例
+
+    // 我们需要保存这个member变量，这个变量在Login的过程中有用到
+	pMdUserSpi->g_pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();   // 创建行情实例
+	pMdUserSpi->g_pMdUserApi->RegisterSpi(pMdUserSpi);               // 注册事件类
+	pMdUserSpi->g_pMdUserApi->RegisterFront(md->front_addr);           // 设置行情前置地址
+	
+	md->_spi = (void *)pMdUserSpi;
+	md->_api = (void *)(pMdUserSpi->g_pMdUserApi);
+
+	_spi(md)->_md = md;
 	_api(md)->Init();
+
+    return 1;
 }
+
+int ctp_md_stop(ctp_md_t * md) {
+    log_debug("ctp_md_stop");
+    // Release API First
+    if( _api(md) ) {
+        _api(md)->RegisterSpi(NULL);
+        _api(md)->Release();
+        md->_api = NULL;
+    }
+    if( _spi(md) ) {
+        // Delete Spi
+        delete _spi(md);
+        md->_spi = NULL;
+    }
+
+    // Update Connected Status
+    md->connected = 0;
+
+    return 1;
+}
+
+
 void ctp_md_join(ctp_md_t * md) {
 	_api(md)->Join();
 }
@@ -32,6 +73,7 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
 {
     log_debug("ctp_md_init | api version | %s", CThostFtdcMdApi::GetApiVersion());
     log_debug("ctp_md_init | %s | %s", front_addr, broker);
+
 	// <TODO> Check string length
 	strcpy(md->front_addr, &front_addr[0]);
 	strcpy(md->broker, &broker[0]);
@@ -43,15 +85,8 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
     memset(md->symbols, 0, sizeof(char *) * (max_symbols_num + 1));
     md->symbols_num = 0;
 
-	CustomMdSpi * pMdUserSpi = new CustomMdSpi();       // 创建行情回调实例
-
-	pMdUserSpi->g_pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();   // 创建行情实例
-	pMdUserSpi->g_pMdUserApi->RegisterSpi(pMdUserSpi);               // 注册事件类
-	pMdUserSpi->g_pMdUserApi->RegisterFront(md->front_addr);           // 设置行情前置地址
-	
-	md->_spi = (void *)pMdUserSpi;
-	md->_api = (void *)(pMdUserSpi->g_pMdUserApi);
-	_spi(md)->_md = md;
+    md->_api = NULL;
+    md->_spi = NULL;
 
 	md->connected = 0;
 

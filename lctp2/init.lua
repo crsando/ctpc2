@@ -203,10 +203,10 @@ end
 
 -- function new_collector(server, symbols, on_tick)
 function new_collector(server)
-server = server or servers.md['sim']
+    server = server or servers.md['sim']
 
-local md = ctpc.ctp_md_new()
-ctpc.ctp_md_init(md, server.front_addr, server.broker, server.user)
+    local md = ctpc.ctp_md_new()
+    ctpc.ctp_md_init(md, server.front_addr, server.broker, server.user)
 
     local _mt = {
         hook = function (self, hook)
@@ -237,6 +237,10 @@ ctpc.ctp_md_init(md, server.front_addr, server.broker, server.user)
                 ctpc.ctp_md_start(self.md)
                 return self 
             end,
+        stop = function (self)
+                ctpc.ctp_md_stop(self.md)
+                return self 
+            end,
         recv = function (self, blocking)
                 local ptr = ctpc.ctp_md_recv(self.md, blocking)
                 local tick_data = nil
@@ -250,6 +254,9 @@ ctpc.ctp_md_init(md, server.front_addr, server.broker, server.user)
             end,
         is_ready = function (self)
                 return (self.md.connected >= 2)
+            end,
+        connected = function (self)
+                return self.md.connected
             end,
     }
     _mt.__index = _mt

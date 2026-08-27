@@ -1,5 +1,6 @@
 local inspect = require "inspect"
 local service = require "lservice3".input(...)
+local scheduler = require "lservice3.scheduler"
 local config = service.config
 local ctp = require "lctp2"
 
@@ -27,6 +28,40 @@ local function load_accounts()
     return accounts
 end
 
+local function boot_test_collector()
+    local accounts = load_accounts()
+    service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
+            server = accounts["collector"]["gtja-3"],
+        } }
+
+    --[[
+    service.call("collector", "start")
+    service.call("collector", "subscribe", "lh2703")
+    service.call("collector", "stop")
+
+
+    scheduler:at(os.time() + 5, function()
+            service.send("collector", "stop")
+        end)
+    ]]
+
+    local now = os.time()
+    print(os.date("%Y-%m-%d %H:%M:%S %z %Z", now))
+    print("isdst:", tostring(os.date("*t", now).isdst))
+
+    scheduler:at(os.time() + 5, function()
+            print("scheduler:at ", os.date("%Y-%m-%d %H:%M:%S") )
+        end)
+    scheduler:daily("13:19:00", function()
+            print("scheduler:daily")
+            service.send("collector", "start")
+        end)
+
+    -- scheduler:at("2026-08-27 12:55:00", function()
+            -- service.call("collector", "start")
+        -- end)
+end
+
 local function boot()
     local symbol  = "IM2703"
     local accounts = load_accounts()
@@ -35,6 +70,7 @@ local function boot()
     service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
             -- server = accounts["collector"]["openctp-7x24"],
             server = accounts["collector"]["gtja-3"],
+            auto_disconnect = true, -- 在指定时间自动连接，释放
             -- server = accounts["collector"]["hy"],
             -- symbol = symbol
         } }
@@ -75,7 +111,7 @@ end
 local S = {}
 
 function S.boot()
-    boot()
+    boot_test_collector()
     -- service.send(0, "quit")
 end
 

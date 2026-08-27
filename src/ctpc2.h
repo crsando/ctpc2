@@ -47,7 +47,8 @@ int ctp_md_subscribe(ctp_md_t * md, char * symbols[], int num);
 int ctp_md_unsubscribe(ctp_md_t * md, char * symbols[], int num);
 
 void ctp_md_hook(ctp_md_t * md, ctp_hook_cb hook);
-void ctp_md_start(ctp_md_t * md);
+int ctp_md_start(ctp_md_t * md);
+int ctp_md_stop(ctp_md_t * md);
 
 typedef struct CThostFtdcDepthMarketDataField ctp_md_tick_t;
 void ctp_md_send(ctp_md_t * md, void *msg);
