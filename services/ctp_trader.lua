@@ -195,7 +195,6 @@ local query = {
 
             local function get_current_ms()
                 local sec, usec = uv.gettimeofday()
-                print(inspect(tv))
                 -- sec 是秒，usec 是微秒
                 return sec * 1000 + math.floor(usec / 1000)
             end
@@ -320,6 +319,8 @@ function S.query_instrument(symbol)
             end
         end
     end
+
+    rst = info
 
     if symbol == "" then 
         return rst

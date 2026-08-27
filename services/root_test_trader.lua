@@ -68,8 +68,9 @@ local function boot_test_trader()
             server = accounts["trader"]["gtja-3"],
         } }
     local rsp = service.call("trader", "start") -- blocking, until trader starts
-    local rsp = service.call("trader", "stop") -- blocking, until trader starts
     local rsp = service.call("trader", "query_account") -- blocking, until trader starts
+    print(inspect(rsp))
+    local rsp = service.call("trader", "stop") -- blocking, until trader starts
 end
 
 local function boot()
