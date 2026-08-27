@@ -2,7 +2,6 @@ local inspect = require "inspect"
 local ctp = require "lctp2"
 ctp.log_set_level("LOG_DEBUG")
 
-
 -- 我自己的库，帮我解决一些编码问题
 local iconv = require "iconv"
 
@@ -16,6 +15,8 @@ local cv, err = iconv.open("UTF-8", "GB18030") -- to, from
 ]]
 
 local service = require "lservice3" .input(...)
+local scheduler = require "lservice3.scheduler"
+local uv = service.uv
 local config = service.config; do 
         assert(config.server, "no config.server")
     end
@@ -53,6 +54,11 @@ function S.start()
     return true
 end
 
+function S.stop()
+    trader:stop()
+    return true
+end
+
 --
 -- warp query request/response
 -- hard rule: one query at a time, a queue is used to ensure this
@@ -61,6 +67,9 @@ local query = {
     start_index = 1,
     last_index = 0,
     max_length = 100,
+
+    timer = uv.new_timer(),
+    timer_wall_ms = nil,
     
     reorder = function(self)
             local s, e = self.start_index, self.last_index
@@ -86,27 +95,51 @@ local query = {
     -- 此时，在query:request()中，收到的是两个，一个ok/err，一个rst，后者rst是所有OnRspXXX的结果的一个table。
     -- 
     request = function(self, name, ...)
+            local co = service.get_session()
+
             local entity = {
-                    session = service.get_session(),
+                    session = co,
                     req_id = nil,
                     name = name,
                     body = {...},
                     cache = {},
                 }
 
+            -- 注意：我们这里永远只是enqueue，我们并不会在这里立即处理
+            -- 所有的处理在on_idle里头进行流量控制
             self:enqueue(entity)
             self:process()
 
-            local q = self:first()
+            -- local q = self:first()
+            -- service.set_timeout(10 * 1000, function() self:timedout(q.req_id) end)
 
-            -- 10 seconds
-            -- <TODO: Test>
-            service.set_timeout(10 * 1000, function() self:timedout(q.req_id) end)
+
+            -- request 的硬性约束：一个request最多接受等待10秒，否则强制结束，避免让一个session一直挂在那里
+            scheduler:at(os.time() + 10, function()
+                    service.resume_session(co, "timedout")
+                end)
+
+            while true do 
+                local err, rst = coroutine.yield_session()
+
+                if err == "timedout" then 
+                    return nil, "timedout"
+                end
+
+                if err == "process" then 
+                    self:process()
+                end
+
+                if rst then 
+                end
+            end
 
             -- 
             -- 正常来说，这里是由 query:response() 完成 resume
             --
-            local err, rst = coroutine.yield() -- wait for response
+            -- local err, rst = coroutine.yield() -- wait for response
+            local err, rst = coroutine.yield_session()
+
 
             --
             -- 现在的策略是：把rst进行一些处理后再返回
@@ -119,24 +152,16 @@ local query = {
             return err, body
         end,
 
-    timedout = function(self, req_id)
-            local q = self:first()
-            if q and (q.req_id == req_id) then 
-                q.cache = nil
-                self:response()
-            end
-        end,
-
     -- exit point
     response = function(self)
             local q = self:first()
             if q then 
+                self:dequeue()
                 if q.session then 
                     -- err: 0, no error
                     -- ctp.log_debug("resume session %s", inspect(q))
                     service.resume_session(q.session, 0, q.cache)
                 end
-                self:dequeue()
             end
         end,
 
@@ -170,23 +195,56 @@ local query = {
 
     -- send the real ctp request/query by trader
     process = function(self)
-            local q = self:first()
-            if q and (not q.req_id) then 
-                local f = trader[q.name]
+            -- 两次查询之间的最小间隔
+            local interval_ms = 1000
 
-                if not f then 
-                    return 0, "no matched query name"
+            local function get_current_ms()
+                local tv = uv.gettimeofday()
+                -- sec 是秒，usec 是微秒
+                return tv.sec * 1000 + math.floor(tv.usec / 1000)
+            end
+
+            local function process_step() 
+                -- 我们在这里强制检查
+                -- 若trader尚未ready，什么都不做，继续保留在其中
+                if not trader:is_ready() then return 0 end
+                local q = self:first()
+                if q and (not q.req_id) then 
+                    local f = trader[q.name]
+
+                    if not f then 
+                        return 0, "no matched query name"
+                    end
+
+                    -- 设置下一次query的最小时间戳，当前时间+1s
+                    self.timer_wall_ms = get_current_ms() + interval_ms
+                    local ok, req_id = pcall(f, trader, unpack(q.body))
+                    q.req_id = req_id
+
+                    return 1 -- did something
+                else 
+                    return 0 -- did nothing
                 end
+            end
 
-                local req_id = f(trader, unpack(q.body))
-                q.req_id = req_id
-
-                return 1 -- did something
-            else 
-                return 0 -- did nothing
+            if not self.timer:is_active() then 
+                local curr_ms = get_current_ms()
+                local delta_ms; do 
+                        delta_ms = (self.timer_wall_ms or curr_ms) - curr_ms
+                        delta_ms = (delta_ms > 0) and delta_ms or 0
+                    end
+                
+                self.timer:start(delta_ms, diff_ms, function()
+                        if not self:first() then 
+                            self.timer:stop()
+                        else 
+                            process_step()
+                        end
+                    end)
             end
         end,
 
+    -- 当我们从Trader接收到OnRspXXX这类消息的时候，Update对应的Request Cache，如果is_last，则self:response完成一个request的处理。
     update = function (self, rsp)
             local q = self:first()
 
@@ -206,7 +264,7 @@ local query = {
             -- finish query
             if rsp.is_last == true then 
                 self:response()
-                self:process() -- process next request
+                -- self:process() -- process next request
             end
         end,
 } -- end query object definitions
@@ -214,6 +272,38 @@ local query = {
 --
 -- query interfaces
 --
+local process_query, delay_process_query; do 
+    local next_process_query_epoch = nil
+    delay_process_query = function (delta_epoch)
+        local np = os.time() + delta_epoch
+        if (not next_process_query_epoch) or (next_process_query_epoch > np) then 
+            next_process_query_epoch = np 
+            scheduler:at(np, process_query)
+        end
+    end
+    process_query = corotuine.wrap(function ()
+        end)
+end
+
+
+local process_query; do
+    local last_query_epoch = nil; 
+    process_query_routine = coroutine.warp(function ()
+        while true do 
+            local epoch = os.time()
+            if (not last_query_epoch) or (epoch > last_query_epoch) then 
+                query:process()
+
+                if not query:first() then 
+                    -- run self at 1 seconds later
+                    scheduler:at(epoch + 1, process_query)
+                end
+            end
+
+            coroutine.yield()
+        end
+    end)
+end
 
 function S.query_account()
     local err, rst = query:request("query_account")
@@ -574,6 +664,7 @@ end
 -- main loop
 -- process trader internal messages
 function service.on_idle()
+    -- process trader messages
     while true do 
         local rsp = trader:recv(false) -- non-blocking
         if rsp then 

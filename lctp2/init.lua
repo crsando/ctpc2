@@ -284,6 +284,10 @@ function new_trader(server)
                 end
                 return self
             end,
+        stop = function(self) 
+                ctpc.ctp_trader_stop(self.trader)
+                return self
+            end,
 
         async = function(self, async)
                 self.trader.async = ffi.new("void*", async)
@@ -298,7 +302,10 @@ function new_trader(server)
                 ctpc.ctp_trader_logout(self.trader)
                 return self
             end,
-        -- is_ready = function(self) return (self.trader.connected >= 4) end,
+
+        is_ready = function(self) 
+                return (self.trader.connected >= 4) 
+            end,
 
         recv_raw = function (self, blocking)
                 -- raw receive

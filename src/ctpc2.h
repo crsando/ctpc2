@@ -95,7 +95,8 @@ ctp_trader_t * ctp_trader_new();
 ctp_trader_t * ctp_trader_init(ctp_trader_t * trader, const char front_addr[], const char broker[], 
     const char user[], const char password[], const char app_id[], const char auth_code[]);
 
-ctp_trader_t * ctp_trader_start(ctp_trader_t * trader);
+int ctp_trader_start(ctp_trader_t * trader);
+int ctp_trader_stop(ctp_trader_t * trader);
 
 typedef struct {
     // header

@@ -127,6 +127,17 @@ ctp_trader_t * ctp_trader_init(
     strcpy(trader->app_id, app_id);
     strcpy(trader->auth_code, auth_code);
 
+	return trader;
+}
+
+int ctp_trader_start(ctp_trader_t * trader) {
+    if((trader->_spi != NULL) || (trader->_api !=NULL)) {
+        log_debug("ctp_trader_start: already initialized");
+        return 0;
+    }
+
+    trader->connected = 0;
+
     CThostFtdcTraderApi * pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi(); // 创建交易实例
 	CustomTradeSpi *pTradeSpi = new CustomTradeSpi;               // 创建交易回调实例
 
@@ -138,12 +149,25 @@ ctp_trader_t * ctp_trader_init(
 	pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);   // 订阅私有流
 	pTradeUserApi->RegisterFront(trader->front_addr);              // 设置交易前置地址
 
-	return trader;
+	_api(trader)->Init();
+    return 1;
 }
 
-ctp_trader_t * ctp_trader_start(ctp_trader_t * trader) {
-	_api(trader)->Init();
-    return trader;
+int ctp_trader_stop(ctp_trader_t * trader) {
+    log_debug("ctp_trader_stop");
+    if(trader->_api) {
+        _api(trader)->RegisterSpi(NULL);
+        _api(trader)->Release();
+        trader->_api = NULL;
+    }
+    if(trader->_spi) {
+        delete _spi(trader);
+        trader->_spi = NULL;
+    }
+
+    trader->connected = 0;
+
+    return 1;
 }
 
 int ctp_trader_logout(ctp_trader_t * trader) {

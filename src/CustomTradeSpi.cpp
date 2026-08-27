@@ -89,12 +89,25 @@ void CustomTradeSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID
         memcpy(rsp->rsp_info, pRspInfo, sizeof(CThostFtdcRspInfoField));
     }
     ctp_trader_send(this->_trader, rsp);
-
 }
 
 void CustomTradeSpi::OnFrontDisconnected(int nReason)
 {
 	log_debug("OnFrontDisconnected | FrontAddr:%s | nReason:%d", this->_trader->front_addr, nReason);
+	this->_trader->connected = 0;
+
+    ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t));
+    memset(rsp, 0, sizeof(ctp_rsp_t));
+    rsp->req_id = -1;
+    rsp->last = 1;
+    rsp->is_last = true;
+    strcpy(rsp->desc, "");
+    strcpy(rsp->func_name, "OnFrontDisconnected"); \
+    strcpy(rsp->field_name, ""); 
+    rsp->field = NULL;
+    rsp->size = 0;
+    rsp->rsp_info = NULL;
+    ctp_trader_send(this->_trader, rsp);
 }
 
 void CustomTradeSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -347,6 +360,10 @@ void CustomTradeSpi::OnRspUserLogout(
 	{
 		loginFlag = false; // 登出就不能再交易了 
 		log_debug("OnRspUserLogout | Success | BrokerID:%s | UserID:%s", this->_trader->broker, this->_trader->user);
+
+        if(this->_trader->connected >= 2) {
+            this->_trader->connected = 1; // connected, not logined
+        }
 	}
 
     ON_RSP_THEN_SEND(OnRspUserLogout, CThostFtdcUserLogoutField);

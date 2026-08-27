@@ -8,7 +8,7 @@ local config = service.config; do
         assert(config.server, "no config.server")
     end
 
-if config.auto_disconnect do 
+if config.auto_disconnect then 
     local myid = service.get_id()
     scheduler:daily("08:45:00", function() service.send(myid, "start") end)
     scheduler:daily("17:00:00", function() service.send(myid, "stop") end)

@@ -62,6 +62,16 @@ local function boot_test_collector()
         -- end)
 end
 
+local function boot_test_trader()
+    local accounts = load_accounts()
+    service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
+            server = accounts["trader"]["gtja-3"],
+        } }
+    local rsp = service.call("trader", "start") -- blocking, until trader starts
+    local rsp = service.call("trader", "stop") -- blocking, until trader starts
+    local rsp = service.call("trader", "query_account") -- blocking, until trader starts
+end
+
 local function boot()
     local symbol  = "IM2703"
     local accounts = load_accounts()
@@ -111,7 +121,8 @@ end
 local S = {}
 
 function S.boot()
-    boot_test_collector()
+    -- boot_test_collector()
+    boot_test_trader()
     -- service.send(0, "quit")
 end
 
