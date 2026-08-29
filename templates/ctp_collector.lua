@@ -10,6 +10,7 @@ local config = service.config; do
 
 local S = {}
 local collector = ctp.new_collector(config.server)
+S._collector = collector -- expose
 
 local quotes = {}
 
@@ -25,7 +26,7 @@ function S.start()
     while not ready do  
         ready = collector:is_ready()
         ctp.log_debug("is_ready: %s", ready and "true" or "false")
-        service.sleep(50)
+        service.sleep(500)
     end
 
     -- 这个地方我们不做subscribe

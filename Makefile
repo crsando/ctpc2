@@ -1,6 +1,7 @@
 # Build and installation configuration. Override these values on the command line.
 PREFIX ?= /usr/local
 CTP_VER ?= ctp-6.7.10
+# CTP_VER ?= openctp-6.7.10
 BUILD_DIR ?= build/$(CTP_VER)
 
 SRC_DIR := src

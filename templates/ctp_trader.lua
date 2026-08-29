@@ -40,6 +40,7 @@ local server, trader; do
     server = config.server
     trader = ctp.new_trader(server)
         :async(service.get_async())
+    S._trader = trader -- expose
 end
 
 function S.start()

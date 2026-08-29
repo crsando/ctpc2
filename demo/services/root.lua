@@ -28,73 +28,24 @@ local function load_accounts()
     return accounts
 end
 
-local function boot_test_collector()
-    local accounts = load_accounts()
-    service.spawn { name = "collector", source = "@services/collector.lua", config = { 
-            -- server = accounts["collector"]["gtja-3"],
-            server = accounts["collector"]["simnow-7x24"],
-        } }
-
-    -- service.call("collector", "start")
-    -- service.call("collector", "subscribe", "lh2703")
-
-
-    --[[scheduler:at(os.time() + 10, function()
-            service.send("collector", "stop")
-        end)]]
-end
-
-local function boot_test_trader()
-    local accounts = load_accounts()
-    service.spawn { name = "trader", source = "@services/trader.lua", config = {
-            -- server = accounts["trader"]["gtja-3"],
-            server = accounts["trader"]["simnow-7x24"],
-        } }
-    local rsp = service.call("trader", "start") -- blocking, until trader starts
-    local rsp = service.call("trader", "query_account") -- blocking, until trader starts
-    print(inspect(rsp))
-    local rsp = service.call("trader", "stop") -- blocking, until trader starts
-end
-
 local function boot()
-    local symbol  = "IM2703"
     local accounts = load_accounts()
 
     ctp.log_debug("booting root")
     service.spawn { name = "collector", source = "@services/collector.lua", config = { 
-            -- server = accounts["collector"]["openctp-7x24"],
-            server = accounts["collector"]["simnow-7x24"],
-            auto_disconnect = true, -- 在指定时间自动连接，释放
-            -- server = accounts["collector"]["hy"],
-            -- symbol = symbol
+            server = accounts["collector"]["openctp-7x24"],
+            -- server = accounts["collector"]["simnow-7x24"],
         } }
 
     service.call("collector", "start")
     service.call("collector", "subscribe", "sc2609")
 
     service.spawn { name = "trader", source = "@services/trader.lua", config = {
-            -- server = accounts["trader"]["gtja-sim"],
             -- server = accounts["trader"]["gtja-3"],
-            server = accounts["trader"]["simnow-7x24"],
-            -- server = accounts["trader"]["openctp-7x24"],
-            -- symbol = symbol
+            -- server = accounts["trader"]["simnow-7x24"],
+            server = accounts["trader"]["openctp-7x24"],
         } }
     local rsp = service.call("trader", "start") -- blocking, until trader starts
-
-    --[[
-    do 
-        local rst = service.call("trader", "query_account")
-        ctp.log_info("query_account: %s", inspect(rst))
-        local rst = service.call("trader", "query_instrument", "IM2703")
-        ctp.log_info("query_instrument: %s", inspect(rst))
-        local rst = service.call("trader", "query_position")
-        ctp.log_info("query_position: %s", inspect(rst))
-    end
-    ]]
-
-    -- service.call("trader", "quit")
-
-    -- service.spawn { name = "bot", source = "@services/bot.lua", config = { } }
 
     service.spawn { name = "gateway", source = "@services/gateway.lua", config = { } }
 
@@ -105,9 +56,7 @@ end
 local S = {}
 
 function S.boot()
-    -- boot()
-    -- boot_test_collector()
-    boot_test_trader()
+    boot()
     -- service.send(0, "quit")
 end
 
