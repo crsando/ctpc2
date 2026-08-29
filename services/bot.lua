@@ -2,7 +2,7 @@ local inspect = require "inspect"
 local ctp = require "lctp2"
 ctp.log_set_level("LOG_DEBUG")
 
-local service = require "lservice3" .input(...)
+local service = require "service"
 local config = service.config; do 
         -- do nothing
     end

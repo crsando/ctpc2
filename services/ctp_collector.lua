@@ -2,20 +2,11 @@ local inspect = require "inspect"
 local ctp = require "lctp2"
 ctp.log_set_level("LOG_DEBUG")
 
-local service = require "lservice3" .input(...)
+local service = require "service"
 local config = service.config; do 
-        -- config.server = { front_addr =  "tcp://180.169.75.18:61213", broker = "7090", user = "85506493" }
         assert(config.server, "no config.server")
         config.auto_disconnect = true
     end
-
-if config.auto_disconnect then 
-    local myid = service.get_id()
-    scheduler:daily("08:45:00", function() service.send(myid, "start") end)
-    scheduler:daily("17:00:00", function() service.send(myid, "stop") end)
-    scheduler:daily("20:45:00", function() service.send(myid, "start") end)
-    scheduler:daily("04:00:00", function() service.send(myid, "stop") end)
-end
 
 local S = {}
 local collector = ctp.new_collector(config.server)
@@ -91,4 +82,5 @@ function service.on_idle()
     end
 end
 
-return service.dispatch(S)
+-- return service.dispatch(S)
+return S

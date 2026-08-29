@@ -12,7 +12,7 @@ local ctp = require "lctp2"
 local cjson = require "cjson.safe"
 ctp.log_set_level("LOG_DEBUG")
 
-local service = require "lservice3" .input(...)
+local service = require "service"
 local config = service.config; do 
         local PREFIX = os.getenv("HOME")
         config.data_dir = assert(config.data_dir or (PREFIX .. "/.local/share/tifa"))

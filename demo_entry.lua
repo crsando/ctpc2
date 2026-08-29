@@ -1,5 +1,5 @@
 local inspect = require "inspect"
-local service = require "lservice3"
+local service = require "service"
 
 local script_name = arg[1] or "root_test_trader"
 

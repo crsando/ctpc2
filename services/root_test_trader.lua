@@ -1,6 +1,6 @@
 local inspect = require "inspect"
-local service = require "lservice3".input(...)
-local scheduler = require "lservice3.scheduler"
+local service = require "service"
+local scheduler = require "service.scheduler"
 local config = service.config
 local ctp = require "lctp2"
 
@@ -31,41 +31,24 @@ end
 local function boot_test_collector()
     local accounts = load_accounts()
     service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
-            server = accounts["collector"]["gtja-3"],
+            -- server = accounts["collector"]["gtja-3"],
+            server = accounts["collector"]["simnow-7x24"],
         } }
 
-    --[[
-    service.call("collector", "start")
-    service.call("collector", "subscribe", "lh2703")
-    service.call("collector", "stop")
+    -- service.call("collector", "start")
+    -- service.call("collector", "subscribe", "lh2703")
 
 
-    scheduler:at(os.time() + 5, function()
+    --[[scheduler:at(os.time() + 10, function()
             service.send("collector", "stop")
-        end)
-    ]]
-
-    local now = os.time()
-    print(os.date("%Y-%m-%d %H:%M:%S %z %Z", now))
-    print("isdst:", tostring(os.date("*t", now).isdst))
-
-    scheduler:at(os.time() + 5, function()
-            print("scheduler:at ", os.date("%Y-%m-%d %H:%M:%S") )
-        end)
-    scheduler:daily("13:19:00", function()
-            print("scheduler:daily")
-            service.send("collector", "start")
-        end)
-
-    -- scheduler:at("2026-08-27 12:55:00", function()
-            -- service.call("collector", "start")
-        -- end)
+        end)]]
 end
 
 local function boot_test_trader()
     local accounts = load_accounts()
     service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
-            server = accounts["trader"]["gtja-3"],
+            -- server = accounts["trader"]["gtja-3"],
+            server = accounts["trader"]["simnow-7x24"],
         } }
     local rsp = service.call("trader", "start") -- blocking, until trader starts
     local rsp = service.call("trader", "query_account") -- blocking, until trader starts
@@ -80,7 +63,7 @@ local function boot()
     ctp.log_debug("booting root")
     service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
             -- server = accounts["collector"]["openctp-7x24"],
-            server = accounts["collector"]["gtja-3"],
+            server = accounts["collector"]["simnow-7x24"],
             auto_disconnect = true, -- 在指定时间自动连接，释放
             -- server = accounts["collector"]["hy"],
             -- symbol = symbol
@@ -92,7 +75,7 @@ local function boot()
     service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
             -- server = accounts["trader"]["gtja-sim"],
             -- server = accounts["trader"]["gtja-3"],
-            server = accounts["trader"]["hy"],
+            server = accounts["trader"]["simnow-7x24"],
             -- server = accounts["trader"]["openctp-7x24"],
             -- symbol = symbol
         } }
@@ -122,8 +105,9 @@ end
 local S = {}
 
 function S.boot()
+    boot()
     -- boot_test_collector()
-    boot_test_trader()
+    -- boot_test_trader()
     -- service.send(0, "quit")
 end
 
