@@ -1,67 +1,63 @@
-PREFIX=/usr/local
+# Build and installation configuration. Override these values on the command line.
+PREFIX ?= /usr/local
+CTP_VER ?= ctp-6.7.10
+BUILD_DIR ?= build/$(CTP_VER)
 
-CTP_VER=ctp-6.7.10
-# CTP_VER=openctp-6.7.10
+SRC_DIR := src
+CTP_DIR := lib/$(CTP_VER)
+TARGET := libctpc2.so
 
+INCLUDE_PATH := $(PREFIX)/include/ctpc2
+INST_LIB_PATH := $(PREFIX)/lib
+LUA_SHARE := $(PREFIX)/share/lua/5.1
 
-# HY的仿真环境需要用该版本
-# CTP_VER=ctp-6.6.7
+CC := gcc
+CXX := g++
+CPPFLAGS := -I$(SRC_DIR) -I$(CTP_DIR)
+CFLAGS := -fPIC -MMD -MP
+CXXFLAGS := -fPIC -MMD -MP
+LDFLAGS := -shared -Wl,-rpath,$(INST_LIB_PATH)
+LDLIBS := -L$(CTP_DIR) -lthostmduserapi_se -lthosttraderapi_se -luv -lpthread
 
-# OpenCTP 日常测试使用
-# CTP_VER=openctp-6.7.7
+C_SOURCES := $(wildcard $(SRC_DIR)/*.c)
+CXX_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
+C_OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(C_SOURCES))
+CXX_OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(CXX_SOURCES))
+OBJECTS := $(C_OBJECTS) $(CXX_OBJECTS)
+DEPFILES := $(OBJECTS:.o=.d)
 
-INCLUDE_PATH=$(PREFIX)/include/ctpc2
-INST_LIB_PATH=$(PREFIX)/lib
-LUA_SHARE=$(PREFIX)/share/lua/5.1
+.PHONY: all clean install uninstall
 
-all: libctpc2.so
-	@echo --- make all
+all: $(TARGET)
 
-ctpc2.o: ./src/ctpc2.cpp
-	g++ -c -fPIC ./src/ctpc2.cpp -I./lib/$(CTP_VER) 
-md.o: ./src/md.c
-	gcc -c -fPIC ./src/md.c -lpthread -luv -I./lib/$(CTP_VER)
-trader.o: ./src/trader.c
-	gcc -c -fPIC ./src/trader.c -lpthread -luv -I./lib/$(CTP_VER)
-CustomTradeSpi.o: ./src/CustomTradeSpi.cpp
-	g++ -c -fPIC ./src/CustomTradeSpi.cpp -I./lib/$(CTP_VER)
-CustomMdSpi.o: ./src/CustomMdSpi.cpp
-	g++ -c -fPIC ./src/CustomMdSpi.cpp -I./lib/$(CTP_VER)
-queue.o: ./src/queue.c
-	gcc -c -fPIC ./src/queue.c -lpthread
-reg.o: ./src/reg.c
-	gcc -c -fPIC ./src/reg.c
-log.o: ./src/log.c
-	gcc -c -fPIC ./src/log.c
-util.o: ./src/util.c
-	gcc -c -fPIC ./src/util.c
-position.o: ./src/position.c
-	gcc -c -fPIC ./src/position.c -I./lib/$(CTP_VER)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-libctpc2.so: ctpc2.o md.o trader.o queue.o log.o CustomMdSpi.o CustomTradeSpi.o reg.o position.o util.o
-	gcc ctpc2.o md.o trader.o queue.o log.o CustomTradeSpi.o CustomMdSpi.o reg.o position.o util.o \
-		-shared -o libctpc2.so \
-		-Wl,-rpath,$(INST_LIB_PATH) \
-		-I./lib/$(CTP_VER) -L./lib/$(CTP_VER) -lthostmduserapi_se -lthosttraderapi_se -luv -lpthread
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 clean:
-	rm *.o
-	rm ./libctpc2.so
+	$(RM) $(OBJECTS) $(DEPFILES) $(TARGET)
+
+install: all
+	install -d $(INCLUDE_PATH) $(INST_LIB_PATH) $(LUA_SHARE)/lctp2/templates
+	install -m 0644 $(CTP_DIR)/*.h $(INCLUDE_PATH)/
+	install -m 0644 $(SRC_DIR)/*.h $(INCLUDE_PATH)/
+	install -m 0755 $(CTP_DIR)/libthostmduserapi_se.so $(INST_LIB_PATH)/
+	install -m 0755 $(CTP_DIR)/libthosttraderapi_se.so $(INST_LIB_PATH)/
+	install -m 0755 $(TARGET) $(INST_LIB_PATH)/
+	install -m 0644 lctp2/*.lua $(LUA_SHARE)/lctp2/
+	install -m 0644 templates/*.lua $(LUA_SHARE)/lctp2/templates/
 
 uninstall:
-	rm $(INST_LIB_PATH)/libthostmduserapi_se.so
-	rm $(INST_LIB_PATH)/libthosttraderapi_se.so
-	rm $(INST_LIB_PATH)/libctpc2.so
-	rm -r $(LUA_SHARE)/lctp2
+	$(RM) $(INST_LIB_PATH)/libthostmduserapi_se.so
+	$(RM) $(INST_LIB_PATH)/libthosttraderapi_se.so
+	$(RM) $(INST_LIB_PATH)/libctpc2.so
+	rm -rf $(LUA_SHARE)/lctp2
 
-install:
-	mkdir -p $(INCLUDE_PATH)
-	mkdir -p $(LUA_SHARE)/lctp2
-	cp ./lib/$(CTP_VER)/*.h $(INCLUDE_PATH)
-	cp ./lib/$(CTP_VER)/libthostmduserapi_se.so $(INST_LIB_PATH)
-	cp ./lib/$(CTP_VER)/libthosttraderapi_se.so $(INST_LIB_PATH)
-	cp ./src/*.h $(INCLUDE_PATH)
-	cp ./libctpc2.so $(INST_LIB_PATH)
-	cp ./lctp2/*.lua $(LUA_SHARE)/lctp2/
-	mkdir -p $(LUA_SHARE)/lctp2/templates
-	cp ./templates/*.lua $(LUA_SHARE)/lctp2/templates
+-include $(DEPFILES)
