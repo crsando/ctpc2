@@ -63,3 +63,5 @@ install:
 	cp ./src/*.h $(INCLUDE_PATH)
 	cp ./libctpc2.so $(INST_LIB_PATH)
 	cp ./lctp2/*.lua $(LUA_SHARE)/lctp2/
+	mkdir -p $(LUA_SHARE)/lctp2/templates
+	cp ./templates/*.lua $(LUA_SHARE)/lctp2/templates

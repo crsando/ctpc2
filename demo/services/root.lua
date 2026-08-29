@@ -30,7 +30,7 @@ end
 
 local function boot_test_collector()
     local accounts = load_accounts()
-    service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
+    service.spawn { name = "collector", source = "@services/collector.lua", config = { 
             -- server = accounts["collector"]["gtja-3"],
             server = accounts["collector"]["simnow-7x24"],
         } }
@@ -46,7 +46,7 @@ end
 
 local function boot_test_trader()
     local accounts = load_accounts()
-    service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
+    service.spawn { name = "trader", source = "@services/trader.lua", config = {
             -- server = accounts["trader"]["gtja-3"],
             server = accounts["trader"]["simnow-7x24"],
         } }
@@ -61,7 +61,7 @@ local function boot()
     local accounts = load_accounts()
 
     ctp.log_debug("booting root")
-    service.spawn { name = "collector", source = "@services/ctp_collector.lua", config = { 
+    service.spawn { name = "collector", source = "@services/collector.lua", config = { 
             -- server = accounts["collector"]["openctp-7x24"],
             server = accounts["collector"]["simnow-7x24"],
             auto_disconnect = true, -- 在指定时间自动连接，释放
@@ -72,7 +72,7 @@ local function boot()
     service.call("collector", "start")
     service.call("collector", "subscribe", "sc2609")
 
-    service.spawn { name = "trader", source = "@services/ctp_trader.lua", config = {
+    service.spawn { name = "trader", source = "@services/trader.lua", config = {
             -- server = accounts["trader"]["gtja-sim"],
             -- server = accounts["trader"]["gtja-3"],
             server = accounts["trader"]["simnow-7x24"],
@@ -105,9 +105,9 @@ end
 local S = {}
 
 function S.boot()
-    boot()
+    -- boot()
     -- boot_test_collector()
-    -- boot_test_trader()
+    boot_test_trader()
     -- service.send(0, "quit")
 end
 
