@@ -594,7 +594,10 @@ end
 
 function S.quit()
     ctp.log_debug("trader is quitting")
-    service.call(0, "notify", service.get_id(), "quit")
+    if trader then 
+        trader:stop()
+        trader = nil
+    end
     service.quit()
 end
 
@@ -602,7 +605,7 @@ end
 -- process trader internal messages
 function service.on_idle()
     -- process trader messages
-    while true do 
+    while (trader ~= nil) do 
         local rsp = trader:recv(false) -- non-blocking
         if rsp then 
             -- process trader messages

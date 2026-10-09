@@ -39,6 +39,10 @@ function S.stop()
 end
 
 function S.quit()
+    if collector then 
+        collector:stop()
+        collector = nil
+    end
     service.quit()
 end
 
