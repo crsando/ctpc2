@@ -8,11 +8,7 @@
 
 extern "C" {
 	#include "log.h"
-	#include "position.h"
 }
-
-#define _trader_api ((CThostFtdcTraderApi *)(this->_trader->_api))
-#define _trader_spi ((CThostFtdcTraderApi *)(this->_trader->_spi))
 
 void CustomTradeSpi::OnFrontConnected()
 {
@@ -51,7 +47,6 @@ void CustomTradeSpi::OnRspUserLogin(
 	if (!isErrorRspInfo(pRspInfo))
 	{
 		this->_trader->connected = 3;
-		this->loginFlag = true;
 		log_debug("OnRspUserLogin | Success | BrokerID:%s | UserID:%s", pRspUserLogin->BrokerID, pRspUserLogin->UserID);
 		log_debug("OnRspUserLogin | FrontID: %d | SessionID: %d | MaxOrderRef: %s",
 			pRspUserLogin->FrontID, pRspUserLogin->SessionID, pRspUserLogin->MaxOrderRef);
@@ -162,15 +157,6 @@ void CustomTradeSpi::fn (tp * pField, CThostFtdcRspInfoField * pRspInfo, int nRe
     ON_RSP_THEN_SEND(fn, tp); \
 }
 
-ctp_rsp_t * pack_data(void * data, size_t size) {
-	ctp_rsp_t * rsp = (ctp_rsp_t*)malloc(sizeof(ctp_rsp_t));
-	memset(rsp, 0, sizeof(ctp_rsp_t));
-	rsp->field = (void *)malloc(size);
-	memcpy(rsp->field, data, size);
-	rsp->size = size;
-	return rsp;
-}
-
 void CustomTradeSpi::OnRspSettlementInfoConfirm(
 	CThostFtdcSettlementInfoConfirmField * pField,
 	CThostFtdcRspInfoField *pRspInfo,
@@ -182,7 +168,7 @@ void CustomTradeSpi::OnRspSettlementInfoConfirm(
 		log_debug("OnRspSettlementInfoConfirm | Success | ConfirmDate:%s %s", pField->ConfirmDate, pField->ConfirmTime);
 	}
 	else {
-		log_debug("OnRspSettlementInfoConfirm | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		log_debug("OnRspSettlementInfoConfirm | Failed | %d | %s", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 	}
 
     ON_RSP_THEN_SEND(OnRspSettlementInfoConfirm, CThostFtdcSettlementInfoConfirmField);
@@ -196,55 +182,19 @@ CUSTOM_ON(OnRspOrderAction, CThostFtdcInputOrderActionField);
 CUSTOM_ON(OnRspQryInstrumentMarginRate, CThostFtdcInstrumentMarginRateField);
 
 
-// CUSTOM_ON(OnRspQryOrder, CThostFtdcOrderField);
 void CustomTradeSpi::OnRspQryOrder(CThostFtdcOrderField * pField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
     if(pField)
         log_debug("OnRspQryOrder %d | %s | %s+%s | %c", nRequestID, pField->InstrumentID, pField->ExchangeID, pField->OrderSysID, pField->OrderStatus);
     else 
         log_debug("OnRspQryOrder | Empty");
-    // for(int i = 0; i < 21; i ++) {
-    //     log_debug("\t>>> OrderSysID: %2d : %d", i, pField->OrderSysID[i]);
-    // }
     ON_RSP_THEN_SEND(OnRspQryOrder, CThostFtdcOrderField);
 }
-
-// void CustomTradeSpi::OnRspOrderInsert(
-// 	CThostFtdcInputOrderField *pField, 
-// 	CThostFtdcRspInfoField *pRspInfo,
-// 	int nRequestID,
-// 	bool bIsLast)
-// {
-// 	if (!isErrorRspInfo(pRspInfo)) {
-// 		log_debug("OnRspOrderInsert | %s | %d | %s", pField->OrderRef);
-// 	}
-// 	else {
-// 		log_debug("OnRspOrderInsert | Failed", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-// 	}
-//     ON_RSP_THEN_SEND(OnRspOrderInsert, CThostFtdcInputOrderField);
-// }
-
-// void CustomTradeSpi::OnRspOrderAction(
-// 	CThostFtdcInputOrderActionField *pField,
-// 	CThostFtdcRspInfoField *pRspInfo,
-// 	int nRequestID,
-// 	bool bIsLast)
-// {
-// 	if (!isErrorRspInfo(pRspInfo)) { 
-// 		log_debug("OnRspOrderAction | %s | %s | %d | %s", 
-// 			pField->ExchangeID, 
-// 			pField->OrderSysID, 
-// 			pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-// 	}
-//     ON_RSP_THEN_SEND(OnRspOrderAction, CThostFtdcInputOrderActionField);
-// }
 
 void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pField)
 {
     char submit_status[128];
     char order_status[128];
 	// FrontID + SessionID + OrderRef
-	// int front_id = this->_trader->front_id;
-	// int session_id = this->_trader->session_id;
 	strcpy(this->_trader->lst_order_ref, pField->OrderRef);
 
     switch (pField->OrderSubmitStatus) {
@@ -313,7 +263,6 @@ void CustomTradeSpi::OnRtnOrder(CThostFtdcOrderField *pField)
 
 
 	// ExchangeID + OrderSysID
-	// log_debug("OnRtnOrder | %s | %s | %s | Info | %s | %lf | %d | %d | Status | %c | %c", 
 	log_debug("OnRtnOrder | Ref: %d+%d+%s | Sys: %s+%s | %s | %lf | #:%d | #Traded: %d | Status | %s | %s", 
 			pField->FrontID,
 			pField->SessionID,
@@ -358,7 +307,6 @@ void CustomTradeSpi::OnRspUserLogout(
 {
 	if (!isErrorRspInfo(pRspInfo))
 	{
-		loginFlag = false; // 登出就不能再交易了 
 		log_debug("OnRspUserLogout | Success | BrokerID:%s | UserID:%s", this->_trader->broker, this->_trader->user);
 
         if(this->_trader->connected >= 2) {
@@ -422,15 +370,6 @@ int CustomTradeSpi::reqUserLogin()
 	CTP_TRADER_REQ(this->_trader, UserLogin, &loginReq);
 }
 
-int CustomTradeSpi::reqUserLogout()
-{
-	CThostFtdcUserLogoutField logoutReq;
-	memset(&logoutReq, 0, sizeof(logoutReq));
-	strcpy(logoutReq.BrokerID, this->_trader->broker);
-	strcpy(logoutReq.UserID, this->_trader->user);
-	CTP_TRADER_REQ(this->_trader, UserLogout, &logoutReq);
-}
-
 
 int CustomTradeSpi::reqSettlementInfoConfirm()
 {
@@ -442,6 +381,3 @@ int CustomTradeSpi::reqSettlementInfoConfirm()
 
 	CTP_TRADER_REQ(this->_trader, SettlementInfoConfirm, &settlementConfirmReq);
 }
-
-#undef _trader_api
-#undef _trader_spi

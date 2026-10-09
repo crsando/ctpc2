@@ -14,6 +14,7 @@
 extern "C" {
 #include "log.h"
 #include "ctpc2.h"
+#include "macros.h"
 
 // MD API
 #define _api(md) ((CThostFtdcMdApi *)((md)->_api))
@@ -64,11 +65,6 @@ int ctp_md_stop(ctp_md_t * md) {
 }
 
 
-void ctp_md_join(ctp_md_t * md) {
-	_api(md)->Join();
-}
-
-
 ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker[], const char user[]) 
 {
     log_debug("ctp_md_init | api version | %s", CThostFtdcMdApi::GetApiVersion());
@@ -78,12 +74,6 @@ ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker
 	strcpy(md->front_addr, &front_addr[0]);
 	strcpy(md->broker, &broker[0]);
 	strcpy(md->user, &user[0]);
-
-    // symbols
-    const int max_symbols_num = 16;
-    md->symbols = (char **)malloc(sizeof(char *) * (max_symbols_num + 1));
-    memset(md->symbols, 0, sizeof(char *) * (max_symbols_num + 1));
-    md->symbols_num = 0;
 
     md->_api = NULL;
     md->_spi = NULL;
@@ -211,14 +201,6 @@ int ctp_trader_query_instrument_margin_rate(ctp_trader_t * trader, const char * 
 	CTP_TRADER_REQ(trader, QryInstrumentMarginRate, &field);
 }
 
-// useless, it is for options not for futures
-// int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol) {
-//     CThostFtdcQryDepthMarketDataField field;
-// 	memset(&field, 0, sizeof(field));
-// 	strcpy(field.InstrumentID, symbol);
-// 	CTP_TRADER_REQ(trader, QryDepthMarketData, &field);
-// }
-
 int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag)
 {
     log_debug("ctp_trader_order_insert %s | %lf | %d | %d", symbol, price, volume, flag);
@@ -288,7 +270,7 @@ int ctp_trader_order_cancel(ctp_trader_t * t, const char * symbol, const char * 
     strcpy(field.ExchangeID, exchange_id);
     strcpy(field.OrderSysID, order_sys_id);
 
-    log_info("ctp_trader_order_cancel %s: %s+%s | %d", symbol, exchange_id, order_sys_id, strlen(order_sys_id));
+    log_info("ctp_trader_order_cancel %s: %s+%s | %zu", symbol, exchange_id, order_sys_id, strlen(order_sys_id));
 
 	CTP_TRADER_REQ(t, OrderAction, &field);
 }
@@ -304,7 +286,7 @@ int ctp_trader_password_update(ctp_trader_t * t, const char * pass_old, const ch
     // update cache
     strcpy(t->password, pass_new);
 
-    log_debug("ctp_trader_password_update | %d", field.UserID);
+    log_debug("ctp_trader_password_update | %s", field.UserID);
 
 	CTP_TRADER_REQ(t, UserPasswordUpdate, &field);
 }

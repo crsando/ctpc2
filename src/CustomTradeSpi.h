@@ -4,12 +4,15 @@
 
 extern "C" {
 	#include "ctpc2.h"
+	#include "macros.h"
 }
 
 class CustomTradeSpi : public CThostFtdcTraderSpi
 {
 // ---- ctp_api部分回调接口 ---- //
 public:
+	virtual ~CustomTradeSpi() {}
+
 	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
 	void OnFrontConnected();
 
@@ -60,35 +63,15 @@ public:
     void OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     void OnRspUserPasswordUpdate( CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	// Market Data
-	// void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 public:
 	ctp_trader_t * _trader;
-	
+
 // ---- 自定义函数 ---- //
-public:
-	bool loginFlag; // 登陆成功的标识
-	void reqOrderInsert(
-		TThostFtdcInstrumentIDType instrumentID,
-		TThostFtdcPriceType price,
-		TThostFtdcVolumeType volume,
-		TThostFtdcDirectionType direction); // 个性化报单录入，外部调用
 public:
 	// Login Related
 	int reqAuthenticate();
 	int reqUserLogin(); // 登录请求
-	int reqUserLogout(); // 登出请求
 	int reqSettlementInfoConfirm(); // 投资者结果确认
 
-
-	// Utility Methods
-	// void reqQueryInstrument(const char * instrument_id); // 请求查询合约
-	// void reqQueryTradingAccount(); // 请求查询资金帐户
-	// void reqQueryInvestorPosition(); // 请求查询投资者持仓
-	// void reqOrderInsert(); // 请求报单录入
-
-	// void reqOrderAction(CThostFtdcOrderField *pOrder); // 请求报单操作
 	bool isErrorRspInfo(CThostFtdcRspInfoField *pRspInfo); // 是否收到错误信息
-	// bool isMyOrder(CThostFtdcOrderField *pOrder); // 是否我的报单回报
-	// bool isTradingOrder(CThostFtdcOrderField *pOrder); // 是否正在交易的报单
 };

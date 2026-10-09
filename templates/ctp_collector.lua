@@ -87,5 +87,4 @@ function service.on_idle()
     end
 end
 
--- return service.dispatch(S)
 return S

@@ -3,16 +3,9 @@
 
 #include "ThostFtdcUserApiDataType.h"
 #include "ThostFtdcUserApiStruct.h"
-#include "stdint.h"
-#include "macros.h"
-#include "position.h"
+#include <stddef.h>
+#include <stdint.h>
 #include <stdbool.h>
-#include "cond.h"
-
-#include "uv.h"
-
-// common callback type
-typedef void (*ctp_hook_cb)(void * self, void * data);
 
 typedef struct {
     // tcp://xxx.xxx.xxx.xxx:xxxx
@@ -22,9 +15,6 @@ typedef struct {
 
     // status
     int connected; // 0: not connected; 1: connected; 2: logined
-
-    char ** symbols;
-    int symbols_num;
 
     void * _spi;
     void * _api;
@@ -41,12 +31,9 @@ typedef struct {
 ctp_md_t * ctp_md_new();
 ctp_md_t * ctp_md_init(ctp_md_t * md, const char front_addr[], const char broker[], const char user[]);
 
-// refactor
-// void ctp_md_subscribe(ctp_md_t * md, const char symbol[]);
 int ctp_md_subscribe(ctp_md_t * md, char * symbols[], int num);
 int ctp_md_unsubscribe(ctp_md_t * md, char * symbols[], int num);
 
-void ctp_md_hook(ctp_md_t * md, ctp_hook_cb hook);
 int ctp_md_start(ctp_md_t * md);
 int ctp_md_stop(ctp_md_t * md);
 
@@ -121,8 +108,7 @@ ctp_rsp_t * ctp_trader_recv(ctp_trader_t * t, bool blocking);
 void ctp_rsp_free(ctp_rsp_t * r);
 void ctp_trader_wait_for_settle(ctp_trader_t * t);
 //
-// query/fetch model (with req_id as the key)
-// query_xxx => OnRspXXX => reg update => fetch => (optional) free
+// query model: query_xxx returns req_id => OnRspXXX is pushed to the queue with the same req_id
 //
 
 int ctp_trader_query_account(ctp_trader_t * trader); 
@@ -130,17 +116,12 @@ int ctp_trader_query_position(ctp_trader_t * trader);
 int ctp_trader_query_instrument(ctp_trader_t * trader, const char * exchange_id);
 int ctp_trader_query_instrument_margin_rate(ctp_trader_t * trader, const char * symbol);
 
-// ReqQryDepthMarketData
-// int ctp_trader_query_marketdata(ctp_trader_t * trader, const char * symbol);
-
 int ctp_trader_query_order(ctp_trader_t * t);
 
 //
 // Order Executions
 //
 int ctp_trader_order_insert(ctp_trader_t * t, const char * symbol, double price, int volume, char flag);
-// int ctp_trader_order_cancel(ctp_trader_t * t, int front_id, int session_id, const char * order_ref);
-// int ctp_trader_order_cancel(ctp_trader_t * t, const char * exchange_id, const char * order_sys_id);
 int ctp_trader_order_cancel(ctp_trader_t * t, const char * symbol, const char * exchange_id, const char * order_sys_id);
 
 // password

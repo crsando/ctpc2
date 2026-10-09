@@ -1,6 +1,5 @@
 #pragma once
 // ---- 派生的行情类 ---- //
-// #include <vector>
 #include "ThostFtdcMdApi.h"
 
 #include <string>
@@ -14,6 +13,8 @@ class CustomMdSpi: public CThostFtdcMdSpi
 {
 	// ---- 继承自CTP父类的回调接口并实现 ---- //
 public:
+	virtual ~CustomMdSpi() {}
+
 	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
 	void OnFrontConnected();
 

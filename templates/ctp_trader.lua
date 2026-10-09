@@ -74,6 +74,7 @@ local query = {
                 local tmp = self[self.start_index + i - 1]
                 self[self.start_index + i - 1] = nil
                 self[i] = tmp
+                i = i + 1
             end
 
             self.start_index = 1 
@@ -238,7 +239,7 @@ local query = {
 
             -- check request id for a match, ignore if not matched
             if not ( q.req_id == rsp.req_id ) then 
-                ctp.log_deubg("req_id not match, ignore reponse | %s | req_id : %d", rsp.func_name, rsp.req_id)
+                ctp.log_debug("req_id not match, ignore reponse | %s | req_id : %d", rsp.func_name, rsp.req_id)
                 return 
             end
 
@@ -641,128 +642,4 @@ function S.trade(...)
     return order:trade(...)
 end
 
-function S.test_1()
-    ctp.log_debug("begin trader test sequence")
-    local rst = service.call(service.get_id(), "query_account")
-    ctp.log_debug("balance %d", rst.field.Balance)
-end
-
---[=[
-function S.test()
-    ctp.log_debug("begin trader test sequence")
-
-    -- local rst = service.call(service.get_id(), "query_position")
-    -- print("positions", inspect(rst))
-
-    ctp.log_debug("---")
-    ctp.log_debug("nuke all")
-    ctp.log_debug("---")
-    local rst = service.call(service.get_id(), "nuke")
-
-    local rst = service.call(service.get_id(), "query_account")
-    ctp.log_debug("balance %d", rst.field.Balance)
-
-    -- local rst = service.call(service.get_id(), "query_order")
-    -- print(inspect(rst))
-
-
-    -- local rst = service.call(service.get_id(), "query_instrument_margin_rate", "IF2507")
-    -- print(inspect(rst))
-
-    ctp.log_debug("------")
-    ctp.log_debug("begin trader order insert test")
-    ctp.log_debug("------")
-
-    -- 测试市价单
-    do 
-        local msg, rst = service.call(service.get_id(), "trade", {
-                symbol = "IC2607", 
-                price = 0,  -- market order
-                volume = 1, 
-                flag = ctp.THOST_FTDC_OFEN_Open,
-                timeout = 5000
-            })
-        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-    end
-
-    -- 平仓之前的挂单
-    do 
-        local msg, rst = service.call(service.get_id(), "trade", {
-                symbol = "IC2607", 
-                price = 0,  -- market order
-                volume = -1, 
-                flag = ctp.THOST_FTDC_OFEN_Close,
-                timeout = 5000
-            })
-        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-    end
-
-
-    -- 测试低价单（无法成交，超时自动取消挂单）
-    do 
-        local msg, rst = service.call(service.get_id(), "trade", {
-                symbol = "IC2607", 
-                price = 8000, 
-                volume = 1, 
-                flag = ctp.THOST_FTDC_OFEN_Open,
-                timeout = 5000
-            })
-        -- ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-        ctp.log_debug("order timeout - cancelled")
-    end
-
-    -- 测试无效单（价格过高）
-    --[[do 
-        local msg, rst = service.call(service.get_id(), "trade", "IC2607", 20000, 1, ctp.THOST_FTDC_OFEN_Open)
-        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-    end]]
-
-
-    -- 测试项目：资金不足
-    --[[do 
-        local msg, rst = service.call(service.get_id(), "trade", "IC2607", 8535, 10, ctp.THOST_FTDC_OFEN_Open)
-        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-    end]]
-
-    -- 测试项目：资金不足
-    --[[do 
-        local msg, rst = service.call(service.get_id(), "trade", "IC2607", 8535, -1000, ctp.THOST_FTDC_OFEN_Close)
-        ctp.log_debug("trade result : %s | traded volume: %d", msg, rst.VolumeTraded or 0)
-    end]]
-
-    -- 市价单，成交后平仓
-    --[[
-    do 
-        local msg, rst = service.call(service.get_id(), "trade", "IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
-        print("trade result", msg, rst.VolumeTraded or 0)
-        local msg, rst = service.call(service.get_id(), "trade", "IF2607", 0, -1, ctp.THOST_FTDC_OFEN_Close)
-        print("trade result", msg, rst.VolumeTraded or 0)
-    end 
-    ]]
-
-    -- order:insert("IF2607", 0, 1, ctp.THOST_FTDC_OFEN_Open)
-    return 1
-end
-
-function S.test_2()
-    ctp.log_debug("---")
-    ctp.log_debug("begin test 2")
-    ctp.log_debug("---")
-    local rst = service.call(service.get_id(), "nuke")
-
-    for i = 1, 4 do 
-        local msg, rst = service.call(service.get_id(), "trade", {
-                symbol = "IC2607", 
-                price = 8000, 
-                volume = 1, 
-                flag = ctp.THOST_FTDC_OFEN_Open,
-                timeout = 1000
-        })
-        ctp.log_debug(msg, rst)
-    end
-
-end
-]=]
-
--- return service.dispatch(S)
 return S

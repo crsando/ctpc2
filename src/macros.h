@@ -1,5 +1,5 @@
 #ifndef _MACROS_H_
-#define _MACROS_H
+#define _MACROS_H_
 
 #define CTP_TRADER_READY(trader) ((trader)->connected >= 4 ? 1 : 0)
 

@@ -18,10 +18,7 @@ void CustomMdSpi::OnFrontConnected()
 	memset(&loginReq, 0, sizeof(loginReq));
 	strcpy(loginReq.BrokerID, this->_md->broker);
 	strcpy(loginReq.UserID, this->_md->user);
-	// strcpy(loginReq.Password, this->_md->password);
-	static int requestID = 0; // 请求编号
-	int rt = g_pMdUserApi->ReqUserLogin(&loginReq, requestID);
-    // int rt = ((CThostFtdcMdApi *)(this->_md->_api))->ReqUserLogin(&loginReq, 0);
+	g_pMdUserApi->ReqUserLogin(&loginReq, 0);
 }
 
 // 断开连接通知
@@ -50,23 +47,6 @@ void CustomMdSpi::OnRspUserLogin(
 	{
 		this->_md->connected = 2;
 		log_debug("OnRspUserLogin | Success | BrokerID:%s | UserID:%s", this->_md->broker, this->_md->user);
-
-		// 开始订阅行情
-        // refactor: 我们不在这里行情订阅了，把行情订阅单独拉出来放到另一个地方
-        /*
-        int i;
-        log_debug("OnRspUserLogin | SubscribeMarketData | symbols_num %d", this->_md->symbols_num);
-        for(i = 0; i < this->_md->symbols_num; i++) {
-            log_debug("OnRspUserLogin | SubscribeMarketData | %2i | %s", i, (this->_md->symbols)[i]);
-        }
-		int rt = g_pMdUserApi->SubscribeMarketData(this->_md->symbols, this->_md->symbols_num);
-
-		if (!rt)
-		{
-			this->_md->connected = 3;
-			log_debug("OnRspUserLogin | SubscribeMarketData | Success");
-		}
-        */
 	}
 	else
 		log_debug("OnRspUserLogin | Fail | ErrorID:%d", pRspInfo->ErrorID);
@@ -93,7 +73,7 @@ void CustomMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, b
 {
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
 	if (bResult)
-		log_error("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		log_error("OnRspError | ErrorID:%d | ErrorMsg:%s", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
 }
 
 // 订阅行情应答
@@ -106,7 +86,7 @@ void CustomMdSpi::OnRspSubMarketData(
     log_debug("OnRspSubMarketData | %s", pSpecificInstrument->InstrumentID);
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
 	if (bResult) {
-		log_error("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		log_error("OnRspError | ErrorID:%d | ErrorMsg:%s", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
     }
     else {
         this->subscribed.insert(pSpecificInstrument->InstrumentID);
@@ -123,7 +103,7 @@ void CustomMdSpi::OnRspUnSubMarketData(
     log_debug("OnRspUnSubMarketData | %s", pSpecificInstrument->InstrumentID);
 	bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
 	if (bResult) {
-		log_error("OnRspError | ErrorID:%d | ErrorMsg", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		log_error("OnRspError | ErrorID:%d | ErrorMsg:%s", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
     }
     else {
         subscribed.erase(pSpecificInstrument->InstrumentID);
@@ -161,24 +141,10 @@ void CustomMdSpi::OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpec
 // 行情详情通知
 void CustomMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	// log_debug("OnRtnDepthMarketData | InstrumentID:%s | LastPrice:%lf", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice);
-	// clock_t start, end;
-
-	// start = clock();
-	// if(this->_md->_on_tick) {
-	// 	(*(this->_md->_on_tick))(pDepthMarketData);
-	// }
-
 	CThostFtdcDepthMarketDataField * data = (CThostFtdcDepthMarketDataField *)malloc(sizeof(CThostFtdcDepthMarketDataField));
 	memcpy(data, pDepthMarketData, sizeof(CThostFtdcDepthMarketDataField));
 
-	ctp_md_send(this->_md, (void*)data);
-
-	// end = clock();
-
-	// double time_taken = 1000 * double(end - start) / double(CLOCKS_PER_SEC); // milliseconds
-	// log_info("OnRtnDepthMarketData | time_taken: %lf millisecs", time_taken);
-}
+	ctp_md_send(this->_md, (void*)data);}
 
 // 询价详情通知
 void CustomMdSpi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp)
