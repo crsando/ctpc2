@@ -11,10 +11,66 @@
 
 #include "assert.h"
 
+#include <errno.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
 extern "C" {
 #include "log.h"
 #include "ctpc2.h"
 #include "macros.h"
+
+// CTP flow files (*.con) go to /dev/shm/<root>/<broker>/<user>/
+#define _FLOW_BASE_ "/dev/shm"
+
+// mkdir one level, then make sure it is a real directory owned by us
+static int ctp_flow_mkdir(const char * path) {
+    struct stat st;
+    if (mkdir(path, 0700) != 0 && errno != EEXIST) {
+        log_error("flow path | mkdir %s | %s", path, strerror(errno));
+        return -1;
+    }
+    if (lstat(path, &st) != 0) {
+        log_error("flow path | lstat %s | %s", path, strerror(errno));
+        return -1;
+    }
+    if (!S_ISDIR(st.st_mode) || st.st_uid != getuid()) {
+        log_error("flow path | %s is not a directory owned by uid %d", path, (int)getuid());
+        return -1;
+    }
+    return 0;
+}
+
+// build /dev/shm/<root>/<broker>/<user>/ (with trailing '/') and create it
+static int ctp_flow_path(char * out, size_t n, const char * root, const char * broker, const char * user) {
+    const char * parts[3] = { root, broker, user };
+    size_t len = (size_t)snprintf(out, n, "%s", _FLOW_BASE_);
+
+    for (int i = 0; i < 3; i++) {
+        const char * p = (parts[i] && parts[i][0]) ? parts[i] : "_";
+        if (strchr(p, '/') || strcmp(p, ".") == 0 || strcmp(p, "..") == 0) {
+            log_error("flow path | invalid component: %s", p);
+            return -1;
+        }
+        int r = snprintf(out + len, n - len, "/%s", p);
+        if (r < 0 || (size_t)r >= n - len) {
+            out[len] = '\0';
+            log_error("flow path | too long: %s/%s", out, p);
+            return -1;
+        }
+        len += (size_t)r;
+        if (ctp_flow_mkdir(out) != 0)
+            return -1;
+    }
+
+    if (len + 1 >= n) {
+        log_error("flow path | too long: %s/", out);
+        return -1;
+    }
+    out[len] = '/';
+    out[len + 1] = '\0';
+    return 0;
+}
 
 // MD API
 #define _api(md) ((CThostFtdcMdApi *)((md)->_api))
@@ -26,12 +82,18 @@ int ctp_md_start(ctp_md_t * md) {
         return 0;
     }
 
-    log_debug("ctp_md_start | init Spi/Api");
+    char flow[256];
+    if (ctp_flow_path(flow, sizeof(flow), "ctp_md", md->broker, md->user) != 0) {
+        log_error("ctp_md_start | flow path not ready, abort");
+        return 0;
+    }
+
+    log_debug("ctp_md_start | init Spi/Api | flow path %s", flow);
 
 	CustomMdSpi * pMdUserSpi = new CustomMdSpi();       // 创建行情回调实例
 
     // 我们需要保存这个member变量，这个变量在Login的过程中有用到
-	pMdUserSpi->g_pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();   // 创建行情实例
+	pMdUserSpi->g_pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi(flow);   // 创建行情实例
 	pMdUserSpi->g_pMdUserApi->RegisterSpi(pMdUserSpi);               // 注册事件类
 	pMdUserSpi->g_pMdUserApi->RegisterFront(md->front_addr);           // 设置行情前置地址
 	
@@ -128,7 +190,14 @@ int ctp_trader_start(ctp_trader_t * trader) {
 
     trader->connected = 0;
 
-    CThostFtdcTraderApi * pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi(); // 创建交易实例
+    char flow[256];
+    if (ctp_flow_path(flow, sizeof(flow), "ctp_trader", trader->broker, trader->user) != 0) {
+        log_error("ctp_trader_start | flow path not ready, abort");
+        return 0;
+    }
+    log_debug("ctp_trader_start | flow path %s", flow);
+
+    CThostFtdcTraderApi * pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi(flow); // 创建交易实例
 	CustomTradeSpi *pTradeSpi = new CustomTradeSpi;               // 创建交易回调实例
 
     pTradeSpi->_trader = trader;
