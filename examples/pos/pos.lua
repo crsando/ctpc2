@@ -5,12 +5,18 @@ local accounts = require "lctp2.accounts"
 
 local inspect = require "inspect"
 
-function root.boot()
+function root.boot(...)
+    local server; do 
+        local profile_name  = select(1, ...) or "gjta-3"
+        server = accounts["trader"][profile_name]
+    end
+
+    print(inspect {...})
 
     service.spawn { 
         name = "trader", 
         source = [[return require "lctp2.templates.ctp_trader"]], 
-        config = { server = accounts["trader"]["gtja-3"] } 
+        config = { server = server } 
     }
 
     service.call("trader", "start") -- blocking, until trader starts
