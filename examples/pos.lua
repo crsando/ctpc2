@@ -5,14 +5,32 @@ local accounts = require "lctp2.accounts"
 
 local inspect = require "inspect"
 
+local ffi = require("ffi")
+
+ffi.cdef[[
+  void* freopen(const char *filename, const char *mode, void *stream);
+  extern void *stderr;
+]]
+
+-- 重定向整个进程的 stderr 到 /dev/null
+local ok = ffi.C.freopen("/dev/null", "w", ffi.C.stderr)
+assert(ok ~= nil, "freopen failed")
+
 function root.boot(...)
     local server; do 
-        local profile_name  = select(1, ...) or "gjta-3"
-        server = accounts["trader"][profile_name]
+        local profile_name  = select(1, ...)
+	server = accounts["trader"][profile_name]
+    end
+    if not server then 
+	    print("no server given")
+    else 
+	    service.call(0, "run", server)
     end
 
-    print(inspect {...})
+    service.quit()
+end
 
+function root.run(server)
     service.spawn { 
         name = "trader", 
         source = [[return require "lctp2.templates.ctp_trader"]], 
@@ -25,7 +43,6 @@ function root.boot(...)
     print(inspect(position))
 
     service.call("trader", "quit")
-    service.quit()
 end 
 
 return root
