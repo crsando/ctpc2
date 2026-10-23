@@ -1,11 +1,66 @@
 local inspect = require "inspect"
 local service = require "service"
+local root = require "service.root"
+local scheduler = require "service.scheduler"
 
-local root_addr = service.new { 
-    source = "@services/root.lua", 
-    config = { } 
-}
+local ctp = require "lctp2"
 
-service.start(root_addr)
-service.send(service.get_id(root_addr), "boot")
-service.join(root_addr)
+local trader_id = nil
+
+--
+-- 从 ~/.tifa/accounts.lua 中读取服务器列表信息（包含用户名和密码）
+--
+local function load_accounts()
+    -- 获取家目录路径（兼容 Windows 和 Linux/macOS）
+    local home = os.getenv("HOME") or os.getenv("USERPROFILE")
+    if not home then return nil end
+
+    local filepath = home .. "/.tifa/accounts.lua"
+
+    -- 加载文件（此时只编译不执行）
+    local chunk, err = loadfile(filepath)
+    if not chunk then
+        error("failed loading: " .. tostring(err))
+    end
+
+    -- 执行文件，获取返回值
+    -- 假设 accounts.lua 结尾有 return 了一个 table
+    local accounts = chunk() 
+    return accounts
+end
+
+local function boot()
+    local accounts = load_accounts()
+
+    ctp.log_debug("booting root")
+    service.spawn { name = "collector", source = "@services/collector.lua", config = { 
+            server = accounts["collector"]["hy"],
+        } }
+
+    service.call("collector", "start")
+    service.call("collector", "subscribe", "sc2701")
+
+    service.spawn { name = "trader", source = "@services/trader.lua", config = {
+            server = accounts["trader"]["gtja-3"],
+        } }
+    local rsp = service.call("trader", "start") -- blocking, until trader starts
+
+    -- service.spawn { name = "gateway", source = "@services/gateway.lua", config = { } }
+
+    -- service.spawn { name = "book", source = "@services/book.lua", config = { } }
+    -- service.call("book", "init")
+end
+
+function root.boot()
+    boot()
+    -- service.send(0, "quit")
+end
+
+function root.quit()
+    ctp.log_debug("root is quiting")
+    service.send("collector", "quit")
+    service.send("trader", "quit")
+    service.quit()
+end
+
+return root
