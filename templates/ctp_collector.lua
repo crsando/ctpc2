@@ -64,14 +64,13 @@ function S.unsubscribe(symbols)
     return 1
 end
 
-local function on_tick(tick)
-    quotes[tick.InstrumentID] = tick.LastPrice
-    -- ctp.log_debug("on_tick | %s | %f", tick.InstrumentID, tick.LastPrice)
-    -- print("on_tick", inspect(tick))
-end
-
 function S.get_quotes()
     return quotes
+end
+
+-- default implementation, needs reload
+function S.on_tick(tick)
+    quotes[tick.InstrumentID] = tick.LastPrice
 end
 
 function service.on_idle()
@@ -81,9 +80,7 @@ function service.on_idle()
         if tick == nil then 
             break 
         end
-        if tick ~= nil then 
-            on_tick(tick)
-        end
+        S.on_tick(tick)
     end
 end
 
